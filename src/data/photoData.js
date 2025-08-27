@@ -1,0 +1,20 @@
+export const carsPhotos = [
+    { src: "/photoAssets/cars/car1.avif", title: "Classic Mustang" },
+    { src: "/photoAssets/cars/car2.avif", title: "Sports Coupe" },
+  ];
+  
+  export const portraitsPhotos = [
+    { src: "/photoAssets/portraits/portrait1.avif", title: "Smile" },
+    { src: "/photoAssets/portraits/portrait2.avif", title: "Thinking" },
+  ];
+  
+  export const dronesPhotos = [
+    { src: "/photoAssets/drones/drone1.avif", title: "City Skyline" },
+    { src: "/photoAssets/drones/drone2.avif", title: "Forest Aerial" },
+  ];
+  
+  export const photoCategories = [
+    { name: "Cars", path: "/photography/cars", thumbnail: "/photoAssets/cars/car1.avif" },
+    { name: "Portraits", path: "/photography/portraits", thumbnail: "/photoAssets/portraits/portrait1.avif" },
+    { name: "Drones", path: "/photography/drones", thumbnail: "/photoAssets/drones/drone1.avif" },
+  ];
