@@ -1,6 +1,7 @@
 import React from 'react';
 import './AboutPage.scss';
 import Nav from '../../Components/Nav/Nav';
+import Footer from '../../Components/Footer/Footer';
 function AboutPage() {
   return (
     <>
@@ -46,6 +47,7 @@ function AboutPage() {
           />
         </div>
       </div>
+      <Footer></Footer>
     </div>
     </>
   );

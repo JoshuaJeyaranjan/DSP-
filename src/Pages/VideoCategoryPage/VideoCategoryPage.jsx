@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import VideoGallery from '../../Components/VideoGallery/VideoGallery'
 import { landscapeVideos, droneVideos, shortVideos } from '../../data/videoData'
 import Nav from '../../Components/Nav/Nav'
+import Footer from '../../Components/Footer/Footer';
 const videoMap = {
   landscape: landscapeVideos,
   drone: droneVideos,
@@ -24,6 +25,7 @@ function VideoCategoryPage() {
       <h1>{category.charAt(0).toUpperCase() + category.slice(1)} Videos</h1>
       <VideoGallery videos={videos} />
     </div>
+    <Footer></Footer>
     </>
   )
 }

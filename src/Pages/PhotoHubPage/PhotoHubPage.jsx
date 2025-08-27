@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { photoCategories } from "../../data/photoData";
 import './PhotoHubPage.scss'
 import Nav from "../../Components/Nav/Nav";
+import Footer from '../../Components/Footer/Footer';
 function PhotoHubPage() {
   return (
     <>
@@ -18,6 +19,7 @@ function PhotoHubPage() {
         ))}
       </div>
     </div>
+    <Footer></Footer>
     </>
   );
 }

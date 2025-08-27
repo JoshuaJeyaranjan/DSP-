@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
 import './ContactPage.scss';
 import Nav from '../../Components/Nav/Nav';
-
+import Footer from '../../Components/Footer/Footer';
 function ContactPage() {
   const [formStatus, setFormStatus] = useState('');
 
@@ -54,6 +54,7 @@ function ContactPage() {
         {formStatus && <p className="form-status">{formStatus}</p>}
       </form>
     </div>
+    <Footer></Footer>
     </>
   );
 }

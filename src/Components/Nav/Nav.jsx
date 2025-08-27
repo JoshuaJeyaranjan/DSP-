@@ -65,6 +65,9 @@ function Nav() {
             <NavLink to="/video" className="nav__link" onClick={closeMobileMenu}>
               Video
             </NavLink>
+            <NavLink to="/photography" className="nav__link" onClick={closeMobileMenu}>
+              Photography
+            </NavLink>
             <NavLink to="/about" className="nav__link" onClick={closeMobileMenu}>
               About
             </NavLink>
