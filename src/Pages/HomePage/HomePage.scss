@@ -1,0 +1,31 @@
+.home {
+    background-image: url('/photoAssets/home-hero.avif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; // optional: make it full viewport height
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    &__title{
+        padding-top: 50%;
+        margin-bottom: 2rem;
+    }
+    
+    &__link{
+        text-decoration: none;
+        color: white;
+        padding: 1rem;
+        border: 1px solid black;
+        border-radius: 10px;
+        margin-top: 4rem;
+        background-color: gray;
+    }
+
+  }
+.text{
+    color: white;
+}
+  
