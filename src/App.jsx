@@ -8,7 +8,7 @@ import AboutPage from './Pages/AboutPage/AboutPage'
 import PhotoCategoryPage from './Pages/PhotoCategoryPage/PhotoCategoryPage'
 import VideoCategoryPage from './Pages/VideoCategoryPage/VideoCategoryPage'
 import { ThemeProvider } from './context/ThemeContext'
-
+import '../src/styles/main.scss'
 function App() {
   return (
     <ThemeProvider>

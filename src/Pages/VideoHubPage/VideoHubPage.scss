@@ -1,19 +1,19 @@
 .video-hub-page {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+    
+    
   
     h1 {
       text-align: center;
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: var(--color-text-primary);
+      color: white !important;
     }
   
     p {
       text-align: center;
       margin-bottom: 2rem;
-      color: var(--color-text-secondary);
+      // color: var(--color-text-secondary);
     }
   
     .video-categories {
@@ -74,12 +74,12 @@
   }
   .photo-hub-page,
 .video-hub-page {
-  padding: 2rem;
+  
 
   h1 {
     text-align: center;
     margin-bottom: 2rem;
-    color: var(--color-text-primary);
+    color: white;
     font-size: 2rem;
   }
 
@@ -114,8 +114,36 @@
 
     h2 {
       margin: 0.5rem 0;
-      color: var(--color-text-primary);
+      color: var(--color-white);
       font-size: 1.1rem;
     }
   }
+}
+
+
+.hero{
+
+  position: relative;
+  min-height: 66vh;
+  background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.6)
+  ); // darker at bottom
+  z-index: 1;
+}
+
+.title{
+  color: var(--color-white);
+  z-index: 2;
+  font-weight: 100
+  ;
 }

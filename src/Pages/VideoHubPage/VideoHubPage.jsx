@@ -7,14 +7,20 @@ import Footer from '../../Components/Footer/Footer';
 function VideoHubPage() {
   return (
     <>
-    <Nav></Nav>
+    <Nav overlay></Nav>
+    
     <div className="video-hub-page">
-      <h1>Video Portfolio</h1>
+      <div className="hero">
+      <div className="overlay"></div>
+      <h1 className="title">FILM</h1>
+      </div>
+      
       <div className="video-categories">
         {videoCategories.map((category, idx) => (
           <Link to={category.path} className="video-category-card" key={idx}>
-            <img src={category.thumbnail} alt={category.name} />
             <h2>{category.name}</h2>
+            <img src={category.thumbnail} alt={category.name} />
+            
           </Link>
         ))}
       </div>

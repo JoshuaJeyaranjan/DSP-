@@ -25,8 +25,7 @@ function VideoGallery({ videos, videosPerPage = 6 }) {
                 loading="lazy"
               />
             </div>
-            {video.title && <h3>{video.title}</h3>}
-            {video.description && <p>{video.description}</p>}
+       
           </div>
         ))}
       </div>

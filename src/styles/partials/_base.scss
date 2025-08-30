@@ -1,0 +1,22 @@
+
+
+html,body {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 16px; // or whatever base size
+    line-height: 1.5;
+    // color: $text-color; // from your _variables.scss
+    // background-color: $background-color;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700; // make headings bold by default
+    line-height: 1.2;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+    font-weight: 400;
+    font-size: 1rem;
+  }
+  

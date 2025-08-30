@@ -1,71 +1,68 @@
 .photo-hub-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+  max-width: 1200px;
+
+  h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+
+  p {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--color-text-secondary);
+  }
+
+  .photo-categories {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .photo-category-card {
+      width: 300px;
+      text-decoration: none;
       color: var(--color-text-primary);
-    }
-  
-    p {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: var(--color-text-secondary);
-    }
-  
-    .photo-categories {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      flex-wrap: wrap;
-  
-      .photo-category-card {
-        width: 300px;
-        text-decoration: none;
-        color: var(--color-text-primary);
-        border: 1px solid var(--color-text-secondary);
-        border-radius: 8px;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background: var(--color-bg);
-  
-        &:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-  
-        .category-thumbnail {
-          width: 100%;
-          height: 180px;
-          object-fit: cover;
-        }
-  
-        h2 {
-          padding: 1rem;
-          margin: 0;
-          text-align: center;
-        }
+      border: 1px solid var(--color-text-secondary);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background: var(--color-bg);
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
       }
-    }
-  
-    @media (max-width: 900px) {
-      .photo-categories {
-        flex-direction: column;
-        align-items: center;
-  
-        .photo-category-card {
-          width: 90%;
-        }
+
+      .category-thumbnail {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      h2 {
+        padding: 1rem;
+        margin: 0;
+        text-align: center;
       }
     }
   }
-  .photo-hub-page,
-.video-hub-page {
-  padding: 2rem;
 
+  @media (max-width: 900px) {
+    .photo-categories {
+      flex-direction: column;
+      align-items: center;
+
+      .photo-category-card {
+        width: 90%;
+      }
+    }
+  }
+}
+
+.photo-hub-page,
+.video-hub-page {
   h1 {
     text-align: center;
     margin-bottom: 2rem;
@@ -75,8 +72,10 @@
 
   .photo-categories,
   .video-categories {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     gap: 1.5rem;
   }
 
@@ -108,4 +107,85 @@
       font-size: 1.1rem;
     }
   }
+}
+
+/* ---------------- Hero Section ---------------- */
+.hero {
+  position: relative;
+  min-height: 66vh;
+  background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transition: background 0.4s ease-in-out;
+  }
+
+  .title {
+    z-index: 2;
+    font-weight: 100;
+    font-size: 3rem;
+    text-align: center;
+    transition: color 0.4s ease-in-out;
+  }
+}
+/* Theme-aware hero + title — robust selectors covering common toggles */
+
+/* Light mode (default if data-theme !== "dark" or class .light/.theme-light present) */
+body:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
+html:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
+.theme-light .photo-hub-page .hero .overlay,
+.light .photo-hub-page .hero .overlay,
+[data-theme="light"] .photo-hub-page .hero .overlay {
+  /* dark overlay for light mode so white title reads well */
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0.65)
+  );
+  transition: background 0.35s ease-in-out;
+}
+
+body:not([data-theme="dark"]) .photo-hub-page .hero .title,
+html:not([data-theme="dark"]) .photo-hub-page .hero .title,
+.theme-light .photo-hub-page .hero .title,
+.light .photo-hub-page .hero .title,
+[data-theme="light"] .photo-hub-page .hero .title {
+  color: #ffffff !important; /* white title on light theme (with dark overlay) */
+  transition: color 0.35s ease-in-out;
+}
+
+/* Dark mode */
+body[data-theme="dark"] .photo-hub-page .hero .overlay,
+html[data-theme="dark"] .photo-hub-page .hero .overlay,
+.theme-dark .photo-hub-page .hero .overlay,
+.dark .photo-hub-page .hero .overlay,
+[data-theme="dark"] .photo-hub-page .hero .overlay {
+  /* light overlay for dark mode so dark title reads well */
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.28)
+  );
+  transition: background 0.35s ease-in-out;
+}
+
+body[data-theme="dark"] .photo-hub-page .hero .title,
+html[data-theme="dark"] .photo-hub-page .hero .title,
+.theme-dark .photo-hub-page .hero .title,
+.dark .photo-hub-page .hero .title,
+[data-theme="dark"] .photo-hub-page .hero .title {
+  color: #0b0b0b !important; /* dark title on dark mode (with light overlay) */
+  transition: color 0.35s ease-in-out;
+}
+
+/* Safety: make sure title sits above overlay */
+.photo-hub-page .hero .title {
+  position: relative;
+  z-index: 2;
+}
+.photo-hub-page .hero .overlay {
+  z-index: 1;
 }

@@ -2,64 +2,91 @@
 @use "../../styles/partials/mixins" as *;
 
 .footer {
-    // background: var(--color-bg);
-    // color: var(--color-text-secondary);
-    text-align: center;
-    padding: 2rem 1rem;
-    // border-top: 1px solid var(--color-text-secondary);
-  
-    &__top {
-      margin-bottom: 1rem;
-  
-      .footer__back-to-top {
-        // background: var(--color-primary);
-        // color: var(--color-bg);
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: transform 0.2s ease, background 0.2s ease;
-  
-        &:hover {
-          transform: translateY(-2px);
-        //   background: darken(var(--color-primary), 10%);
-        }
-      }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: background 0.25s ease, color 0.25s ease;
+
+  &__copyright {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__socials {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  &__social-link {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__icon {
+    width: 1.25rem;
+    height: auto;
+    display: block;
+    transition: filter 200ms ease, opacity 200ms ease;
+  }
+
+  /* Back to top button - default (light mode) = black */
+  &__back-to-top {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.25s ease;
+    color: black;             /* default: black */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    line-height: 1;
+    border-radius: 6px;
+
+    &:hover {
+      transform: translateY(-2px);
     }
-  
-    &__content {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: center;
-      font-size: 0.9rem;
-  
-      &__socials {
-        display: flex;
-        gap: 1.5rem;
-        margin-top: 0.5rem;
-  
-        .footer__social-link {
-        //   color: var(--color-text-primary);
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.2s ease;
-  
-          &:hover {
-            // color: var(--color-primary);
-          }
-        }
-      }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+
+    /* arrow inherits the button color */
+    .arrow {
+      color: inherit;
+      display: inline-block;
+      font-size: 1.25rem;
+      line-height: 1;
+      margin: 0;
     }
   }
-  
-  @media (min-width: 768px) {
-    .footer__content {
-      flex-direction: row;
-      justify-content: space-between;
-      max-width: 1024px;
-      margin: 0 auto;
-      width: 100%;
-    }
-  }
+}
+
+/* Dark-mode overrides: explicitly make arrow white.
+   This set of selectors covers common patterns: data-theme on body/html, or classes .theme-dark/.dark.
+   If you use a different toggler, add it here. */
+body[data-theme="dark"] .footer__back-to-top,
+html[data-theme="dark"] .footer__back-to-top,
+.theme-dark .footer__back-to-top,
+.dark .footer__back-to-top,
+[data-theme="dark"] .footer__back-to-top {
+  color: white;
+}
+
+/* Also invert the social icon in dark mode so SVGs stay visible */
+body[data-theme="dark"] .footer__icon,
+html[data-theme="dark"] .footer__icon,
+.theme-dark .footer__icon,
+.dark .footer__icon,
+[data-theme="dark"] .footer__icon {
+  filter: invert(1) saturate(0.7);
+}

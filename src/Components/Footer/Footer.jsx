@@ -7,36 +7,34 @@ function Footer() {
   };
 
   return (
-    <footer className="footer">
-      <div className="footer__top">
-        <button className="footer__back-to-top" onClick={scrollToTop}>
-          Back to Top ↑
+    <footer className="footer" role="contentinfo">
+      <p className="footer__copyright">
+        &copy; {new Date().getFullYear()} DFS Vision. All rights reserved.
+      </p>
+
+      <div className="footer__socials">
+        <a
+          href="https://www.instagram.com/dfs.vision/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer__social-link"
+          aria-label="Instagram"
+        >
+          <img
+            className="footer__icon"
+            src="/photoAssets/instagram.svg"
+            alt="Instagram"
+          />
+        </a>
+
+        <button
+          className="footer__back-to-top"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          type="button"
+        >
+          <span className="arrow">↑</span>
         </button>
-      </div>
-
-      <div className="footer__content">
-        <p className="footer__copyright">
-          &copy; {new Date().getFullYear()} Joshua Jey Photography. All rights reserved.
-        </p>
-
-        <div className="footer__socials">
-          <a
-            href="https://www.instagram.com/joshuajeyphotography"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer__social-link"
-          >
-            Instagram
-          </a>
-          <a
-            href="https://www.youtube.com/channel/UCXXXXX"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="footer__social-link"
-          >
-            YouTube
-          </a>
-        </div>
       </div>
     </footer>
   );

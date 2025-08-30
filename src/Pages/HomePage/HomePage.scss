@@ -1,31 +1,65 @@
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
+
 .home {
-    background-image: url('/photoAssets/home-hero.avif');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh; // optional: make it full viewport height
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+  position: relative;
+  height: 100vh;
+  background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
 
-    &__title{
-        padding-top: 50%;
-        margin-bottom: 2rem;
-    }
-    
-    &__link{
-        text-decoration: none;
-        color: white;
-        padding: 1rem;
-        border: 1px solid black;
-        border-radius: 10px;
-        margin-top: 4rem;
-        background-color: gray;
-    }
-
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.4),
+      rgba(0, 0, 0, 0.6)
+    ); // darker at bottom
+    z-index: 1;
   }
-.text{
+
+  &__content {
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem;
+  }
+
+  &__title {
+    font-family: "Montserrat", sans-serif;
+    color: var(--color-primary-light);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-weight: 100;
+  }
+
+  &__subtitle {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 300;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: 2.5rem;
     color: white;
+  }
+
+  &__link {
+    display: inline-block;
+    font-family: "Montserrat", sans-serif;
+    text-decoration: none;
+    padding: 0.75rem 2rem;
+    border: 2px solid white;
+    border-radius: 50px;
+    font-weight: 500;
+    color: white;
+    background: transparent;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: white;
+      color: black;
+      transform: translateY(-3px);
+    }
+  }
 }
-  

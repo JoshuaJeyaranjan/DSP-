@@ -32,6 +32,10 @@ function ContactPage() {
     <div className="contact-page">
       <h1>Contact Me</h1>
       <p>Send a message and I’ll get back to you as soon as possible.</p>
+      <div className="image-container">
+      <img className='contact__image' src="public/photoAssets/about-placeholder.avif" alt="" />
+      </div>
+      
 
       <form className="contact-form" onSubmit={handleSubmit}>
         <label>

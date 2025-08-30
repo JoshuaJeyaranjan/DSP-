@@ -1,15 +1,17 @@
 // -------------------------------------------------------------
 // 1. BREAKPOINTS
 // -------------------------------------------------------------
-$mobile-breakpoint: 767px;
+// $mobile-breakpoint: 767px;
 $tablet-breakpoint: 768px;
 $desktop-breakpoint: 1024px; // Changed from 1280px for consistency
 
 // -------------------------------------------------------------
 // 2. FONT STACKS & TYPOGRAPHY
 // -------------------------------------------------------------
-$font-heading: 'Italiana', serif;
-$font-body: 'Poppins', sans-serif;
+// Fonts
+$font-heading: 'Montserrat', sans-serif;
+$font-body: 'Montserrat', sans-serif; // or choose another if you want contrast later
+
 
 $font-weight-light: 300;
 $font-weight-regular: 400;
@@ -170,7 +172,7 @@ $transition-slow: 0.6s ease-out;
   --color-surface: var(--color-primary-light);
   --color-surface-secondary: var(--color-secondary-light);
 
-  --color-text-primary: #212529;
+  --color-text-primary: #ffffff;
   --color-text-secondary: #808080;
 
   --color-border: var(--color-primary-mid);
@@ -186,6 +188,9 @@ $transition-slow: 0.6s ease-out;
   --color-success: $primary-green
   --color-black: #000000;
   --color-overlay: rgba(0, 0, 0, 0.9);
+
+  --nav-link-color: var(--color-black);
+  --nav-hamburger-color: black;
 
   --nav-gradient: linear-gradient(
     270deg,
@@ -227,6 +232,9 @@ $transition-slow: 0.6s ease-out;
 
   --color-error: #e53e3e;
   --color-error-background: #721c24;
+
+  --nav-link-color: var(--color-black);
+  --nav-hamburger-color: var(--color-black);
 
   --color-white: #000000;
   --color-black: #ffffff;

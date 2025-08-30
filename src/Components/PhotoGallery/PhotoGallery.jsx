@@ -16,7 +16,7 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
         {currentPhotos.map((photo, idx) => (
           <div className="photo-card" key={idx}>
             <img src={photo.src} alt={photo.title} loading="lazy" />
-            {photo.title && <p>{photo.title}</p>}
+            
           </div>
         ))}
       </div>

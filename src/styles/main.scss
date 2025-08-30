@@ -1,0 +1,29 @@
+@import './partials/variables';
+@import './partials/mixins';
+@import './partials/reset';
+@import './partials/base';
+
+
+
+html, body {
+    font-family: $font-body;
+    font-size: 16px;
+    line-height: 1.6;
+    background: var(--color-white);
+    color: var(--color-black);
+  }
+  
+  // Headings
+  h1, h2, h3, h4, h5, h6 {
+    font-family: $font-heading;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+    color: var(--color-white);
+  }
+  
+  p {
+    margin-bottom: 1rem;
+    font-weight: 400;
+    font-size: 1rem;
+  }

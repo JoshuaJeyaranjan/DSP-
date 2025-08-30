@@ -10,7 +10,8 @@
       h1 {
         font-size: 2.5rem;
         margin-bottom: 1rem;
-        color: var(--color-text-primary);
+        color: var(--color-black);
+        font-weight: 100;
       }
   
       p {
@@ -23,12 +24,12 @@
     .about-content {
       display: flex;
       flex-direction: column;
-      gap: 4rem;
+      gap: 2rem;
   
       .about-section {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: 1rem;
   
         &.reverse {
           flex-direction: row-reverse;
