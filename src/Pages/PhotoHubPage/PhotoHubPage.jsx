@@ -17,7 +17,8 @@ function PhotoHubPage() {
       <div className="photo-categories">
         {photoCategories.map((category, idx) => (
           <Link to={category.path} className="photo-category-card" key={idx}>
-            <h2>{category.name}</h2>
+            <h2 className="category-title">{category.name}</h2>
+
             <img src={category.thumbnail} alt={category.name} />
             
           </Link>

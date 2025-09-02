@@ -18,7 +18,7 @@ function VideoHubPage() {
       <div className="video-categories">
         {videoCategories.map((category, idx) => (
           <Link to={category.path} className="video-category-card" key={idx}>
-            <h2>{category.name}</h2>
+            <h2 className="category-title">{category.name}</h2>
             <img src={category.thumbnail} alt={category.name} />
             
           </Link>

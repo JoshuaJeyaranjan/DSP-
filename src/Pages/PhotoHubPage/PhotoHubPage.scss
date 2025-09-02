@@ -1,11 +1,22 @@
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
+
+/* Page container — center the whole thing in the viewport */
 .photo-hub-page {
   max-width: 1200px;
+  margin: 0 auto;                  /* <-- centers the page container */
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;    
+  padding-top: 0rem;
+  margin-top: 0rem;         /* <-- centers children horizontally */
 
   h1 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: var(--color-text-primary);
+    color: var(--color-black);
   }
 
   p {
@@ -14,44 +25,56 @@
     color: var(--color-text-secondary);
   }
 
+  /* Categories container */
   .photo-categories {
+    width: 100%;                   /* full-width inside the centered container */
+    max-width: 1100px;             /* keeps row content constrained for very wide screens */
     display: flex;
     gap: 2rem;
-    justify-content: center;
+    justify-content: center;       /* <-- centers the cards horizontally */
     flex-wrap: wrap;
+    padding: 1rem 0;
+    margin: 0 auto;    
+    flex-direction: row;
+                /* extra insurance for centering */
 
     .photo-category-card {
       width: 300px;
       text-decoration: none;
       color: var(--color-text-primary);
-      border: 1px solid var(--color-text-secondary);
-      border-radius: 8px;
       overflow: hidden;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       background: var(--color-bg);
 
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+
       &:hover {
         transform: translateY(-5px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
       }
 
-      .category-thumbnail {
+      img {
         width: 100%;
         height: 180px;
         object-fit: cover;
+        display: block;
       }
 
       h2 {
         padding: 1rem;
         margin: 0;
-        text-align: center;
+        font-weight: 100;
+        color: var(--color-text-primary);
       }
     }
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: $tablet-breakpoint) {
     .photo-categories {
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
 
       .photo-category-card {
@@ -61,6 +84,7 @@
   }
 }
 
+/* Shared styles for hub pages (kept tidy) */
 .photo-hub-page,
 .video-hub-page {
   h1 {
@@ -72,18 +96,20 @@
 
   .photo-categories,
   .video-categories {
+    /* the layout is already handled above for photo-hub; this is a fallback */
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     padding-top: 1rem;
     padding-bottom: 1rem;
     gap: 1.5rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
   }
 
   .photo-category-card,
   .video-category-card {
     background: var(--color-bg);
-    border: 1px solid var(--color-text-secondary);
-    border-radius: 8px;
     overflow: hidden;
     text-align: center;
     cursor: pointer;
@@ -91,7 +117,7 @@
 
     &:hover {
       transform: scale(1.03);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
     }
 
     img {
@@ -103,8 +129,9 @@
 
     h2 {
       margin: 0.5rem 0;
-      color: var(--color-text-primary);
       font-size: 1.1rem;
+      font-weight: 100;
+      color: var(--color-text-primary);
     }
   }
 }
@@ -112,17 +139,19 @@
 /* ---------------- Hero Section ---------------- */
 .hero {
   position: relative;
-  min-height: 66vh;
+  min-width: 100vw;
   background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 
   .overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
     transition: background 0.4s ease-in-out;
+    width: 100%;
   }
 
   .title {
@@ -133,19 +162,15 @@
     transition: color 0.4s ease-in-out;
   }
 }
-/* Theme-aware hero + title — robust selectors covering common toggles */
 
-/* Light mode (default if data-theme !== "dark" or class .light/.theme-light present) */
+/* Theme-aware overlays + titles (keeps your existing approach) */
+/* Light mode */
 body:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 .theme-light .photo-hub-page .hero .overlay,
 .light .photo-hub-page .hero .overlay,
 [data-theme="light"] .photo-hub-page .hero .overlay {
-  /* dark overlay for light mode so white title reads well */
-  background: linear-gradient(
-    rgba(0, 0, 0, 0.45),
-    rgba(0, 0, 0, 0.65)
-  );
+  background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28));
   transition: background 0.35s ease-in-out;
 }
 
@@ -154,7 +179,7 @@ html:not([data-theme="dark"]) .photo-hub-page .hero .title,
 .theme-light .photo-hub-page .hero .title,
 .light .photo-hub-page .hero .title,
 [data-theme="light"] .photo-hub-page .hero .title {
-  color: #ffffff !important; /* white title on light theme (with dark overlay) */
+  color: black !important;
   transition: color 0.35s ease-in-out;
 }
 
@@ -164,11 +189,7 @@ html[data-theme="dark"] .photo-hub-page .hero .overlay,
 .theme-dark .photo-hub-page .hero .overlay,
 .dark .photo-hub-page .hero .overlay,
 [data-theme="dark"] .photo-hub-page .hero .overlay {
-  /* light overlay for dark mode so dark title reads well */
-  background: linear-gradient(
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.28)
-  );
+  background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65));
   transition: background 0.35s ease-in-out;
 }
 
@@ -177,15 +198,23 @@ html[data-theme="dark"] .photo-hub-page .hero .title,
 .theme-dark .photo-hub-page .hero .title,
 .dark .photo-hub-page .hero .title,
 [data-theme="dark"] .photo-hub-page .hero .title {
-  color: #0b0b0b !important; /* dark title on dark mode (with light overlay) */
+  color: white !important;
   transition: color 0.35s ease-in-out;
 }
 
-/* Safety: make sure title sits above overlay */
-.photo-hub-page .hero .title {
-  position: relative;
-  z-index: 2;
+/* Category title color helpers */
+.category-title {
+  transition: color 0.3s ease;
 }
-.photo-hub-page .hero .overlay {
-  z-index: 1;
+
+body:not([data-theme="dark"]) .category-title,
+html:not([data-theme="dark"]) .category-title,
+[data-theme="light"] .category-title {
+  color: black;
+}
+
+body[data-theme="dark"] .category-title,
+html[data-theme="dark"] .category-title,
+[data-theme="dark"] .category-title {
+  color: white;
 }

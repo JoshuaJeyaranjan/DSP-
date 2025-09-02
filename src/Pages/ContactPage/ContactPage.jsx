@@ -30,10 +30,12 @@ function ContactPage() {
     <> 
     <Nav></Nav>
     <div className="contact-page">
+      <div className="contact-preamble">
       <h1>Contact Me</h1>
       <p>Send a message and I’ll get back to you as soon as possible.</p>
       <div className="image-container">
       <img className='contact__image' src="public/photoAssets/about-placeholder.avif" alt="" />
+      </div>
       </div>
       
 

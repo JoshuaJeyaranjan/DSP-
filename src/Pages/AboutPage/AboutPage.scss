@@ -1,78 +1,83 @@
 .about-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-  
-    .about-hero {
-      text-align: center;
-      margin-bottom: 3rem;
-  
-      h1 {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--color-black);
-        font-weight: 100;
-      }
-  
-      p {
-        font-size: 1.1rem;
-        color: var(--color-text-secondary);
-        line-height: 1.6;
-      }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  padding-top: 0rem;
+
+  .about-hero {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--color-black);
+      font-weight: 100;
     }
-  
-    .about-content {
+
+    p {
+      font-size: 1.1rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .about-section {
       display: flex;
-      flex-direction: column;
-      gap: 2rem;
-  
-      .about-section {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-  
-        &.reverse {
-          flex-direction: row-reverse;
-        }
-  
-        .about-image {
-          width: 50%;
-          border-radius: 8px;
-          object-fit: cover;
-        }
-  
-        .about-text {
-          width: 50%;
-  
-          h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.75rem;
-            color: var(--color-text-primary);
-          }
-  
-          p {
-            font-size: 1rem;
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-          }
+      flex-direction: column; // default: column for mobile
+      align-items: center;
+      gap: 1rem;
+
+      .about-image {
+        width: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .about-text {
+        width: 100%;
+        text-align: center;
+
+        p {
+          font-size: 1rem;
+          color: var(--color-text-secondary);
+          line-height: 1.6;
         }
       }
     }
-  
-    @media (max-width: 900px) {
-      .about-content .about-section,
-      .about-content .about-section.reverse {
-        flex-direction: column;
-        text-align: center;
-  
+
+    // Desktop layout
+    @media (min-width: 901px) {
+      .about-section {
+        flex-direction: row; // image left, text right
+        align-items: center;
+        text-align: left;
+        gap: 2rem;
+        justify-content: center;
+        padding-bottom: 3rem;
+
         .about-image,
         .about-text {
-          width: 100%;
+          width: 50%;
+          gap: 2rem;
+          
         }
-  
+
         .about-text {
-          margin-top: 1rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
       }
     }
   }
+}
+
+.about-title{
+  padding: 0rem;
+  margin: 0rem;
+}

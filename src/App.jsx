@@ -9,6 +9,7 @@ import PhotoCategoryPage from './Pages/PhotoCategoryPage/PhotoCategoryPage'
 import VideoCategoryPage from './Pages/VideoCategoryPage/VideoCategoryPage'
 import { ThemeProvider } from './context/ThemeContext'
 import '../src/styles/main.scss'
+import ReviewPage from './Pages/ReviewPage/ReviewPage'
 function App() {
   return (
     <ThemeProvider>
@@ -18,6 +19,7 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
+          <Route path='/reviews' element={<ReviewPage />} />
 
           {/* Video Section */}
           <Route path='/video' element={<VideoHubPage />} />
