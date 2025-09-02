@@ -57,7 +57,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: white;
+      background: $primary-gold;
       color: black;
       transform: translateY(-3px);
     }

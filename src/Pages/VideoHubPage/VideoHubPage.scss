@@ -1,20 +1,25 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
+/* -------------------------
+   Video Hub Page (complete)
+   ------------------------- */
+
 .video-hub-page {
-  max-width: 1200px;
+  
   margin: 0 auto;
-  padding: 2rem 1rem;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
 
+  /* Page heading (used by other pages too) */
   h1 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: var(--color-white) !important;
     font-weight: 100;
+    transition: color 0.35s ease-in-out;
   }
 
   p {
@@ -74,6 +79,7 @@
         font-size: 1.25rem;
         font-weight: 400;
         color: var(--color-text-primary);
+        transition: color 0.25s ease;
       }
 
       p {
@@ -93,6 +99,7 @@
 
     .video-category-card {
       max-width: 100%;
+
       .category-thumbnail,
       img {
         height: 220px;
@@ -101,8 +108,8 @@
   }
 }
 
-/* ---------------- Hero Section ---------------- */
-.hero {
+/* ---------------- Hero Section (video page) ---------------- */
+.video-hub-page .hero {
   position: relative;
   min-height: 66vh;
   background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
@@ -115,7 +122,7 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    transition: background 0.4s ease-in-out;
+    transition: background 0.35s ease-in-out;
     width: 100%;
   }
 
@@ -124,64 +131,74 @@
     font-weight: 100;
     font-size: 3rem;
     text-align: center;
-    transition: color 0.4s ease-in-out;
-    color: var(--color-white);
+    transition: color 0.35s ease-in-out;
+    /* color set via theme-specific rules below */
   }
 }
 
-/* Theme-aware overlay + title */
+/* ---------------- Theme rules for hero and titles ---------------- */
 
-/* Light mode — darker overlay so white title reads well */
+/* Light mode: use a light overlay so dark text reads well */
 body:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 .theme-light .video-hub-page .hero .overlay,
 .light .video-hub-page .hero .overlay,
 [data-theme="light"] .video-hub-page .hero .overlay {
-  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
-  transition: background 0.35s ease-in-out;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.28)
+  );
 }
 
+/* Light mode: title = black */
 body:not([data-theme="dark"]) .video-hub-page .hero .title,
 html:not([data-theme="dark"]) .video-hub-page .hero .title,
 .theme-light .video-hub-page .hero .title,
 .light .video-hub-page .hero .title,
 [data-theme="light"] .video-hub-page .hero .title {
-  color: var(--color-white) !important;
-  transition: color 0.35s ease-in-out;
+  color: black;
 }
 
-/* Dark mode — lighter overlay so dark title reads well */
+/* Dark mode: use a dark overlay so white text reads well */
 body[data-theme="dark"] .video-hub-page .hero .overlay,
 html[data-theme="dark"] .video-hub-page .hero .overlay,
 .theme-dark .video-hub-page .hero .overlay,
 .dark .video-hub-page .hero .overlay,
 [data-theme="dark"] .video-hub-page .hero .overlay {
-  background: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
-  transition: background 0.35s ease-in-out;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0.65)
+  );
 }
 
+/* Dark mode: title = white */
 body[data-theme="dark"] .video-hub-page .hero .title,
 html[data-theme="dark"] .video-hub-page .hero .title,
 .theme-dark .video-hub-page .hero .title,
 .dark .video-hub-page .hero .title,
 [data-theme="dark"] .video-hub-page .hero .title {
-  color: var(--color-black) !important;
-  transition: color 0.35s ease-in-out;
+  color: white;
 }
 
-/* Category title color helper */
-.category-title {
-  transition: color 0.28s ease;
+/* ---------------- Category title helpers (explicit) ---------------- */
+.video-hub-page .category-title {
+  transition: color 0.25s ease;
 }
 
-body:not([data-theme="dark"]) .category-title,
-html:not([data-theme="dark"]) .category-title,
-[data-theme="light"] .category-title {
-  color: var(--color-black);
+/* category title - light mode -> black */
+body:not([data-theme="dark"]) .video-hub-page .category-title,
+html:not([data-theme="dark"]) .video-hub-page .category-title,
+.theme-light .video-hub-page .category-title,
+.light .video-hub-page .category-title,
+[data-theme="light"] .video-hub-page .category-title {
+  color: black !important;
 }
 
-body[data-theme="dark"] .category-title,
-html[data-theme="dark"] .category-title,
-[data-theme="dark"] .category-title {
-  color: var(--color-white);
+/* category title - dark mode -> white */
+body[data-theme="dark"] .video-hub-page .category-title,
+html[data-theme="dark"] .video-hub-page .category-title,
+.theme-dark .video-hub-page .category-title,
+.dark .video-hub-page .category-title,
+[data-theme="dark"] .video-hub-page .category-title {
+  color: white !important;
 }

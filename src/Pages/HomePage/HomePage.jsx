@@ -18,7 +18,7 @@ const HomePage = () => {
           </Link>
         </div>
       </section>
-      <Footer />
+    <Footer />
     </>
   );
 };

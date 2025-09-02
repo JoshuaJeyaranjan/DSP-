@@ -3,9 +3,9 @@
 
 /* Page container — center the whole thing in the viewport */
 .photo-hub-page {
-  max-width: 1200px;
+  
   margin: 0 auto;                  /* <-- centers the page container */
-  padding: 2rem 1rem;
+  
   display: flex;
   flex-direction: column;
   align-items: center;    
@@ -137,9 +137,9 @@
 }
 
 /* ---------------- Hero Section ---------------- */
-.hero {
+.photo-hub-page .hero {
   position: relative;
-  min-width: 100vw;
+  min-height: 66vh;
   background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
   display: flex;
   align-items: center;
@@ -159,7 +159,7 @@
     font-weight: 100;
     font-size: 3rem;
     text-align: center;
-    transition: color 0.4s ease-in-out;
+    
   }
 }
 
@@ -179,7 +179,7 @@ html:not([data-theme="dark"]) .photo-hub-page .hero .title,
 .theme-light .photo-hub-page .hero .title,
 .light .photo-hub-page .hero .title,
 [data-theme="light"] .photo-hub-page .hero .title {
-  color: black !important;
+  color: black;
   transition: color 0.35s ease-in-out;
 }
 
@@ -198,23 +198,25 @@ html[data-theme="dark"] .photo-hub-page .hero .title,
 .theme-dark .photo-hub-page .hero .title,
 .dark .photo-hub-page .hero .title,
 [data-theme="dark"] .photo-hub-page .hero .title {
-  color: white !important;
+  color: white;
   transition: color 0.35s ease-in-out;
 }
 
+/* Category title color helpers */
 /* Category title color helpers */
 .category-title {
   transition: color 0.3s ease;
 }
 
-body:not([data-theme="dark"]) .category-title,
-html:not([data-theme="dark"]) .category-title,
+/* Light mode */
 [data-theme="light"] .category-title {
-  color: black;
+  color: black!important;
+  background-color: transparent; // remove red debug background
 }
 
-body[data-theme="dark"] .category-title,
-html[data-theme="dark"] .category-title,
+/* Dark mode */
 [data-theme="dark"] .category-title {
   color: white;
+  
 }
+

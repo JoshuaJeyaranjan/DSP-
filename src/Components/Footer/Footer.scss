@@ -34,6 +34,11 @@
     height: auto;
     display: block;
     transition: filter 200ms ease, opacity 200ms ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }
   }
 
   /* Back to top button - default (light mode) = black */
@@ -53,6 +58,7 @@
 
     &:hover {
       transform: translateY(-2px);
+      color: $primary-gold;
     }
 
     &:focus {
@@ -67,6 +73,11 @@
       font-size: 1.25rem;
       line-height: 1;
       margin: 0;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }
     }
   }
 }

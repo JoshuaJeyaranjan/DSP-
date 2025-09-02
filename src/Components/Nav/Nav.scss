@@ -1,9 +1,12 @@
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
+
 $nav-height: 80px;
 $breakpoint-mobile: 1000px;
 $transition-speed: 0.25s;
 
 // --- Mixins ---
-@mixin link-underline-effect($color: var(--color-text-primary)) {
+@mixin link-underline-effect($color: $primary-gold) {
   position: relative;
   padding-bottom: 0.25rem;
 
@@ -21,7 +24,7 @@ $transition-speed: 0.25s;
   }
 
   &:hover::after {
-    transform: scaleX(1);
+    transform: scaleX(1); 
     transform-origin: bottom left;
   }
 }
@@ -31,12 +34,15 @@ $transition-speed: 0.25s;
   width: 100%;
   display: flex;
   align-items: center;
+  
   justify-content: center;
   height: $nav-height;
   box-sizing: border-box;
   padding: 0 1rem;
   z-index: 1000;
-  transition: background $transition-speed ease, color $transition-speed ease, box-shadow $transition-speed ease;
+  transition: background $transition-speed ease,
+              color $transition-speed ease,
+              box-shadow $transition-speed ease;
 
   // inner container
   &__section {
@@ -56,8 +62,21 @@ $transition-speed: 0.25s;
   }
 
   // logo
-  &__logo-link { display: flex; align-items: center; text-decoration: none; }
-  &__logo { max-width: 4rem; height: auto; display: block; }
+  &__logo-link { display: flex; align-items: center; text-decoration: none; 
+  
+  
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+      
+    }}
+  &__logo { max-width: 4rem; height: auto; display: block; 
+  
+  
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }}
 
   // links
   &__links {
@@ -79,6 +98,7 @@ $transition-speed: 0.25s;
         padding: 2rem;
         min-height: 90vh;
         background: var(--color-white);
+        
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 999;
       }
@@ -87,14 +107,16 @@ $transition-speed: 0.25s;
 
   &__link {
     font-size: 1rem;
-    color: var(--color-black); // ✅ links now follow theme
+    color: var(--color-black);
     text-decoration: none;
     transition: color $transition-speed ease-in-out;
 
-    &:hover { color: var(--color-text-primary); }
+    // hover text color
+    &:hover { color: $primary-gold; }
 
+    // underline effect
     &:not(&--button):not(&--icon) {
-      @include link-underline-effect(var(--color-text-primary));
+      @include link-underline-effect($primary-gold);
     }
 
     &--icon img {
@@ -102,6 +124,11 @@ $transition-speed: 0.25s;
       width: 24px;
       transition: transform $transition-speed ease-in-out;
       display: block;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }
     }
   }
 
@@ -112,8 +139,7 @@ $transition-speed: 0.25s;
     justify-content: space-around;
     width: 2rem;
     height: 2rem;
-    background: transparent
-    ;
+    background: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
@@ -122,7 +148,7 @@ $transition-speed: 0.25s;
     span {
       width: 2rem;
       height: 3px;
-      background-color: var(--nav-hamburger-color); // ✅ follows theme now
+      background-color: var(--nav-hamburger-color);
       border-radius: 10px;
       transition: all 0.3s linear;
       transform-origin: 1px;
@@ -226,4 +252,27 @@ $transition-speed: 0.25s;
   transform: scale(1.75);
   transform-origin: center 40%;
   display: block;
+}
+
+.nav__link--active {
+  // color: goldenrod!important;
+  
+
+  &::after {
+    /* optional underline/pill */
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 3px;
+    color: goldenrod;
+  }
+}
+
+/* Ensure overlay/special nav variants keep visibility */
+.nav--overlay .nav__link--active {
+  // color: goldenrod;
 }
