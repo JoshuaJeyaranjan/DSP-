@@ -1,10 +1,9 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
-/* -------------------------
-   Video Hub Page (complete)
-   ------------------------- */
-
+/* ---------------------------
+   Video Hub Page
+   --------------------------- */
 .video-hub-page {
   
   margin: 0 auto;
@@ -13,13 +12,12 @@
   flex-direction: column;
   align-items: center;
 
-  /* Page heading (used by other pages too) */
   h1 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
     font-weight: 100;
-    transition: color 0.35s ease-in-out;
   }
 
   p {
@@ -28,40 +26,45 @@
     color: var(--color-text-secondary);
   }
 
-  /* Responsive grid for video category cards */
+  /* Categories container */
   .video-categories {
     width: 100%;
-    max-width: 1100px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    
     gap: 1.5rem;
     padding: 1rem 0;
+    margin: 0 auto;
     justify-items: center;
-    align-items: start;
+    align-items: center;
+    justify-self: center;
+    align-self: center;
+    margin-left: auto;
   }
 
   .video-category-card {
     width: 100%;
     max-width: 320px;
-    text-decoration: none;
-    color: var(--color-text-primary);
-    overflow: hidden;
-    transition: transform 0.28s ease, box-shadow 0.28s ease;
     background: var(--color-bg);
     border-radius: 8px;
-    border: 1px solid var(--color-text-secondary);
+    border: 1px solid rgba(0,0,0,0.04);
+    overflow: hidden;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    text-align: left;
+    cursor: pointer;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: paint;
 
     &:hover {
       transform: translateY(-6px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     }
 
-    .category-thumbnail,
-    img {
+    img,
+    .category-thumbnail {
       width: 100%;
       height: 180px;
       object-fit: cover;
@@ -73,13 +76,14 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      justify-content: center;
+      align-items: center;
 
       h2 {
         margin: 0;
         font-size: 1.25rem;
-        font-weight: 400;
+        font-weight: 100;
         color: var(--color-text-primary);
-        transition: color 0.25s ease;
       }
 
       p {
@@ -90,7 +94,7 @@
     }
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 799px) {
     .video-categories {
       grid-template-columns: 1fr;
       gap: 1rem;
@@ -98,17 +102,32 @@
     }
 
     .video-category-card {
-      max-width: 100%;
+      background: var(--color-bg);
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
 
-      .category-thumbnail,
-      img {
-        height: 220px;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+      img,
+      .category-thumbnail {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
       }
     }
   }
 }
 
-/* ---------------- Hero Section (video page) ---------------- */
+/* ---------------- Hero Section ---------------- */
 .video-hub-page .hero {
   position: relative;
   min-height: 66vh;
@@ -122,35 +141,35 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    transition: background 0.35s ease-in-out;
     width: 100%;
+    transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out;
+    pointer-events: none;
+    will-change: background, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: paint;
   }
 
   .title {
     z-index: 2;
+    position: relative;
     font-weight: 100;
     font-size: 3rem;
     text-align: center;
     transition: color 0.35s ease-in-out;
-    /* color set via theme-specific rules below */
   }
 }
 
-/* ---------------- Theme rules for hero and titles ---------------- */
-
-/* Light mode: use a light overlay so dark text reads well */
+/* ---------------- Theme-aware overlays + titles ---------------- */
+/* Light mode */
 body:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 .theme-light .video-hub-page .hero .overlay,
 .light .video-hub-page .hero .overlay,
 [data-theme="light"] .video-hub-page .hero .overlay {
-  background: linear-gradient(
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.28)
-  );
+  background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28));
 }
 
-/* Light mode: title = black */
 body:not([data-theme="dark"]) .video-hub-page .hero .title,
 html:not([data-theme="dark"]) .video-hub-page .hero .title,
 .theme-light .video-hub-page .hero .title,
@@ -159,19 +178,15 @@ html:not([data-theme="dark"]) .video-hub-page .hero .title,
   color: black;
 }
 
-/* Dark mode: use a dark overlay so white text reads well */
+/* Dark mode */
 body[data-theme="dark"] .video-hub-page .hero .overlay,
 html[data-theme="dark"] .video-hub-page .hero .overlay,
 .theme-dark .video-hub-page .hero .overlay,
 .dark .video-hub-page .hero .overlay,
 [data-theme="dark"] .video-hub-page .hero .overlay {
-  background: linear-gradient(
-    rgba(0, 0, 0, 0.45),
-    rgba(0, 0, 0, 0.65)
-  );
+  background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65));
 }
 
-/* Dark mode: title = white */
 body[data-theme="dark"] .video-hub-page .hero .title,
 html[data-theme="dark"] .video-hub-page .hero .title,
 .theme-dark .video-hub-page .hero .title,
@@ -180,25 +195,26 @@ html[data-theme="dark"] .video-hub-page .hero .title,
   color: white;
 }
 
-/* ---------------- Category title helpers (explicit) ---------------- */
-.video-hub-page .category-title {
-  transition: color 0.25s ease;
+/* ---------------- Category title helpers ---------------- */
+.category-title {
+  transition: color 0.25s ease-in-out;
 }
 
-/* category title - light mode -> black */
-body:not([data-theme="dark"]) .video-hub-page .category-title,
-html:not([data-theme="dark"]) .video-hub-page .category-title,
-.theme-light .video-hub-page .category-title,
-.light .video-hub-page .category-title,
-[data-theme="light"] .video-hub-page .category-title {
+/* Light mode */
+body:not([data-theme="dark"]) .category-title,
+html:not([data-theme="dark"]) .category-title,
+.theme-light .category-title,
+.light .category-title,
+[data-theme="light"] .category-title {
   color: black !important;
+  background: transparent !important;
 }
 
-/* category title - dark mode -> white */
-body[data-theme="dark"] .video-hub-page .category-title,
-html[data-theme="dark"] .video-hub-page .category-title,
-.theme-dark .video-hub-page .category-title,
-.dark .video-hub-page .category-title,
-[data-theme="dark"] .video-hub-page .category-title {
+/* Dark mode */
+body[data-theme="dark"] .category-title,
+html[data-theme="dark"] .category-title,
+.theme-dark .category-title,
+.dark .category-title,
+[data-theme="dark"] .category-title {
   color: white !important;
 }

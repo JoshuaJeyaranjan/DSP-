@@ -208,7 +208,7 @@ $transition-speed: 0.25s;
   background: var(--color-bg);
   color: var(--color-black);
   width: 100%;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  // box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 
   // ✅ hamburger + links both tied to theme now
   .nav__hamburger span { background-color: var(--nav-hamburger-color); }

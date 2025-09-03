@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { videoCategories } from "../../data/videoData";
 import './VideoHubPage.scss'
+import '../PhotoHubPage/PhotoHubPage.scss'
 import Nav from "../../Components/Nav/Nav";
 import Footer from '../../Components/Footer/Footer';
 function VideoHubPage() {

@@ -1,22 +1,24 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
-/* Page container — center the whole thing in the viewport */
+/* ---------------------------
+   Photo Hub Page
+   --------------------------- */
 .photo-hub-page {
   
-  margin: 0 auto;                  /* <-- centers the page container */
+  margin: 0 auto;
   
   display: flex;
   flex-direction: column;
-  align-items: center;    
+  align-items: center;
   padding-top: 0rem;
-  margin-top: 0rem;         /* <-- centers children horizontally */
 
   h1 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: var(--color-black);
+    color: var(--color-text-primary);
+    font-weight: 100;
   }
 
   p {
@@ -25,66 +27,99 @@
     color: var(--color-text-secondary);
   }
 
-  /* Categories container */
+  /* ---------------- Categories container ----------------
+     Use a constrained container + grid/flex that keeps the cards centered.
+     We prefer grid for equal-width responsive layout, but keep fallback to flex.
+  --------------------------------------------------------*/
   .photo-categories {
-    width: 100%;                   /* full-width inside the centered container */
-    max-width: 1100px;             /* keeps row content constrained for very wide screens */
-    display: flex;
-    gap: 2rem;
-    justify-content: center;       /* <-- centers the cards horizontally */
-    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
     padding: 1rem 0;
-    margin: 0 auto;    
-    flex-direction: row;
-                /* extra insurance for centering */
+    margin: 0 auto;
+    justify-items: center; /* center each card in its column */
+    align-items: start;
+  }
 
-    .photo-category-card {
-      width: 300px;
-      text-decoration: none;
-      color: var(--color-text-primary);
-      overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      background: var(--color-bg);
+  .photo-category-card {
+    width: 100%;
+    max-width: 320px;
+    text-decoration: none;
+    color: var(--color-text-primary);
+    overflow: hidden;
+    background: var(--color-bg);
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    cursor: pointer;
 
+    /* compositing hints so hover doesn't force repaints in siblings */
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: paint;
+
+    &:hover {
+      transform: translateY(-6px); /* compositor-friendly */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    img,
+    .category-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover; /* keep image fully visible — see note below */
+      display: block;
+    }
+
+    .category-info {
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      align-items: stretch;
-      text-align: center;
-
-      &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-      }
-
-      img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        display: block;
-      }
+      gap: 0.5rem;
 
       h2 {
-        padding: 1rem;
         margin: 0;
+        font-size: 1.25rem;
         font-weight: 100;
         color: var(--color-text-primary);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--color-text-secondary);
       }
     }
   }
 
+  /* smaller screens: single column */
   @media (max-width: $tablet-breakpoint) {
     .photo-categories {
-      flex-direction: row;
-      align-items: center;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 0.5rem 0;
+    }
 
-      .photo-category-card {
-        width: 90%;
+    .photo-category-card {
+      max-width: 100%;
+      img,
+      .category-thumbnail {
+        height: 220px;
       }
     }
   }
 }
 
-/* Shared styles for hub pages (kept tidy) */
+/* --------------------------
+   Shared hub fallbacks (video / photo)
+   -------------------------- */
 .photo-hub-page,
 .video-hub-page {
   h1 {
@@ -96,15 +131,15 @@
 
   .photo-categories,
   .video-categories {
-    /* the layout is already handled above for photo-hub; this is a fallback */
-    display: flex;
-    flex-direction: row;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    gap: 1.5rem;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
+    justify-items: center;
   }
 
   .photo-category-card,
@@ -114,9 +149,11 @@
     text-align: center;
     cursor: pointer;
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 
     &:hover {
-      transform: scale(1.03);
+      transform: translateY(-6px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
     }
 
@@ -136,7 +173,7 @@
   }
 }
 
-/* ---------------- Hero Section ---------------- */
+/* ---------------- Hero Section (isolated overlay & title) ---------------- */
 .photo-hub-page .hero {
   position: relative;
   min-height: 66vh;
@@ -146,32 +183,39 @@
   justify-content: center;
   width: 100%;
 
+  /* overlay: isolated layer, non-interactive */
   .overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
-    transition: background 0.4s ease-in-out;
     width: 100%;
+    transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out;
+    pointer-events: none;          /* ensure hover on cards isn't blocked */
+    will-change: background, opacity;
+    transform: translateZ(0);      /* promote to compositor layer */
+    backface-visibility: hidden;
+    contain: paint;
   }
 
   .title {
     z-index: 2;
+    position: relative; /* above overlay */
     font-weight: 100;
     font-size: 3rem;
     text-align: center;
-    
+    transition: color 0.35s ease-in-out;
   }
 }
 
-/* Theme-aware overlays + titles (keeps your existing approach) */
-/* Light mode */
+/* ---------------- Theme-aware overlays + titles ---------------- */
+
+/* Light mode: light overlay so black title reads */
 body:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 .theme-light .photo-hub-page .hero .overlay,
 .light .photo-hub-page .hero .overlay,
 [data-theme="light"] .photo-hub-page .hero .overlay {
   background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28));
-  transition: background 0.35s ease-in-out;
 }
 
 body:not([data-theme="dark"]) .photo-hub-page .hero .title,
@@ -180,17 +224,15 @@ html:not([data-theme="dark"]) .photo-hub-page .hero .title,
 .light .photo-hub-page .hero .title,
 [data-theme="light"] .photo-hub-page .hero .title {
   color: black;
-  transition: color 0.35s ease-in-out;
 }
 
-/* Dark mode */
+/* Dark mode: darker overlay so white title reads */
 body[data-theme="dark"] .photo-hub-page .hero .overlay,
 html[data-theme="dark"] .photo-hub-page .hero .overlay,
 .theme-dark .photo-hub-page .hero .overlay,
 .dark .photo-hub-page .hero .overlay,
 [data-theme="dark"] .photo-hub-page .hero .overlay {
   background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65));
-  transition: background 0.35s ease-in-out;
 }
 
 body[data-theme="dark"] .photo-hub-page .hero .title,
@@ -199,24 +241,31 @@ html[data-theme="dark"] .photo-hub-page .hero .title,
 .dark .photo-hub-page .hero .title,
 [data-theme="dark"] .photo-hub-page .hero .title {
   color: white;
-  transition: color 0.35s ease-in-out;
 }
 
-/* Category title color helpers */
-/* Category title color helpers */
+/* ---------------- Category title helpers ---------------- */
 .category-title {
-  transition: color 0.3s ease;
+  transition: color 0.25s ease-in-out;
 }
 
-/* Light mode */
+/* Light mode titles */
+body:not([data-theme="dark"]) .category-title,
+html:not([data-theme="dark"]) .category-title,
+.theme-light .category-title,
+.light .category-title,
 [data-theme="light"] .category-title {
-  color: black!important;
-  background-color: transparent; // remove red debug background
+  color: black !important;
 }
 
-/* Dark mode */
+/* Dark mode titles */
+body[data-theme="dark"] .category-title,
+html[data-theme="dark"] .category-title,
+.theme-dark .category-title,
+.dark .category-title,
 [data-theme="dark"] .category-title {
-  color: white;
-  
+  color: white !important;
 }
 
+/* ---------------- Misc helpers / debug removal ---------------- */
+/* If you previously added a red debug background, remove it here */
+.category-title { background: transparent !important; }
