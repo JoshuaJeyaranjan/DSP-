@@ -177,7 +177,7 @@
 .photo-hub-page .hero {
   position: relative;
   min-height: 66vh;
-  background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+  // background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,6 +204,7 @@
     font-size: 3rem;
     text-align: center;
     transition: color 0.35s ease-in-out;
+    
   }
 }
 
@@ -269,3 +270,8 @@ html[data-theme="dark"] .category-title,
 /* ---------------- Misc helpers / debug removal ---------------- */
 /* If you previously added a red debug background, remove it here */
 .category-title { background: transparent !important; }
+
+.photo-hero{
+  width: 100vw;
+  height: 60vh;
+}

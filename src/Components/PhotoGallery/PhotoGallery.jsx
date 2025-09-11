@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import "./PhotoGallery.scss";
@@ -10,19 +10,24 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
 
   const startIdx = currentPage * photosPerPage;
   const endIdx = startIdx + photosPerPage;
-  const currentPhotos = photos.slice(startIdx, endIdx);
+
+  const currentPhotos = useMemo(
+    () => photos.slice(startIdx, endIdx),
+    [photos, startIdx, endIdx]
+  );
 
   const totalPages = Math.ceil(photos.length / photosPerPage);
 
   return (
     <div className="photo-gallery">
       <div className="photo-grid">
-        {currentPhotos.map((photo, idx) => (
+        {currentPhotos.map((photo) => (
           <div
             className="photo-card"
-            key={idx}
+            key={photo.id} // stable unique key
             onClick={() => {
-              setCurrentIndex(startIdx + idx);
+              const idx = photos.findIndex(p => p.id === photo.id);
+              setCurrentIndex(idx);
               setLightboxOpen(true);
             }}
           >
@@ -31,6 +36,14 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
               src={photo.src}
               alt={photo.title}
               loading="lazy"
+              onError={(e) => {
+                if (e.target.src !== photo.fallbackSrc) {
+                  console.warn(`Failed to load ${photo.src}, using fallback`);
+                  e.target.src = photo.fallbackSrc;
+                } else {
+                  console.error(`Fallback also failed for ${photo.fallbackSrc}`);
+                }
+              }}
             />
           </div>
         ))}
@@ -50,12 +63,11 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
         </div>
       )}
 
-      {/* Lightbox */}
       <Lightbox
         open={lightboxOpen}
         index={currentIndex}
         close={() => setLightboxOpen(false)}
-        slides={photos.map((p) => ({ src: p.src }))}
+        slides={photos.map((p) => ({ src: p.src, title: p.title }))}
       />
     </div>
   );
