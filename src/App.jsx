@@ -11,6 +11,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import '../src/styles/main.scss'
 import ReviewPage from './Pages/ReviewPage/ReviewPage'
 import AdminPage from './Pages/AdminPage/AdminPage'
+import AdminVideoPage from './Pages/AdminVideoPage/AdminVideoPage'
 function App() {
   return (
     <ThemeProvider>
@@ -19,6 +20,7 @@ function App() {
           {/* Main Pages */}
           <Route path='/' element={<HomePage />} />
           <Route path='/admin' element={<AdminPage />} />
+          <Route path='/admin-video' element={<AdminVideoPage />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/reviews' element={<ReviewPage />} />

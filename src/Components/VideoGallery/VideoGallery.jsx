@@ -10,6 +10,29 @@ function VideoGallery({ videos, videosPerPage = 6 }) {
 
   const totalPages = Math.ceil(videos.length / videosPerPage);
 
+  // Helper function to normalize YouTube URLs
+  const toEmbedUrl = (url) => {
+    if (!url) return "";
+
+    // Already embed format
+    if (url.includes("/embed/")) return url;
+
+    // Match normal YouTube URLs
+    const watchMatch = url.match(/v=([^&]+)/);
+    if (watchMatch && watchMatch[1]) {
+      return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    }
+
+    // Handle shortened youtu.be URLs
+    const shortMatch = url.match(/youtu\.be\/([^?]+)/);
+    if (shortMatch && shortMatch[1]) {
+      return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    }
+
+    // Fallback
+    return url;
+  };
+
   return (
     <div className="video-gallery">
       <div className="video-grid">
@@ -17,7 +40,7 @@ function VideoGallery({ videos, videosPerPage = 6 }) {
           <div className="video-card" key={idx}>
             <div className="video-wrapper">
               <iframe
-                src={video.url}
+                src={toEmbedUrl(video.url)}
                 title={video.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -25,7 +48,6 @@ function VideoGallery({ videos, videosPerPage = 6 }) {
                 loading="lazy"
               />
             </div>
-       
           </div>
         ))}
       </div>
