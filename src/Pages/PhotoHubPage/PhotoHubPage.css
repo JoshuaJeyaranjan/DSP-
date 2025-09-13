@@ -1,0 +1,341 @@
+@charset "UTF-8";
+:root {
+  --color-primary-dark: #323232;
+  --color-primary-mid: #AFAFAF;
+  --color-primary-light: #FFFFFF;
+  --color-primary-green: #28a745;
+  --color-secondary-dark: #000000;
+  --color-secondary-mid: #E1E1E1;
+  --color-secondary-light: #FAFAFA;
+  --color-error: #D22D2D;
+  --color-primary: var(--color-primary-dark);
+  --color-secondary: var(--color-secondary-dark);
+  --color-primary-mid-light: var(--color-primary-mid);
+  --color-secondary-mid-light: var(--color-secondary-mid);
+  --color-background: var(--color-primary-light);
+  --color-background-secondary: var(--color-secondary-light);
+  --color-surface: var(--color-primary-light);
+  --color-surface-secondary: var(--color-secondary-light);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #808080;
+  --color-border: var(--color-primary-mid);
+  --color-border-light: var(--color-secondary-mid);
+  --color-accent: #e53e3e;
+  --color-link: #3498db;
+  --color-link-hover: #2980b9;
+  --color-error-background: #f8d7da;
+  --color-white: #ffffff;
+  --color-success: $primary-green
+  --color-black: #000000;
+  --color-overlay: rgba(0, 0, 0, 0.9);
+  --nav-link-color: var(--color-black);
+  --nav-hamburger-color: black;
+  --nav-gradient: linear-gradient(
+    270deg,
+    var(--color-primary-light),
+    var(--color-primary-mid),
+    var(--color-secondary-mid)
+  );
+}
+
+[data-theme=dark] {
+  --color-primary: var(--color-secondary-dark);
+  --color-secondary: var(--color-primary-dark);
+  --color-primary-mid-dark: #5a5a5a;
+  --color-secondary-mid-dark: #7d7d7d;
+  --color-primary-mid-light: var(--color-primary-mid-dark);
+  --color-secondary-mid-light: var(--color-secondary-mid-dark);
+  --color-background: #121212;
+  --color-background-secondary: #2e2e2e;
+  --color-surface: #1e1e1e;
+  --color-surface-secondary: #2e2e2e;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #b0b0b0;
+  --color-border: var(--color-primary-mid-light);
+  --color-border-light: var(--color-secondary-mid-light);
+  --color-accent: #e53e3e;
+  --color-link: #82cfff;
+  --color-link-hover: #63b3ed;
+  --color-error: #e53e3e;
+  --color-error-background: #721c24;
+  --nav-link-color: var(--color-black);
+  --nav-hamburger-color: var(--color-black);
+  --color-white: #000000;
+  --color-black: #ffffff;
+  --nav-gradient: linear-gradient(
+    270deg,
+    var(--color-primary-dark),
+    var(--color-secondary-dark),
+    var(--color-primary-dark)
+  );
+}
+[data-theme=dark] .nav__icon {
+  filter: brightness(0) invert(1);
+  transition: filter 0.3 ease;
+}
+
+/* ---------------------------
+   Photo Hub Page
+   --------------------------- */
+.photo-hub-page {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0rem;
+  /* ---------------- Categories container ----------------
+     Use a constrained container + grid/flex that keeps the cards centered.
+     We prefer grid for equal-width responsive layout, but keep fallback to flex.
+  --------------------------------------------------------*/
+  /* smaller screens: single column */
+}
+.photo-hub-page h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+  font-weight: 100;
+}
+.photo-hub-page p {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-text-secondary);
+}
+.photo-hub-page .photo-categories {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+  margin: 0 auto;
+  justify-items: center; /* center each card in its column */
+  align-items: start;
+}
+.photo-hub-page .photo-category-card {
+  width: 100%;
+  max-width: 320px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  background: var(--color-bg);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  cursor: pointer;
+  /* compositing hints so hover doesn't force repaints in siblings */
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: paint;
+}
+.photo-hub-page .photo-category-card:hover {
+  transform: translateY(-6px); /* compositor-friendly */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+.photo-hub-page .photo-category-card img,
+.photo-hub-page .photo-category-card .category-thumbnail {
+  width: 100%;
+  height: 180px;
+  -o-object-fit: cover;
+     object-fit: cover; /* keep image fully visible — see note below */
+  display: block;
+}
+.photo-hub-page .photo-category-card .category-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.photo-hub-page .photo-category-card .category-info h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 100;
+  color: var(--color-text-primary);
+}
+.photo-hub-page .photo-category-card .category-info p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+@media (max-width: 768px) {
+  .photo-hub-page .photo-categories {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+  .photo-hub-page .photo-category-card {
+    max-width: 100%;
+  }
+  .photo-hub-page .photo-category-card img,
+  .photo-hub-page .photo-category-card .category-thumbnail {
+    height: 220px;
+  }
+}
+
+/* --------------------------
+   Shared hub fallbacks (video / photo)
+   -------------------------- */
+.photo-hub-page h1,
+.video-hub-page h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-text-primary);
+  font-size: 2rem;
+}
+.photo-hub-page .photo-categories,
+.photo-hub-page .video-categories,
+.video-hub-page .photo-categories,
+.video-hub-page .video-categories {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  justify-items: center;
+}
+.photo-hub-page .photo-category-card,
+.photo-hub-page .video-category-card,
+.video-hub-page .photo-category-card,
+.video-hub-page .video-category-card {
+  background: var(--color-bg);
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+.photo-hub-page .photo-category-card:hover,
+.photo-hub-page .video-category-card:hover,
+.video-hub-page .photo-category-card:hover,
+.video-hub-page .video-category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+.photo-hub-page .photo-category-card img,
+.photo-hub-page .video-category-card img,
+.video-hub-page .photo-category-card img,
+.video-hub-page .video-category-card img {
+  width: 100%;
+  height: 180px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  display: block;
+}
+.photo-hub-page .photo-category-card h2,
+.photo-hub-page .video-category-card h2,
+.video-hub-page .photo-category-card h2,
+.video-hub-page .video-category-card h2 {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 100;
+  color: var(--color-text-primary);
+}
+
+/* ---------------- Hero Section (isolated overlay & title) ---------------- */
+.photo-hub-page .hero {
+  position: relative;
+  min-height: 66vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  /* overlay: isolated layer, non-interactive */
+}
+.photo-hub-page .hero .overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out;
+  pointer-events: none; /* ensure hover on cards isn't blocked */
+  will-change: background, opacity;
+  transform: translateZ(0); /* promote to compositor layer */
+  backface-visibility: hidden;
+  contain: paint;
+}
+.photo-hub-page .hero .title {
+  z-index: 2;
+  position: relative; /* above overlay */
+  font-weight: 100;
+  font-size: 3rem;
+  text-align: center;
+  transition: color 0.35s ease-in-out;
+}
+
+/* ---------------- Theme-aware overlays + titles ---------------- */
+/* Light mode: light overlay so black title reads */
+body:not([data-theme=dark]) .photo-hub-page .hero .overlay,
+html:not([data-theme=dark]) .photo-hub-page .hero .overlay,
+.theme-light .photo-hub-page .hero .overlay,
+.light .photo-hub-page .hero .overlay,
+[data-theme=light] .photo-hub-page .hero .overlay {
+  background: linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.28));
+}
+
+body:not([data-theme=dark]) .photo-hub-page .hero .title,
+html:not([data-theme=dark]) .photo-hub-page .hero .title,
+.theme-light .photo-hub-page .hero .title,
+.light .photo-hub-page .hero .title,
+[data-theme=light] .photo-hub-page .hero .title {
+  color: black;
+}
+
+/* Dark mode: darker overlay so white title reads */
+body[data-theme=dark] .photo-hub-page .hero .overlay,
+html[data-theme=dark] .photo-hub-page .hero .overlay,
+.theme-dark .photo-hub-page .hero .overlay,
+.dark .photo-hub-page .hero .overlay,
+[data-theme=dark] .photo-hub-page .hero .overlay {
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65));
+}
+
+body[data-theme=dark] .photo-hub-page .hero .title,
+html[data-theme=dark] .photo-hub-page .hero .title,
+.theme-dark .photo-hub-page .hero .title,
+.dark .photo-hub-page .hero .title,
+[data-theme=dark] .photo-hub-page .hero .title {
+  color: white;
+}
+
+/* ---------------- Category title helpers ---------------- */
+.category-title {
+  transition: color 0.25s ease-in-out;
+}
+
+/* Light mode titles */
+body:not([data-theme=dark]) .category-title,
+html:not([data-theme=dark]) .category-title,
+.theme-light .category-title,
+.light .category-title,
+[data-theme=light] .category-title {
+  color: black !important;
+}
+
+/* Dark mode titles */
+body[data-theme=dark] .category-title,
+html[data-theme=dark] .category-title,
+.theme-dark .category-title,
+.dark .category-title,
+[data-theme=dark] .category-title {
+  color: white !important;
+}
+
+/* ---------------- Misc helpers / debug removal ---------------- */
+/* If you previously added a red debug background, remove it here */
+.category-title {
+  background: transparent !important;
+}
+
+.photo-hero {
+  width: 100vw;
+  height: 60vh;
+}/*# sourceMappingURL=PhotoHubPage.css.map */

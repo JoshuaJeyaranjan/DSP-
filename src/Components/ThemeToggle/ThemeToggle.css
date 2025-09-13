@@ -1,0 +1,36 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: var(--color-black);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+.theme-toggle:active {
+  transform: translateY(0);
+}
+.theme-toggle:focus {
+  outline: none;
+}
+.theme-toggle__icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  -o-object-fit: contain;
+     object-fit: contain;
+  pointer-events: none;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+}/*# sourceMappingURL=ThemeToggle.css.map */

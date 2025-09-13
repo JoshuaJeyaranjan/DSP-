@@ -313,11 +313,18 @@ export default function AdminPage() {
                     thumbnail: {String(job.dbRow.thumbnail)}
                   </div>
                 )}
-                {job.preview && (
-                  <div className="hover-preview-wrapper">
-                    <img src={job.preview} alt={job.name} className="preview-img" />
-                  </div>
-                )}
+              {job.preview && (
+  <div className="hover-preview-wrapper">
+    <img src={job.preview} alt={job.name} className="preview-img" />
+    <input
+      type="text"
+      readOnly
+      value={job.preview}
+      onClick={(e) => e.target.select()}
+      title="Click to copy URL"
+    />
+  </div>
+)}
               </div>
 
               <div className="job-actions">

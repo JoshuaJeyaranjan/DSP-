@@ -1,56 +1,221 @@
 .admin-page {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: sans-serif;
-  
-    h1 {
-      margin-bottom: 1rem;
-    }
-  
-    input[type="file"] {
-      margin-bottom: 1rem;
-    }
-  
-    button {
-      padding: 0.5rem 1rem;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fdfdfd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #222;
+  }
+
+  .error {
+    margin-bottom: 1rem;
+    padding: 0.8rem 1rem;
+    background: #ffe6e6;
+    color: #c62828;
+    border: 1px solid #f5c2c2;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+
+  .admin-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .file-upload-btn {
+      background: #007bff;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
       cursor: pointer;
-      margin-bottom: 1rem;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #0056b3;
+      }
     }
-  
-    .error {
-      color: red;
-      margin-top: 1rem;
+
+    select {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+
+      &:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 4px rgba(0, 123, 255, 0.2);
+      }
     }
-  
-    .derived-images {
-      margin-top: 2rem;
-  
-      .images-grid {
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: #28a745;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #1e7e34;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .selected-files {
+    margin-bottom: 1rem;
+    padding: 0.8rem 1rem;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    font-size: 0.9rem;
+
+    div {
+      margin-bottom: 0.4rem;
+      color: #444;
+    }
+  }
+
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.2rem;
+
+    p {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #666;
+    }
+
+    .job-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .job-info {
+        font-size: 0.95rem;
+        color: #333;
+
+        strong {
+          font-size: 1rem;
+          color: #222;
+        }
+
+        .job-meta {
+          margin-top: 0.6rem;
+          font-size: 0.85rem;
+          color: #555;
+          line-height: 1.3;
+        }
+
+        .hover-preview-wrapper {
+          margin-top: 0.8rem;
+
+          .preview-img {
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            transition: transform 0.2s ease;
+
+            &:hover {
+              transform: scale(1.03);
+            }
+          }
+        }
+      }
+
+      .job-actions {
+        margin-top: 1rem;
         display: flex;
         flex-wrap: wrap;
-        gap: 1rem;
-  
-        .image-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-  
-          img {
-            max-width: 150px;
-            max-height: 150px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        gap: 0.5rem;
+
+        button {
+          flex: 1;
+          min-width: 120px;
+          padding: 0.5rem 0.8rem;
+          border: none;
+          border-radius: 6px;
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.1s ease;
+
+          &:hover {
+            transform: translateY(-1px);
           }
-  
-          a {
-            margin-top: 0.25rem;
-            font-size: 0.85rem;
-            color: #007bff;
-            text-decoration: none;
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+
+        button:nth-child(1) {
+          background: #dc3545;
+          color: white;
+
+          &:hover {
+            background: #a71d2a;
+          }
+        }
+
+        button:nth-child(2) {
+          background: #007bff;
+          color: white;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+
+        button:nth-child(3) {
+          background: #17a2b8;
+          color: white;
+
+          &:hover {
+            background: #117a8b;
+          }
+        }
+
+        button:nth-child(4) {
+          background: #6f42c1;
+          color: white;
+
+          &:hover {
+            background: #4e2d85;
+          }
+        }
+
+        button:nth-child(5) {
+          background: #ffc107;
+          color: black;
+
+          &:hover {
+            background: #d39e00;
           }
         }
       }
     }
   }
-  
+}
