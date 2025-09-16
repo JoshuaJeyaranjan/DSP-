@@ -1,1 +1,37 @@
-/*# sourceMappingURL=NotFoundPage.css.map */
+/* src/Pages/NotFoundPage/NotFoundPage.scss */
+.notfound-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  text-align: center;
+  padding: 2rem;
+}
+.notfound-page .notfound-content h1 {
+  font-size: 8rem;
+  margin: 0;
+  color: goldenrod;
+}
+.notfound-page .notfound-content h2 {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+.notfound-page .notfound-content p {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+.notfound-page .notfound-content .home-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: goldenrod;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.notfound-page .notfound-content .home-link:hover {
+  background-color: #e04343;
+}/*# sourceMappingURL=NotFoundPage.css.map */

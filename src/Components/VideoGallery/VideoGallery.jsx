@@ -2,62 +2,57 @@ import React, { useState } from "react";
 import "./VideoGallery.scss";
 import { toEmbedUrl } from "../../utils/youtube";
 
-const DEFAULT_THUMB = "/photoAssets/videoThumbnails/default.jpg";
-
 function VideoGallery({ videos, videosPerPage = 6 }) {
   const [currentPage, setCurrentPage] = useState(0);
-  const [playingIdx, setPlayingIdx] = useState(null); // track which video is playing
+  const [playingIdx, setPlayingIdx] = useState(null);
 
   const startIdx = currentPage * videosPerPage;
   const endIdx = startIdx + videosPerPage;
   const currentVideos = videos.slice(startIdx, endIdx);
   const totalPages = Math.ceil(videos.length / videosPerPage);
 
-  const handlePlayVideo = (idx) => {
-    setPlayingIdx(idx);
-  };
+  const handlePlayVideo = (idx) => setPlayingIdx(idx);
 
   return (
     <div className="video-gallery">
       <div className="video-grid">
         {currentVideos.map((video, idx) => {
-          const videoKey = startIdx + idx; // unique key across pages
-          const thumbnail = video.thumbnail || DEFAULT_THUMB;
+          const videoKey = startIdx + idx;
 
           return (
             <div className="video-card" key={videoKey}>
-              <div className="video-wrapper">
-                {playingIdx === videoKey ? (
-                  <iframe
-                    src={toEmbedUrl(video.url)}
-                    title={video.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                ) : (
-                  <div
-                    className="thumbnail-wrapper"
-                    onClick={() => handlePlayVideo(videoKey)}
-                    style={{
-                      backgroundImage: `url(${thumbnail})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      cursor: "pointer",
-                      width: "100%",
-                      height: "0",
-                      paddingBottom: "56.25%", // 16:9 aspect ratio
-                      position: "relative",
-                    }}
-                  >
-                    <div className="play-button-overlay">
-                      ▶
-                    </div>
-                  </div>
-                )}
+              <div
+                className="video-wrapper"
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingBottom: "56.25%",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                }}
+                onClick={() => handlePlayVideo(videoKey)}
+              >
+                <iframe
+                  src={toEmbedUrl(video.url, {
+                    controls: 1,
+                    modestbranding: 1,
+                    rel: 0,
+                    autoplay: playingIdx === videoKey ? 1 : 0,
+                  })}
+                  title={video.title}
+                  allowFullScreen
+                  loading="lazy"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                  }}
+                />
               </div>
-              <div className="video-title">{video.title}</div>
+              
             </div>
           );
         })}
@@ -71,7 +66,7 @@ function VideoGallery({ videos, videosPerPage = 6 }) {
               className={currentPage === idx ? "active" : ""}
               onClick={() => {
                 setCurrentPage(idx);
-                setPlayingIdx(null); // reset playing video on page change
+                setPlayingIdx(null);
               }}
             >
               {idx + 1}

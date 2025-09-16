@@ -12,6 +12,7 @@ import '../src/styles/main.scss'
 import ReviewPage from './Pages/ReviewPage/ReviewPage'
 import AdminPage from './Pages/AdminPage/AdminPage'
 import AdminVideoPage from './Pages/AdminVideoPage/AdminVideoPage'
+import NotFoundPage from './Pages/NotFoundPage/NotFoundPage'
 function App() {
   return (
     <ThemeProvider>
@@ -34,7 +35,7 @@ function App() {
           <Route path='/photography/:category' element={<PhotoCategoryPage />} />
 
           {/* Fallback */}
-          <Route path='*' element={<HomePage />} />
+          <Route path='*' element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -10,33 +10,76 @@ const DEFAULT_THUMB = "/photoAssets/videoThumbnails/default.jpg";
 export default function AdminVideoPage() {
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
+  const [categoryThumbnail, setCategoryThumbnail] = useState("");
+  const [newCategory, setNewCategory] = useState("");
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
   const [videos, setVideos] = useState([]);
-  const [newCategory, setNewCategory] = useState("");
-  const [categoryThumbnail, setCategoryThumbnail] = useState("");
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
   // ---------------------------
-  // Categories
+  // Fetch Categories
   // ---------------------------
-const fetchCategories = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/categories`);
-    if (!res.ok) throw new Error("Failed to fetch categories");
-    const data = await res.json(); // already [{name, categoryThumbnail}, ...]
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/categories`);
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      const data = await res.json();
 
-    console.log("Fetched categories:", data);
+      setCategories(data);
 
-    setCategories(data); // <- use directly
-    if (!category && data.length > 0) setCategory(data[0].name);
-  } catch (err) {
-    console.error("Error fetching categories:", err);
-    setError(err.message);
-  }
-};
+      // If no category selected, pick the first
+      if (!category && data.length > 0) {
+        setCategory(data[0].name);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setError(err.message);
+    }
+  };
 
+  // ---------------------------
+  // Fetch Videos for Current Category
+  // ---------------------------
+  const fetchVideos = async (catName) => {
+    if (!catName) return;
+    try {
+      const res = await fetch(`${API_BASE}/videos/${catName}`);
+      if (!res.ok) throw new Error("Failed to fetch videos");
+      const data = await res.json();
+      setVideos(data);
+    } catch (err) {
+      console.error(`Error fetching videos for category "${catName}":`, err);
+      setError(err.message);
+    }
+  };
+
+  // ---------------------------
+  // Effects
+  // ---------------------------
+  // Fetch categories on mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Fetch videos when category changes
+  useEffect(() => {
+    if (category) {
+      fetchVideos(category);
+
+      // Set category thumbnail
+      const selectedCat = categories.find((c) => c.name === category);
+      setCategoryThumbnail(selectedCat?.categoryThumbnail || "");
+    } else {
+      setVideos([]);
+      setCategoryThumbnail("");
+    }
+  }, [category, categories]);
+
+  // ---------------------------
+  // Category Handlers
+  // ---------------------------
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return setError("Category name required");
     try {
@@ -83,6 +126,7 @@ const fetchCategories = async () => {
       });
       if (!res.ok) throw new Error("Failed to update category thumbnail");
       setMessage("Category thumbnail updated successfully!");
+      await fetchCategories(); // Refresh thumbnail in categories list
     } catch (err) {
       console.error("Error updating category thumbnail:", err);
       setError(err.message);
@@ -90,43 +134,32 @@ const fetchCategories = async () => {
   };
 
   // ---------------------------
-  // Videos
+  // Video Handlers
   // ---------------------------
-  const fetchVideos = async (catName) => {
-    if (!catName) return;
-    try {
-      const res = await fetch(`${API_BASE}/videos/${catName}`);
-      if (!res.ok) throw new Error("Failed to fetch videos");
-      const data = await res.json();
-      setVideos(data);
-    } catch (err) {
-      console.error(`Error fetching videos for category "${catName}":`, err);
-      setError(err.message);
-    }
-  };
+const handleAddVideo = async () => {
+  if (!category) return setError("Please select a category first");
+  if (!title.trim() || !url.trim()) return setError("Title and URL required");
 
-  const handleAddVideo = async () => {
-    if (!title.trim() || !url.trim()) return setError("Title and URL required");
-    const embedUrl = toEmbedUrl(url);
-    if (!embedUrl) return setError("Invalid YouTube URL");
+  const embedUrl = toEmbedUrl(url);
+  if (!embedUrl) return setError("Invalid YouTube URL");
 
-    try {
-      const res = await fetch(`${API_BASE}/videos/${category}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, url: embedUrl }),
-      });
-      if (!res.ok) throw new Error("Failed to add video");
-      const data = await res.json();
-      setVideos(data.videos);
-      setTitle("");
-      setUrl("");
-      setMessage("Video added successfully!");
-    } catch (err) {
-      console.error("Error adding video:", err);
-      setError(err.message);
-    }
-  };
+  try {
+    const res = await fetch(`${API_BASE}/videos/${category}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, url: embedUrl }),
+    });
+    if (!res.ok) throw new Error("Failed to add video");
+    const data = await res.json();
+    setVideos(data.videos); // <- only update videos for the current category
+    setTitle("");
+    setUrl("");
+    setMessage("Video added successfully!");
+  } catch (err) {
+    console.error("Error adding video:", err);
+    setError(err.message);
+  }
+};
 
   const handleDeleteVideo = async (index) => {
     try {
@@ -159,17 +192,6 @@ const fetchCategories = async () => {
   };
 
   // ---------------------------
-  // Effects
-  // ---------------------------
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchVideos(category);
-  }, [category]);
-
-  // ---------------------------
   // Render
   // ---------------------------
   return (
@@ -191,31 +213,30 @@ const fetchCategories = async () => {
             onChange={(e) => setNewCategory(e.target.value)}
           />
           <button onClick={handleAddCategory}>Add Category</button>
-<ul>
-  {categories.map((cat, idx) => {
-    // Defensive: handle both strings or objects
-    const name = typeof cat === "string" ? cat : cat.name;
-    const thumbnail = cat.categoryThumbnail || "";
 
-    
+          <ul>
+            {categories.map((cat, idx) => {
+              const name = typeof cat === "string" ? cat : cat.name;
+              return (
+                <li key={`${name}-${idx}`}>
+                  <span
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: category === name ? "bold" : "normal",
+                      color: "#1f1f1f",
+                    }}
+                    onClick={() => setCategory(name)}
+                  >
+                    {name}
+                  </span>
+                  <button className="delete-category" onClick={() => handleDeleteCategory(name)}>
+                    Delete
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
 
-    return (
-      <li key={`${name}-${idx}`}>
-        <span
-          style={{ cursor: "pointer", fontWeight: category === name ? "bold" : "normal" }}
-          onClick={() => setCategory(name)}
-        >
-          {name} {/* <-- Only render the string */}
-        </span>
-        <button className="delete-category" onClick={() => handleDeleteCategory(name)}>
-          Delete
-        </button>
-      </li>
-    );
-  })}
-</ul>
-
-          {/* Category Thumbnail */}
           {category && (
             <div className="category-thumbnail-control">
               <h3>Category Thumbnail</h3>
@@ -259,45 +280,20 @@ const fetchCategories = async () => {
 
             <div className="video-list">
               {videos.length === 0 && <p>No videos in this category.</p>}
-              {videos.map((v, idx) => {
-                const videoKey = v.url || idx; // unique key fallback
-                return (
-                  <div key={videoKey} className="video-item">
-                    <div className="video-title">{v.title}</div>
-                    <iframe
-                      src={toEmbedUrl(v.url)}
-                      title={v.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                    <div className="thumbnail-control">
-                      <input
-                        type="text"
-                        placeholder="Video thumbnail URL"
-                        defaultValue={v.thumbnail || ""}
-                        id={`thumb-input-${idx}`}
-                      />
-                      <button
-                        onClick={() => {
-                          const val = document.getElementById(`thumb-input-${idx}`).value;
-                          handleUpdateVideoThumbnail(idx, val);
-                        }}
-                      >
-                        Update Thumbnail
-                      </button>
-                      {v.thumbnail && (
-                        <img
-                          src={v.thumbnail || DEFAULT_THUMB}
-                          alt={`${v.title} thumbnail`}
-                          onError={(e) => (e.currentTarget.src = DEFAULT_THUMB)}
-                        />
-                      )}
-                    </div>
-                    <button onClick={() => handleDeleteVideo(idx)}>Delete</button>
-                  </div>
-                );
-              })}
+              {videos.map((v, idx) => (
+                <div key={v.url || idx} className="video-item">
+                  <div className="video-title">{v.title}</div>
+                  <iframe
+                    src={toEmbedUrl(v.url)}
+                    title={v.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+        
+                  <button onClick={() => handleDeleteVideo(idx)}>Delete</button>
+                </div>
+              ))}
             </div>
           </>
         )}

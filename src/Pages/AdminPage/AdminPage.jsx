@@ -172,21 +172,47 @@ export default function AdminPage() {
     setError(null);
   };
 
-  const handleUploadAll = async () => {
-    if (!files.length) return;
-    setIsUploading(true);
+const handleUploadAll = async () => {
+  if (!files.length) return;
+  setIsUploading(true);
 
-    for (const { file, id } of files) {
-      updateJob(id, { status: "uploading", error: null });
-      try {
-        const { error: uploadErr } = await supabase.storage.from("photos-original").upload(id, file, { upsert: true });
-        if (uploadErr) throw uploadErr;
-        updateJob(id, { status: "uploaded" });
+  for (const { file, id } of files) {
+    updateJob(id, { status: "uploading", error: null });
 
-        const { data: existing } = await supabase.from("images").select("id").eq("path", id).limit(1).maybeSingle();
-        if (!existing) {
-          const userResp = await supabase.auth.getUser();
-          await supabase.from("images").insert([{
+    try {
+      // Upload original
+      const { error: uploadErr } = await supabase.storage
+        .from("photos-original")
+        .upload(id, file, { upsert: true });
+
+      if (uploadErr) throw uploadErr;
+
+      // Call Render thumbnail service
+const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    bucket: "photos-original",
+    file: id,   // must be 'file', not 'path'
+  }),
+});
+
+      if (!resp.ok) {
+        throw new Error(`Thumbnail service error: ${resp.statusText}`);
+      }
+
+      // Insert into DB if new
+      const { data: existing } = await supabase
+        .from("images")
+        .select("id")
+        .eq("path", id)
+        .limit(1)
+        .maybeSingle();
+
+      if (!existing) {
+        const userResp = await supabase.auth.getUser();
+        await supabase.from("images").insert([
+          {
             title: file.name,
             description: null,
             category,
@@ -197,21 +223,21 @@ export default function AdminPage() {
             is_photo_hero: false,
             is_video_hero: false,
             uploaded_by: userResp?.data?.user?.id ?? null,
-          }]);
-        }
-
-        updateJob(id, { status: "done" });
-      } catch (err) {
-        console.error("Upload job error:", id, err);
-        updateJob(id, { status: "error", error: err?.message ?? String(err) });
+          },
+        ]);
       }
+
+      updateJob(id, { status: "done" });
+    } catch (err) {
+      console.error("Upload job error:", id, err);
+      updateJob(id, { status: "error", error: err?.message ?? String(err) });
     }
+  }
 
-    setFiles([]);
-    setIsUploading(false);
-    await loadImagesAndDerived();
-  };
-
+  setFiles([]);
+  setIsUploading(false);
+  await loadImagesAndDerived();
+};
   // ---------------- DELETE ----------------
   const handleDelete = async (job) => {
     if (!window.confirm(`Delete ${job.name} and all derived variants? This cannot be undone.`)) return;
@@ -314,16 +340,25 @@ export default function AdminPage() {
                   </div>
                 )}
               {job.preview && (
-  <div className="hover-preview-wrapper">
-    <img src={job.preview} alt={job.name} className="preview-img" />
+<div className="hover-preview-wrapper">
+  <img src={job.preview} alt={job.name} className="preview-img" />
+
+  <div className="copy-field">
     <input
       type="text"
       readOnly
       value={job.preview}
-      onClick={(e) => e.target.select()}
-      title="Click to copy URL"
+      title="Click the button to copy"
     />
+    <button
+      className="copy-btn"
+      onClick={() => navigator.clipboard.writeText(job.preview)}
+      title="Copy URL"
+    >
+      Copy
+    </button>
   </div>
+</div>
 )}
               </div>
 

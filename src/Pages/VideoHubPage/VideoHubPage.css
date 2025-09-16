@@ -271,4 +271,40 @@ html[data-theme=dark] .category-title,
 .dark .category-title,
 [data-theme=dark] .category-title {
   color: white !important;
+}
+
+.hero {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.5s ease-in;
+  opacity: 0;
+}
+.hero.loaded {
+  opacity: 1;
+}
+
+.hero-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.photo-category-card.skeleton-card .thumb-skeleton {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }/*# sourceMappingURL=VideoHubPage.css.map */
