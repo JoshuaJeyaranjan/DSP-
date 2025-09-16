@@ -5,11 +5,11 @@ import Footer from "../../Components/Footer/Footer";
 import "./VideoHubPage.scss";
 import { createClient } from "@supabase/supabase-js";
 
+const DEFAULT_THUMB = "/photoAssets/videoThumbnails/default.jpg";
+const VIDEO_SERVICE_URL = "https://video-service-73ro.onrender.com";
+
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
-const SERVER_URL = "https://youtube-service-6nd9.onrender.com";
-const DEFAULT_THUMB = "/photoAssets/videoThumbnails/default.jpg";
-
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 function VideoHubPage() {
@@ -23,36 +23,37 @@ function VideoHubPage() {
     let mounted = true;
 
     // -----------------------------
-    // Fetch categories
+    // Fetch categories from Render video service
     // -----------------------------
     const fetchCategories = async () => {
-      setLoading((prev) => ({ ...prev, categories: true }));
+      setLoading(prev => ({ ...prev, categories: true }));
       try {
-        const res = await fetch(`${SERVER_URL}/api/categories`);
+        const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
         if (!res.ok) throw new Error("Failed to fetch categories");
         const data = await res.json();
 
-        const categoryArr = data.map((cat) => ({
+        // data should be an array of categories with { name, categoryThumbnail }
+        const categoryArr = data.map(cat => ({
           name: cat.name,
           path: `/video/${cat.name}`,
-          thumbnail: cat.categoryThumbnail || DEFAULT_THUMB,
+          thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
         }));
 
         if (mounted) setCategories(categoryArr);
       } catch (err) {
         console.error("Error fetching categories:", err);
-        if (mounted) setError((prev) => ({ ...prev, categories: err.message }));
+        if (mounted) setError(prev => ({ ...prev, categories: err.message }));
       } finally {
-        if (mounted) setLoading((prev) => ({ ...prev, categories: false }));
+        if (mounted) setLoading(prev => ({ ...prev, categories: false }));
       }
     };
 
     // -----------------------------
-    // Fetch hero image (photo logic style)
+    // Fetch hero image from Supabase
     // -----------------------------
     const fetchHero = async () => {
-      setLoading((prev) => ({ ...prev, hero: true }));
-      setError((prev) => ({ ...prev, hero: null }));
+      setLoading(prev => ({ ...prev, hero: true }));
+      setError(prev => ({ ...prev, hero: null }));
 
       try {
         const { data: row, error } = await supabase
@@ -63,7 +64,7 @@ function VideoHubPage() {
 
         if (error) {
           console.warn("Supabase hero fetch error:", error);
-          if (mounted) setError((prev) => ({ ...prev, hero: error.message }));
+          if (mounted) setError(prev => ({ ...prev, hero: error.message }));
           return;
         }
 
@@ -72,29 +73,23 @@ function VideoHubPage() {
             .from("photos-original")
             .getPublicUrl(row.path);
 
-          if (pubData?.publicUrl) {
-            setHeroUrl(pubData.publicUrl);
-          }
+          if (pubData?.publicUrl) setHeroUrl(pubData.publicUrl);
         }
       } catch (err) {
         console.error("Error fetching hero:", err);
-        if (mounted) setError((prev) => ({ ...prev, hero: err.message }));
+        if (mounted) setError(prev => ({ ...prev, hero: err.message }));
       } finally {
-        if (mounted) setLoading((prev) => ({ ...prev, hero: false }));
+        if (mounted) setLoading(prev => ({ ...prev, hero: false }));
       }
     };
 
     fetchCategories();
     fetchHero();
 
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
-  const handleHeroLoad = () => {
-    setLoadedHero(true);
-  };
+  const handleHeroLoad = () => setLoadedHero(true);
 
   const backgroundStyle = heroUrl
     ? {
@@ -115,7 +110,6 @@ function VideoHubPage() {
   return (
     <>
       <Nav />
-
       <div className="video-hub-page">
         <section
           className={`hero ${loadedHero ? "loaded" : ""}`}
@@ -138,25 +132,20 @@ function VideoHubPage() {
         </section>
 
         <div className="video-categories">
-          {categories.map((cat) => (
+          {categories.map(cat => (
             <Link key={cat.name} to={cat.path} className="video-category-card">
-              {loading.categories ? (
-                <div className="thumb-skeleton" />
-              ) : (
-                <img
-                  src={cat.thumbnail}
-                  alt={`${cat.name} thumbnail`}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => (e.currentTarget.src = DEFAULT_THUMB)}
-                />
-              )}
+              <img
+                src={cat.thumbnail}
+                alt={`${cat.name} thumbnail`}
+                loading="lazy"
+                decoding="async"
+                onError={e => (e.currentTarget.src = DEFAULT_THUMB)}
+              />
               <span className="category-title">{cat.name}</span>
             </Link>
           ))}
         </div>
       </div>
-
       <Footer />
     </>
   );
