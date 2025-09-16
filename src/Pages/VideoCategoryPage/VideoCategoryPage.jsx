@@ -12,24 +12,26 @@ function VideoCategoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${SERVER_URL}/api/videos/${category}`);
-        if (!res.ok) throw new Error("Failed to fetch videos");
-        const data = await res.json();
-        setVideos(data); // data is an array of videos for this category
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  const fetchVideos = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${SERVER_URL}/api/videos/${category}`);
+      if (!res.ok) throw new Error("Failed to fetch videos");
+      const data = await res.json();
+      
+      // Ensure we get an array, or empty array if missing
+      setVideos(Array.isArray(data.videos) ? data.videos : []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchVideos();
-  }, [category]);
+  fetchVideos();
+}, [category]);
 
   if (loading) return <p>Loading videos...</p>;
   if (error) return <p>Error: {error}</p>;

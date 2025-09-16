@@ -42,19 +42,25 @@ export default function AdminVideoPage() {
   // ---------------------------
   // Fetch Videos for Current Category
   // ---------------------------
-  const fetchVideos = async (catName) => {
-    if (!catName) return;
-    try {
-      const res = await fetch(`${API_BASE}/videos/${catName}`);
-      if (!res.ok) throw new Error("Failed to fetch videos");
-      const data = await res.json();
-      setVideos(data);
-    } catch (err) {
-      console.error(`Error fetching videos for category "${catName}":`, err);
-      setError(err.message);
-    }
-  };
+const fetchVideos = async (catName) => {
+  if (!catName) return;
+  try {
+    const res = await fetch(`${API_BASE}/videos/${catName}`);
+    if (!res.ok) throw new Error("Failed to fetch videos");
 
+    const data = await res.json();
+
+    // If your API returns { videos: [...] }
+    setVideos(data.videos || []); 
+
+    // Or if your API returns the full category object
+    // setVideos(data.videos || []);
+  } catch (err) {
+    console.error(`Error fetching videos for category "${catName}":`, err);
+    setError(err.message);
+    setVideos([]); // fallback so map doesn't crash
+  }
+};
   // ---------------------------
   // Effects
   // ---------------------------
