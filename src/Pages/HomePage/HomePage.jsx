@@ -4,6 +4,7 @@ import "./HomePage.scss";
 import Nav from "../../Components/Nav/Nav";
 import { Link } from "react-router-dom";
 import Footer from "../../Components/Footer/Footer";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -70,7 +71,7 @@ export default function HomePage() {
         )}
         <div className="home__overlay" />
         <div className="home__content">
-          {loading && <p>Loading...</p>}
+          {loading && <PageLoader/>}
           {err && <p className="error">{err}</p>}
 
           <h1 className="home__title">D|F|S V|S|ON</h1>

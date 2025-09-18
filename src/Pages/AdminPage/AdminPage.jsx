@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Nav from "../../Components/Nav/Nav";
 import "./AdminPage.scss";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -290,7 +291,7 @@ const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
   };
 
   // ---------------- RENDER ----------------
-  if (loadingAuth) return <p>Logging in as admin...</p>;
+  if (loadingAuth) return <PageLoader/> ;
 
   return (
     <>

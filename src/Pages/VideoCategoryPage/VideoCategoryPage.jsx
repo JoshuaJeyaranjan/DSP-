@@ -4,6 +4,8 @@ import VideoGallery from "../../Components/VideoGallery/VideoGallery";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 import { createClient } from "@supabase/supabase-js";
+import LoadingSkeleton from "../../Components/LoadingSkeleton/LoadingSkeleton";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -52,7 +54,7 @@ useEffect(() => {
   fetchVideos();
 }, [category]);
 
-  if (loading) return <p>Loading videos...</p>;
+  if (loading) return <PageLoader/>;
   if (error) return <p>Error: {error}</p>;
   if (!videos || videos.length === 0) return <p>No videos found for this category.</p>;
 
@@ -61,7 +63,7 @@ useEffect(() => {
       <Nav />
       <div className="video-category-page">
         <h1>{category.charAt(0).toUpperCase() + category.slice(1)} Videos</h1>
-        <VideoGallery videos={videos} />
+        <VideoGallery videos={videos} loading={loading} />
       </div>
       <Footer />
     </>

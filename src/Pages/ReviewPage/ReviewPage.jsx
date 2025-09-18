@@ -1,16 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./ReviewPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
-/**
- * Simple TestimonialCard component
- * props:
- *  - photo: string (avatar url)
- *  - name: string
- *  - company: string
- *  - text: string
- *  - reversed: boolean (if true, avatar sits on right)
- */
+import { supabase } from "../../utils/supabaseClient"; // make sure path is correct
+
 function TestimonialCard({ photo, name, company, text, reversed = false }) {
   return (
     <article
@@ -28,70 +21,74 @@ function TestimonialCard({ photo, name, company, text, reversed = false }) {
 
         <div className="testimonial__meta">
           <p className="testimonial__name">{name}</p>
-          <p className="testimonial__company">{company}</p>
+          <p className="testimonial__company">{company || ""}</p>
         </div>
       </div>
     </article>
   );
 }
 
-const SAMPLE_TESTIMONIALS = [
-  {
-    name: "Ava Roberts",
-    company: "RevAuto",
-    photo: "/photoAssets/testimonial-ava.jpg",
-    text:
-      "Working with DFS Vision was a breath of fresh air. They captured our launch event perfectly and delivered edits ahead of schedule. Highly recommend.",
-  },
-  {
-    name: "Marcus Lee",
-    company: "StudioHype",
-    photo: "/photoAssets/testimonial-marcus.jpg",
-    text:
-      "Creative, punctual, and detail-oriented. The car photography looked magazine-ready — our social engagement doubled after the campaign.",
-  },
-  {
-    name: "Priya Nair",
-    company: "Portraits Co.",
-    photo: "/photoAssets/testimonial-priya.jpg",
-    text:
-      "Phenomenal eye for lighting and composition. The portraits captured the personality we wanted to show. Clients keep asking who shot them!",
-  },
-  {
-    name: "Ethan Walker",
-    company: "SkyFrame Drones",
-    photo: "/photoAssets/testimonial-ethan.jpg",
-    text:
-      "Drone footage was cinematic and stable — the edits matched our brand tone exactly. Professional across the board.",
-  },
-];
-
 export default function ReviewPage() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        if (!data) {
+          setReviews([]);
+        } else {
+          setReviews(data);
+        }
+      } catch (err) {
+        console.error("[ReviewPage] Error fetching reviews:", err);
+        setError("Failed to load reviews.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReviews();
+  }, []);
+
   return (
     <>
-    <Nav/>
-    <main className="testimonial-page">
-      <header className="testimonial-page__header">
-        <h1>What clients say</h1>
-        <p className="testimonial-page__lead">
-          Hand-picked quotes from recent projects — honest, short and to the point.
-        </p>
-      </header>
+      <Nav />
+      <main className="testimonial-page">
+        <header className="testimonial-page__header">
+          <h1>What clients say</h1>
+          <p className="testimonial-page__lead">
+            Hand-picked quotes from recent projects — honest, short and to the point.
+          </p>
+        </header>
 
-      <section className="testimonial-page__grid" aria-live="polite">
-        {SAMPLE_TESTIMONIALS.map((t, i) => (
-          <TestimonialCard
-            key={i}
-            photo={t.photo}
-            name={t.name}
-            company={t.company}
-            text={t.text}
-            reversed={i % 2 === 1} // alternate layout for visual interest
-          />
-        ))}
-      </section>
-    </main>
-            <Footer/>
+        {loading && <p className="loading">Loading reviews...</p>}
+        {error && <p className="error">{error}</p>}
+
+        <section className="testimonial-page__grid" aria-live="polite">
+          {!loading &&
+            !error &&
+            reviews.map((r, i) => (
+              <TestimonialCard
+                key={r.id}
+                photo={r.image_url}
+                name={r.name}
+                company={r.company || ""}
+                text={r.content}
+                reversed={i % 2 === 1}
+              />
+            ))}
+        </section>
+      </main>
+      <Footer />
     </>
   );
 }

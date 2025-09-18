@@ -146,3 +146,66 @@
       }
     }
   }
+
+  .video-gallery {
+  .video-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .video-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+  }
+}
+
+//   /* Skeletons */
+//   .skeleton {
+//     .skeleton-box {
+//       background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+//       background-size: 200% 100%;
+//       animation: shimmer 1.5s infinite;
+//       border-radius: 12px;
+//       width: 100%;
+//       padding-bottom: 56.25%; // same aspect ratio
+//     }
+
+//     .skeleton-line {
+//       margin-top: 8px;
+//       height: 16px;
+//       border-radius: 8px;
+//       background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+//       background-size: 200% 100%;
+//       animation: shimmer 1.5s infinite;
+//     }
+//   }
+
+//   /* Fade-in animation for loaded videos */
+//   .fade-in {
+//     animation: fadeInUp 0.6s ease forwards;
+//     opacity: 0;
+//     transform: translateY(20px);
+//   }
+// }
+
+// @keyframes shimmer {
+//   100% {
+//     background-position: -200% 0;
+//   }
+// }
+
+// @keyframes fadeInUp {
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }

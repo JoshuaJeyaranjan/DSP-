@@ -13,6 +13,9 @@ import ReviewPage from './Pages/ReviewPage/ReviewPage'
 import AdminPage from './Pages/AdminPage/AdminPage'
 import AdminVideoPage from './Pages/AdminVideoPage/AdminVideoPage'
 import NotFoundPage from './Pages/NotFoundPage/NotFoundPage'
+import AdminReviewsPage from './Pages/AdminReviewsPage/AdminReviewsPage'
+import AdminMiscPage from './Pages/AdminMiscPage/AdminMiscPage'
+
 function App() {
   return (
     <ThemeProvider>
@@ -22,6 +25,8 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path='/admin' element={<AdminPage />} />
           <Route path='/admin-video' element={<AdminVideoPage />} />
+          <Route path='/admin-review' element={<AdminReviewsPage />} />
+          <Route path='/admin-misc' element={<AdminMiscPage />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/reviews' element={<ReviewPage />} />

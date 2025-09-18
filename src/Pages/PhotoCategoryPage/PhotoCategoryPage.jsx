@@ -5,6 +5,7 @@ import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 import { createClient } from "@supabase/supabase-js";
 import "./PhotoCategoryPage.scss";
+import LoadingSkeleton from "../../Components/LoadingSkeleton/LoadingSkeleton";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -84,7 +85,7 @@ data.forEach(img => {
     loadPhotos();
   }, [category]);
 
-  if (loading) return <p>Loading images...</p>;
+  if (loading) return <LoadingSkeleton/>;
   if (!photos.length) return <p>No images found for this category.</p>;
 
   return (

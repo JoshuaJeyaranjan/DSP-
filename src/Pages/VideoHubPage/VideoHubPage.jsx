@@ -4,6 +4,8 @@ import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 import "./VideoHubPage.scss";
 import { createClient } from "@supabase/supabase-js";
+import LoadingSkeleton from "../../Components/LoadingSkeleton/LoadingSkeleton";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const DEFAULT_THUMB = "/photoAssets/videoThumbnails/default.jpg";
 const VIDEO_SERVICE_URL = "https://video-service-73ro.onrender.com";
@@ -102,8 +104,8 @@ function VideoHubPage() {
 
   // -----------------------------
   // Render
-  // -----------------------------
-  if (loading.categories) return <p>Loading video categories...</p>;
+  // -----------------------------.
+  if (loading.categories) return <PageLoader/>;
   if (error.categories) return <p>Error: {error.categories}</p>;
   if (!categories.length) return <p>No video categories found.</p>;
 
@@ -126,7 +128,7 @@ function VideoHubPage() {
             />
           )}
           <div className="overlay" />
-          {loading.hero && <p>Loading hero...</p>}
+          {loading.hero && <PageLoader/>}
           {error.hero && <p className="error">Hero load error: {error.hero}</p>}
           <h1 className="title">Film</h1>
         </section>

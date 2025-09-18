@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import Nav from "../../Components/Nav/Nav";
 import { Link } from "react-router-dom";
 import "./PhotoHubPage.scss";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -114,7 +115,7 @@ export default function PhotoHub() {
       }
     : {};
 
-  if (loading.thumbnails) return <p className="loading-text">Loading thumbnails...</p>;
+  if (loading.thumbnails) return <PageLoader/>;
   if (error.thumbnails) return <p className="error">{error.thumbnails}</p>;
 
   return (
@@ -125,7 +126,7 @@ export default function PhotoHub() {
           {!loadedHero && <div className="hero-skeleton" />}
           {heroUrl && <img src={heroUrl} alt="Photo hero" onLoad={handleHeroLoad} style={{ display: "none" }} />}
           <div className="overlay" />
-          {loading.hero && <p>Loading hero...</p>}
+          {loading.hero && <PageLoader/>}
           {error.hero && <p className="error">Hero load error: {error.hero}</p>}
           <h1 className="title">STILLS</h1>
         </section>
