@@ -13,11 +13,16 @@ const SERVICE_URL = import.meta.env.VITE_NODE_THUMBNAIL_SERVICE_URL;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 const SIZES = ["small", "medium", "large"];
-const CATEGORIES = ["car", "sports", "drone", "portrait", "product"];
+const CATEGORIES = ["car", "sports", "drone", "portrait", "product", "misc"];
 const HERO_COLUMN_FOR_TYPE = {
   home: "is_home_hero",
   photo: "is_photo_hero",
   video: "is_video_hero",
+};
+const SPECIAL_COLUMN_FOR_TYPE = {
+  contact: "is_contact_image",
+  about: "is_about_image",
+  logo: "is_logo_image",
 };
 
 function makeUniqueName(name) {
@@ -33,6 +38,7 @@ function makeUniqueName(name) {
 export default function AdminPage() {
   const [files, setFiles] = useState([]);
   const [category, setCategory] = useState(CATEGORIES[0]);
+  const [filterCategory, setFilterCategory] = useState("all");
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [error, setError] = useState(null);
   const [jobs, setJobs] = useState([]);
@@ -68,6 +74,9 @@ export default function AdminPage() {
             is_home_hero: false,
             is_photo_hero: false,
             is_video_hero: false,
+            is_contact_image: false,
+            is_about_image: false,
+            is_logo_image: false,
             uploaded_by: null,
           });
         }
@@ -89,7 +98,6 @@ export default function AdminPage() {
         });
         if (authErr) throw authErr;
 
-        // Run backfill automatically on mount
         await backfillOriginals();
         await loadImagesAndDerived();
       } catch (err) {
@@ -105,15 +113,6 @@ export default function AdminPage() {
   const updateJob = (id, patch) =>
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
 
-  const getAccessToken = async () => {
-    try {
-      const s = await supabase.auth.getSession();
-      return s?.data?.session?.access_token ?? null;
-    } catch {
-      return supabase.auth?.session?.()?.access_token ?? null;
-    }
-  };
-
   // ---------------- LOAD IMAGES AND DERIVED ----------------
   const loadImagesAndDerived = async () => {
     setError(null);
@@ -126,7 +125,9 @@ export default function AdminPage() {
       if (dbErr) console.warn("images table read error:", dbErr);
       if (!dbRows) return setJobs([]);
 
-      const originals = dbRows.filter((row) => row.bucket === "photos-original");
+      const originals = dbRows.filter(
+        (row) => row.bucket === "photos-original"
+      );
 
       const jobsMapped = originals.map((orig) => {
         const base = orig.path.replace(/\.[^/.]+$/, "");
@@ -136,7 +137,9 @@ export default function AdminPage() {
           .from("photos-derived")
           .getPublicUrl(mediumWebpPath);
 
-        const derived = pub?.publicUrl ? [{ path: mediumWebpPath, publicUrl: pub.publicUrl }] : [];
+        const derived = pub?.publicUrl
+          ? [{ path: mediumWebpPath, publicUrl: pub.publicUrl }]
+          : [];
         const preview = derived[0]?.publicUrl ?? null;
 
         return {
@@ -157,23 +160,7 @@ export default function AdminPage() {
     }
   };
 
-  // ---------------- FILE SELECTION & UPLOAD ----------------
-  const handleFilesChange = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (!selected.length) return;
-
-    const prepared = selected.map((f) => ({ file: f, id: makeUniqueName(f.name) }));
-    setFiles((prev) => [...prev, ...prepared]);
-
-    setJobs((prev) => [
-      ...prev,
-      ...prepared.map((p) => ({ id: p.id, name: p.file.name, status: "pending", derived: [], dbRow: null, error: null })),
-    ]);
-
-    setError(null);
-  };
-
-const handleUploadAll = async () => {
+  const handleUploadAll = async () => {
   if (!files.length) return;
   setIsUploading(true);
 
@@ -188,21 +175,21 @@ const handleUploadAll = async () => {
 
       if (uploadErr) throw uploadErr;
 
-      // Call Render thumbnail service
-const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    bucket: "photos-original",
-    file: id,   // must be 'file', not 'path'
-  }),
-});
+      // Call thumbnail service
+      const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bucket: "photos-original",
+          file: id, // must be 'file', not 'path'
+        }),
+      });
 
       if (!resp.ok) {
         throw new Error(`Thumbnail service error: ${resp.statusText}`);
       }
 
-      // Insert into DB if new
+      // Insert into DB if not exists
       const { data: existing } = await supabase
         .from("images")
         .select("id")
@@ -241,22 +228,35 @@ const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
 };
   // ---------------- DELETE ----------------
   const handleDelete = async (job) => {
-    if (!window.confirm(`Delete ${job.name} and all derived variants? This cannot be undone.`)) return;
+    if (
+      !window.confirm(
+        `Delete ${job.name} and all derived variants? This cannot be undone.`
+      )
+    )
+      return;
     updateJob(job.id, { status: "deleting", error: null });
 
     try {
       const base = job.dbRow.path.replace(/\.[^/.]+$/, "");
       for (const size of SIZES) {
-        const { data: items } = await supabase.storage.from("photos-derived").list(size, { limit: 2000 });
-        const toDelete = items.filter((i) => i.name.includes(base)).map((i) => `${size}/${i.name}`);
-        if (toDelete.length) await supabase.storage.from("photos-derived").remove(toDelete);
+        const { data: items } = await supabase.storage
+          .from("photos-derived")
+          .list(size, { limit: 2000 });
+        const toDelete = items
+          .filter((i) => i.name.includes(base))
+          .map((i) => `${size}/${i.name}`);
+        if (toDelete.length)
+          await supabase.storage.from("photos-derived").remove(toDelete);
       }
       await supabase.storage.from("photos-original").remove([job.dbRow.path]);
-      await supabase.from("images").delete().or(`path.eq.${job.dbRow.path},path.in.(${job.derived.map(d => d.path).join(",")})`);
+      await supabase.from("images").delete().eq("path", job.dbRow.path);
       await loadImagesAndDerived();
     } catch (err) {
       console.error("Delete error:", err);
-      updateJob(job.id, { status: "error", error: err?.message ?? String(err) });
+      updateJob(job.id, {
+        status: "error",
+        error: err?.message ?? String(err),
+      });
     }
   };
 
@@ -277,11 +277,21 @@ const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
   };
 
   const setThumbnailForCategory = async (job) => {
-    if (!job.dbRow?.id || !job.dbRow.category) return alert("Image must exist in DB and have category.");
-    if (!window.confirm(`Make "${job.name}" the thumbnail for category "${job.dbRow.category}"?`)) return;
+    if (!job.dbRow?.id || !job.dbRow.category)
+      return alert("Image must exist in DB and have category.");
+    if (
+      !window.confirm(
+        `Make "${job.name}" the thumbnail for category "${job.dbRow.category}"?`
+      )
+    )
+      return;
     updateJob(job.id, { status: "setting-thumbnail", error: null });
     try {
-      await supabase.from("images").update({ thumbnail: false }).eq("category", job.dbRow.category).eq("thumbnail", true);
+      await supabase
+        .from("images")
+        .update({ thumbnail: false })
+        .eq("category", job.dbRow.category)
+        .eq("thumbnail", true);
       await supabase.from("images").update({ thumbnail: true }).eq("id", job.dbRow.id);
       await loadImagesAndDerived();
     } catch (err) {
@@ -290,8 +300,26 @@ const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
     }
   };
 
+  // ---------------- CONTACT / ABOUT / LOGO ----------------
+  const setSpecialImage = async (job, type) => {
+    if (!job.dbRow?.id) return alert("Image must exist in DB to set this flag.");
+    const col = SPECIAL_COLUMN_FOR_TYPE[type];
+    if (!col) return;
+    if (!window.confirm(`Make "${job.name}" the ${type} image?`)) return;
+    updateJob(job.id, { status: `setting-${type}`, error: null });
+
+    try {
+      await supabase.from("images").update({ [col]: false }).eq(col, true);
+      await supabase.from("images").update({ [col]: true }).eq("id", job.dbRow.id);
+      await loadImagesAndDerived();
+    } catch (err) {
+      console.error("setSpecialImage error:", err);
+      updateJob(job.id, { status: "error", error: err?.message ?? String(err) });
+    }
+  };
+
   // ---------------- RENDER ----------------
-  if (loadingAuth) return <PageLoader/> ;
+  if (loadingAuth) return <PageLoader />;
 
   return (
     <>
@@ -301,77 +329,134 @@ const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
         {error && <div className="error">{error}</div>}
 
         <div className="admin-controls">
-          <label className="file-upload-btn">
-            Choose Files
-            <input type="file" multiple onChange={handleFilesChange} style={{ display: "none" }} />
+  <label className="file-upload-btn">
+    Choose Files
+    <input
+      type="file"
+      multiple
+      onChange={(e) =>
+        setFiles([
+          ...files,
+          ...Array.from(e.target.files || []).map((f) => ({
+            file: f,
+            id: makeUniqueName(f.name),
+          })),
+        ])
+      }
+      style={{ display: "none" }}
+    />
+  </label>
+
+  <select value={category} onChange={(e) => setCategory(e.target.value)}>
+    {CATEGORIES.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+      </option>
+    ))}
+  </select>
+
+  <button
+    onClick={handleUploadAll}
+    disabled={!files.length || isUploading}
+  >
+    {isUploading
+      ? "Uploading..."
+      : `Upload ${files.length ? `(${files.length})` : ""}`}
+  </button>
+
+  <button onClick={loadImagesAndDerived}>Refresh</button>
+</div>
+
+
+        {/* Category filter for jobs */}
+        <div className="filter-controls">
+          <label>
+            Filter by category:{" "}
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              <option value="all">All</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </label>
-
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-            ))}
-          </select>
-
-          <button onClick={handleUploadAll} disabled={!files.length || isUploading}>
-            {isUploading ? "Uploading..." : `Upload ${files.length ? `(${files.length})` : ""}`}
-          </button>
-
-          <button onClick={loadImagesAndDerived}>Refresh</button>
         </div>
-
-        {files.length > 0 && (
-          <div className="selected-files">
-            {files.map((f) => <div key={f.id}>{f.file.name}</div>)}
-          </div>
-        )}
 
         <div className="jobs-grid">
           {jobs.length === 0 && <p>No uploads / images found.</p>}
-          {jobs.map((job) => (
-            <div key={job.id} className="job-card">
-              <div className="job-info">
-                <strong>{job.name}</strong> — <span>{job.status}</span>
-                {job.dbRow && (
-                  <div className="job-meta">
-                    category: {job.dbRow.category ?? "—"}<br />
-                    homeHero: {String(job.dbRow.is_home_hero)} &nbsp;
-                    photoHero: {String(job.dbRow.is_photo_hero)} &nbsp;
-                    videoHero: {String(job.dbRow.is_video_hero)} &nbsp;
-                    thumbnail: {String(job.dbRow.thumbnail)}
-                  </div>
-                )}
-              {job.preview && (
-<div className="hover-preview-wrapper">
-  <img src={job.preview} alt={job.name} className="preview-img" />
+          {jobs
+            .filter((job) =>
+              filterCategory === "all"
+                ? true
+                : job.dbRow?.category === filterCategory
+            )
+            .map((job) => (
+              <div key={job.id} className="job-card">
+                <div className="job-info">
+                  <strong>{job.name}</strong> — <span>{job.status}</span>
+                  {job.dbRow && (
+                    <div className="job-meta">
+                      category: {job.dbRow.category ?? "—"}
+                      <br />
+                      homeHero: {String(job.dbRow.is_home_hero)} &nbsp;
+                      photoHero: {String(job.dbRow.is_photo_hero)} &nbsp;
+                      videoHero: {String(job.dbRow.is_video_hero)} &nbsp;
+                      thumbnail: {String(job.dbRow.thumbnail)} <br />
+                      contact: {String(job.dbRow.is_contact_image)} &nbsp;
+                      about: {String(job.dbRow.is_about_image)} &nbsp;
+                      logo: {String(job.dbRow.is_logo_image)}
+                    </div>
+                  )}
+                  {job.preview && (
+                    <div className="hover-preview-wrapper">
+                      <img
+                        src={job.preview}
+                        alt={job.name}
+                        className="preview-img"
+                      />
+                      <div className="copy-field">
+                        <input type="text" readOnly value={job.preview} />
+                        <button
+                          className="copy-btn"
+                          onClick={() =>
+                            navigator.clipboard.writeText(job.preview)
+                          }
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-  <div className="copy-field">
-    <input
-      type="text"
-      readOnly
-      value={job.preview}
-      title="Click the button to copy"
-    />
-    <button
-      className="copy-btn"
-      onClick={() => navigator.clipboard.writeText(job.preview)}
-      title="Copy URL"
-    >
-      Copy
-    </button>
-  </div>
-</div>
-)}
+                <div className="job-actions">
+                  <button onClick={() => handleDelete(job)}>Delete All</button>
+                  <button onClick={() => setHeroFor(job, "home")}>
+                    Make Home Hero
+                  </button>
+                  <button onClick={() => setHeroFor(job, "photo")}>
+                    Make Photo Hero
+                  </button>
+                  <button onClick={() => setHeroFor(job, "video")}>
+                    Make Video Hero
+                  </button>
+                  <button onClick={() => setThumbnailForCategory(job)}>
+                    Make Category Thumbnail
+                  </button>
+                  <button onClick={() => setSpecialImage(job, "contact")}>
+                    Make Contact Image
+                  </button>
+                  <button onClick={() => setSpecialImage(job, "about")}>
+                    Make About Image
+                  </button>
+               
+                </div>
               </div>
-
-              <div className="job-actions">
-                <button onClick={() => handleDelete(job)}>Delete All</button>
-                <button onClick={() => setHeroFor(job, "home")}>Make Home Hero</button>
-                <button onClick={() => setHeroFor(job, "photo")}>Make Photo Hero</button>
-                <button onClick={() => setHeroFor(job, "video")}>Make Video Hero</button>
-                <button onClick={() => setThumbnailForCategory(job)}>Make Category Thumbnail</button>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </>

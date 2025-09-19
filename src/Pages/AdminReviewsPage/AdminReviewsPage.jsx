@@ -4,14 +4,13 @@ import Footer from "../../Components/Footer/Footer";
 import "./AdminReviewsPage.scss";
 import { createClient } from "@supabase/supabase-js";
 
-
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 
-
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
-const DEFAULT_PHOTO = "https://vuzffkcigrlzarvkoqji.supabase.co/storage/v1/object/public/photos-derived/medium/1758043612700-rkk5vv-IMG_8692.webp";
+const DEFAULT_PHOTO =
+  "https://vuzffkcigrlzarvkoqji.supabase.co/storage/v1/object/public/photos-derived/medium/1758043612700-rkk5vv-IMG_8692.webp";
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -19,7 +18,6 @@ export default function AdminReviewsPage() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
 
-  // Form state for new review
   const [newReview, setNewReview] = useState({
     name: "",
     company: "",
@@ -27,9 +25,10 @@ export default function AdminReviewsPage() {
     content: "",
   });
 
-  // ---------------------------
-  // Fetch all reviews
-  // ---------------------------
+  // Local state for editing reviews
+  const [editStates, setEditStates] = useState({});
+
+  // Fetch reviews
   const fetchReviews = async () => {
     setLoading(true);
     try {
@@ -37,9 +36,15 @@ export default function AdminReviewsPage() {
         .from("reviews")
         .select("*")
         .order("id", { ascending: true });
-
       if (error) throw error;
       setReviews(data);
+
+      // Initialize editStates
+      const initialEdits = {};
+      data.forEach((r) => {
+        initialEdits[r.id] = { ...r }; // copy current values
+      });
+      setEditStates(initialEdits);
     } catch (err) {
       console.error("Error fetching reviews:", err);
       setError(err.message);
@@ -52,19 +57,17 @@ export default function AdminReviewsPage() {
     fetchReviews();
   }, []);
 
-  // ---------------------------
-  // Add review
-  // ---------------------------
+  // Add new review
   const handleAddReview = async () => {
     const { name, company, image_url, content } = newReview;
-    if (!name || !company || !content) return setError("Name, company, and text are required.");
+    if (!name || !company || !content)
+      return setError("Name, company, and text are required.");
 
     try {
       const { data, error } = await supabase
         .from("reviews")
         .insert([{ ...newReview, image_url: image_url || DEFAULT_PHOTO }])
         .select();
-
       if (error) throw error;
 
       setReviews((prev) => [...prev, data[0]]);
@@ -76,9 +79,7 @@ export default function AdminReviewsPage() {
     }
   };
 
-  // ---------------------------
   // Delete review
-  // ---------------------------
   const handleDeleteReview = async (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
     try {
@@ -92,17 +93,15 @@ export default function AdminReviewsPage() {
     }
   };
 
-  // ---------------------------
   // Update review
-  // ---------------------------
-  const handleUpdateReview = async (id, updatedFields) => {
+  const handleUpdateReview = async (id) => {
     try {
+      const updatedFields = editStates[id];
       const { data, error } = await supabase
         .from("reviews")
         .update(updatedFields)
         .eq("id", id)
         .select();
-
       if (error) throw error;
 
       setReviews((prev) => prev.map((r) => (r.id === id ? data[0] : r)));
@@ -113,9 +112,6 @@ export default function AdminReviewsPage() {
     }
   };
 
-  // ---------------------------
-  // Render
-  // ---------------------------
   return (
     <>
       <Nav />
@@ -162,39 +158,47 @@ export default function AdminReviewsPage() {
           ) : reviews.length === 0 ? (
             <p>No reviews found.</p>
           ) : (
-         reviews.map((r) => (
-  <div key={r.id} className="review-item">
-    {/* Image Preview */}
-    <div className="review-image-preview">
-      <img
-        src={r.image_url || "/photoAssets/default-review.webp"}
-        alt={`${r.name} preview`}
-        onError={(e) => (e.currentTarget.src = "/photoAssets/default-review.webp")}
-      />
-    </div>
+            reviews.map((r) => (
+              <div key={r.id} className="review-item">
+                <div className="review-image-preview">
+                  <img
+                    src={editStates[r.id]?.image_url || DEFAULT_PHOTO}
+                    alt={`${r.name} preview`}
+                    onError={(e) => (e.currentTarget.src = DEFAULT_PHOTO)}
+                  />
+                </div>
 
-    <input
-      type="text"
-      value={r.name}
-      onChange={(e) => handleUpdateReview(r.id, { name: e.target.value })}
-    />
-    <input
-      type="text"
-      value={r.company}
-      onChange={(e) => handleUpdateReview(r.id, { company: e.target.value })}
-    />
-    <input
-      type="text"
-      value={r.image_url}
-      onChange={(e) => handleUpdateReview(r.id, { image_url: e.target.value })}
-    />
-    <textarea
-      value={r.content}
-      onChange={(e) => handleUpdateReview(r.id, { content: e.target.value })}
-    />
-    <button onClick={() => handleDeleteReview(r.id)}>Delete</button>
-  </div>
-))
+                <input
+                  type="text"
+                  value={editStates[r.id]?.name || ""}
+                  onChange={(e) =>
+                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], name: e.target.value } }))
+                  }
+                />
+                <input
+                  type="text"
+                  value={editStates[r.id]?.company || ""}
+                  onChange={(e) =>
+                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], company: e.target.value } }))
+                  }
+                />
+                <input
+                  type="text"
+                  value={editStates[r.id]?.image_url || ""}
+                  onChange={(e) =>
+                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], image_url: e.target.value } }))
+                  }
+                />
+                <textarea
+                  value={editStates[r.id]?.content || ""}
+                  onChange={(e) =>
+                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], content: e.target.value } }))
+                  }
+                />
+                <button onClick={() => handleUpdateReview(r.id)}>Update</button>
+                <button onClick={() => handleDeleteReview(r.id)}>Delete</button>
+              </div>
+            ))
           )}
         </div>
       </div>

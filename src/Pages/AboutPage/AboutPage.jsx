@@ -2,25 +2,35 @@ import React, { useEffect, useState } from "react";
 import "./AboutPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
-import { getAssetsByType } from "../../utils/assets";
+import { createClient } from "@supabase/supabase-js";
+
+const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
+const ANON_KEY = import.meta.env.VITE_ANON_KEY;
+const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 function AboutPage() {
-  const [headshot, setHeadshot] = useState(null);
+  const [aboutImage, setAboutImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchHeadshot() {
+    async function fetchAboutImage() {
       try {
-        // Fetch only the main headshot for About page
-        const data = await getAssetsByType("about", "main_headshot");
-        setHeadshot(data);
+        const { data, error } = await supabase
+          .from("images")
+          .select("*")
+          .eq("is_about_image", true)
+          .maybeSingle();
+
+        if (error) throw error;
+        setAboutImage(data);
       } catch (err) {
-        console.error("Error fetching about headshot:", err.message);
+        console.error("Error fetching about image:", err.message);
       } finally {
         setLoading(false);
       }
     }
-    fetchHeadshot();
+
+    fetchAboutImage();
   }, []);
 
   if (loading) return <p>Loading About Page...</p>;
@@ -36,8 +46,12 @@ function AboutPage() {
         <div className="about-content">
           <div className="about-section">
             <img
-              src={headshot?.url || "/photoAssets/about-placeholder.avif"}
-              alt={headshot?.alt_text || "Videographer profile"}
+              src={
+                aboutImage
+                  ? `${PROJECT_URL}/storage/v1/object/public/${aboutImage.bucket}/${aboutImage.path}`
+                  : "/photoAssets/about-placeholder.avif"
+              }
+              alt={aboutImage?.title || "Videographer profile"}
               className="about-image"
               onError={(e) =>
                 (e.currentTarget.src = "/photoAssets/about-placeholder.avif")
