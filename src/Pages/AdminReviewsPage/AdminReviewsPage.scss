@@ -7,6 +7,7 @@
   padding: 2rem;
   font-family: 'Montserrat', sans-serif;
   color: #1f1f1f;
+  padding-top: 0rem;
 
   h1 {
     text-align: center;
@@ -177,4 +178,16 @@
 
 .delete-button {
     background-color: #ff4d4f;
+}
+
+.add-category{
+    padding: 1rem;
+}
+
+.category-item {
+    padding: 1rem
+}
+
+.existing-plans-title {
+    margin-top: 1rem;
 }

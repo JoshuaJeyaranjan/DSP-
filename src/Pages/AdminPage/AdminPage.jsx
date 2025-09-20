@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import Nav from "../../Components/Nav/Nav";
 import "./AdminPage.scss";
 import PageLoader from "../../Components/PageLoader/PageLoader";
-
+import Footer from "../../Components/Footer/Footer";
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
@@ -431,10 +431,12 @@ export default function AdminPage() {
                     {buttonStatus[`delete-${job.id}`] || "Delete All"}
                   </button>
                 </div>
+                
               </div>
             ))}
         </div>
       </div>
+      <Footer/>
     </>
   );
 }

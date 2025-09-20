@@ -1,150 +1,146 @@
-/* AdminMiscPage.scss */
+// AdminMiscPage.scss
 
 .admin-misc-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 0rem;
 
   h1 {
     text-align: center;
     margin-bottom: 2rem;
-    font-size: 2.5rem;
-    color: #222;
+    font-size: 2rem;
+    font-weight: 200;
+    color: white;
   }
 
-  .error {
-    color: #d9534f;
-    margin-bottom: 1rem;
-    text-align: center;
-    font-weight: bold;
-  }
+  .about-editor {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 
-  .type-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-
-    button {
-      padding: 0.5rem 1rem;
-      border: none;
-      background: #f0f0f0;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
-
-      &.active {
-        background: #007bff;
-        color: #fff;
-      }
-
-      &:hover:not(.active) {
-        background: #e0e0e0;
-      }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.5rem;
+      font-weight: 200;
     }
-  }
 
-  .upload-section {
-    text-align: center;
-    margin-bottom: 2rem;
-
-    input[type="file"] {
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-    }
-  }
-
-  .file-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.5rem;
-
-    .file-card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    .about-paragraph {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 0.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
+      margin-bottom: 1.5rem;
 
-      &:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      }
-
-      img {
+      textarea {
         width: 100%;
-        height: 150px;
-        object-fit: cover;
+        min-height: 80px;
+        resize: vertical;
+        padding: 0.75rem;
         border-radius: 8px;
-        margin-bottom: 0.5rem;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.2s ease-in-out;
+
+        &:focus {
+          outline: none;
+          border-color: #0070f3;
+          box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
+        }
       }
 
-      .file-actions {
+      .paragraph-actions {
+        margin-top: 0.5rem;
         display: flex;
-        justify-content: space-between;
-        width: 100%;
+        gap: 0.5rem;
 
         button {
-          flex: 1;
-          margin: 0 0.25rem;
-          padding: 0.3rem 0.5rem;
+          padding: 0.4rem 0.8rem;
           border: none;
-          border-radius: 5px;
+          border-radius: 6px;
           cursor: pointer;
           font-size: 0.9rem;
-          transition: background 0.2s;
+          transition: background 0.2s ease;
 
-          &:first-child {
-            background: #28a745;
-            color: #fff;
-
-            &:hover {
-              background: #218838;
-            }
+          &:hover {
+            opacity: 0.9;
           }
 
-          &:last-child {
-            background: #dc3545;
-            color: #fff;
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
 
-            &:hover {
-              background: #c82333;
-            }
+          &:nth-child(1) {
+            background-color: #e0e0e0; // Up
+          }
+
+          &:nth-child(2) {
+            background-color: #e0e0e0; // Down
+          }
+
+          &:nth-child(3) {
+            background-color: #0070f3;
+            color: white; // Save
+          }
+
+          &:nth-child(4) {
+            background-color: #ff4d4f;
+            color: white; // Delete
           }
         }
       }
     }
 
-    p {
-      text-align: center;
-      grid-column: 1 / -1;
-      color: #666;
+    .add-paragraph-btn,
+    .save-order-btn {
+      display: inline-block;
+      padding: 0.6rem 1rem;
+      margin-top: 1rem;
+      margin-right: 0.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      &:hover {
+        opacity: 0.9;
+      }
+
+      &.add-paragraph-btn {
+        background-color: #28a745;
+        color: white;
+      }
+
+      &.save-order-btn {
+        background-color: #0070f3;
+        color: white;
+      }
     }
   }
+}
 
-  @media (max-width: 768px) {
-    .file-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-  }
+// Responsive adjustments
+@media (max-width: 600px) {
+  .admin-misc-page {
+    padding: 1rem;
 
-  @media (max-width: 480px) {
-    .file-grid {
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
+    .about-editor {
+      padding: 1rem;
 
-    .type-tabs {
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      .paragraph-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+
+        button {
+          flex: 1 1 45%;
+        }
+      }
     }
   }
 }

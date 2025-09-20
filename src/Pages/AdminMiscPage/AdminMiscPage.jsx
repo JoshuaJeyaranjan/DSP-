@@ -1,165 +1,191 @@
-// AdminMiscPage.jsx
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../utils/supabaseClient"; // <-- anon client
+import { supabase } from "../../utils/supabaseClient";
 import "./AdminMiscPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 
-const TYPES = ["about", "contact", "logos"];
-
 export default function AdminMiscPage() {
-  const [activeType, setActiveType] = useState("about");
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [paragraphs, setParagraphs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [buttonStatus, setButtonStatus] = useState({});
 
-  // ----------------------
-  // Fetch files
-  // ----------------------
-  const fetchFiles = async (type) => {
+  // ---------------- BUTTON FEEDBACK ----------------
+  const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
+    setButtonStatus((prev) => ({ ...prev, [key]: label }));
+    setTimeout(() => {
+      setButtonStatus((prev) => ({ ...prev, [key]: null }));
+    }, duration);
+  };
+
+  // Fetch about paragraphs
+  const loadParagraphs = async () => {
     setLoading(true);
-    setError(null);
-
     try {
-      const { data, error } = await supabase.storage
-        .from("misc")
-        .list(type, { limit: 100 });
+      const { data, error } = await supabase
+        .from("about")
+        .select("*")
+        .order("position", { ascending: true });
       if (error) throw error;
-
-      const filesWithUrls = data.map((file) => ({
-        name: file.name,
-        url: supabase.storage
-          .from("misc")
-          .getPublicUrl(`${type}/${file.name}`).data.publicUrl,
-        updatedAt: file.updated_at,
-      }));
-
-      setFiles(filesWithUrls);
+      setParagraphs(data || []);
     } catch (err) {
-      console.error("[AdminMiscPage] Fetch error:", err);
-      setError(err.message || "Failed to fetch files");
-      setFiles([]);
+      console.error("Failed to load paragraphs:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // ----------------------
-  // On mount or type change
-  // ----------------------
   useEffect(() => {
-    fetchFiles(activeType);
-  }, [activeType]);
+    loadParagraphs();
+  }, []);
 
-  // ----------------------
-  // Upload file
-  // ----------------------
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // Update paragraph content
+  const updateParagraph = (id, newContent) => {
+    setParagraphs((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, content: newContent } : p))
+    );
+  };
 
-    setLoading(true);
-    setError(null);
-
-    const filePath = `${activeType}/${Date.now()}-${file.name}`;
-
+  // Save paragraph to DB
+  const saveParagraph = async (id) => {
+    triggerButtonStatus(`${id}-save`, "Saving...");
     try {
-      const { error } = await supabase.storage
-        .from("misc")
-        .upload(filePath, file, { cacheControl: "3600", upsert: false });
+      const paragraph = paragraphs.find((p) => p.id === id);
+      const { error } = await supabase
+        .from("about")
+        .update({ content: paragraph.content, updated_at: new Date() })
+        .eq("id", id);
       if (error) throw error;
-
-      const publicUrl = supabase.storage
-        .from("misc")
-        .getPublicUrl(filePath).data.publicUrl;
-
-      setFiles((prev) => [
-        ...prev,
-        { name: file.name, url: publicUrl, updatedAt: new Date().toISOString() },
-      ]);
+      triggerButtonStatus(`${id}-save`);
     } catch (err) {
-      console.error("[AdminMiscPage] Upload error:", err);
-      setError(err.message || "Failed to upload file");
-    } finally {
-      setLoading(false);
-      e.target.value = "";
+      console.error("Failed to save paragraph:", err);
+      triggerButtonStatus(`${id}-save`, "Error");
     }
   };
 
-  // ----------------------
-  // Delete file
-  // ----------------------
-  const handleDelete = async (name) => {
-    if (!window.confirm(`Delete ${name}?`)) return;
-
+  // Add a new paragraph
+  const addParagraph = async () => {
+    triggerButtonStatus("add", "Adding...");
     try {
-      const { error } = await supabase.storage
-        .from("misc")
-        .remove([`${activeType}/${name}`]);
+      const position =
+        paragraphs.length > 0
+          ? Math.max(...paragraphs.map((p) => p.position)) + 1
+          : 0;
+      const { data, error } = await supabase
+        .from("about")
+        .insert([{ content: "New paragraph...", position }])
+        .select();
       if (error) throw error;
-
-      setFiles((prev) => prev.filter((f) => f.name !== name));
+      setParagraphs((prev) => [...prev, ...data]);
+      triggerButtonStatus("add");
     } catch (err) {
-      console.error("[AdminMiscPage] Delete error:", err);
-      setError(err.message || "Failed to delete file");
+      console.error("Failed to add paragraph:", err);
+      triggerButtonStatus("add", "Error");
     }
   };
 
-  // ----------------------
-  // Copy URL
-  // ----------------------
-  const handleCopyUrl = (url) =>
-    navigator.clipboard.writeText(url).then(() => alert("URL copied!"));
+  // Delete a paragraph
+  const deleteParagraph = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this paragraph?"))
+      return;
+    triggerButtonStatus(`${id}-delete`, "Deleting...");
+    try {
+      const { error } = await supabase.from("about").delete().eq("id", id);
+      if (error) throw error;
+      setParagraphs((prev) => prev.filter((p) => p.id !== id));
+      triggerButtonStatus(`${id}-delete`);
+    } catch (err) {
+      console.error("Failed to delete paragraph:", err);
+      triggerButtonStatus(`${id}-delete`, "Error");
+    }
+  };
 
-  // ----------------------
-  // Render
-  // ----------------------
+  // Move paragraph up/down
+  const moveParagraph = (id, direction) => {
+    triggerButtonStatus(`${id}-move`, direction === "up" ? "Moving ↑" : "Moving ↓");
+    setParagraphs((prev) => {
+      const index = prev.findIndex((p) => p.id === id);
+      if (index === -1) return prev;
+      const newIndex = direction === "up" ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= prev.length) return prev;
+
+      const newArray = [...prev];
+      [newArray[index], newArray[newIndex]] = [
+        newArray[newIndex],
+        newArray[index],
+      ];
+
+      // Update positions locally
+      return newArray.map((p, i) => ({ ...p, position: i }));
+    });
+    triggerButtonStatus(`${id}-move`);
+  };
+
+  // Save all positions
+  const savePositions = async () => {
+    triggerButtonStatus("save-order", "Saving...");
+    try {
+      await Promise.all(
+        paragraphs.map((p) =>
+          supabase
+            .from("about")
+            .update({ position: p.position, updated_at: new Date() })
+            .eq("id", p.id)
+        )
+      );
+      triggerButtonStatus("save-order");
+    } catch (err) {
+      console.error("Failed to save positions:", err);
+      triggerButtonStatus("save-order", "Error");
+    }
+  };
+
   return (
     <>
       <Nav />
       <div className="admin-misc-page">
         <h1>Admin Miscellaneous Media Dashboard</h1>
-        {error && <div className="error">{error}</div>}
 
-        {/* Type Tabs */}
-        <div className="type-tabs">
-          {TYPES.map((type) => (
-            <button
-              key={type}
-              className={activeType === type ? "active" : ""}
-              onClick={() => setActiveType(type)}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </button>
-          ))}
-        </div>
+        <div className="about-editor">
+          <h2>About Section Editor</h2>
 
-        {/* Upload Section */}
-        <div className="upload-section">
-          <input type="file" onChange={handleUpload} />
-        </div>
+          {loading && <p>Loading paragraphs...</p>}
 
-        {/* Files Grid */}
-        <div className="file-grid">
-          {loading ? (
-            <p>Loading files...</p>
-          ) : files.length === 0 ? (
-            <p>No files uploaded yet.</p>
-          ) : (
-            files.map((f) => (
-              <div key={f.name} className="file-card">
-                <img src={f.url} alt={f.name} />
-                <div className="file-meta">
-                  <p>{f.name}</p>
-                  <p>{new Date(f.updatedAt).toLocaleString()}</p>
-                </div>
-                <div className="file-actions">
-                  <button onClick={() => handleCopyUrl(f.url)}>Copy URL</button>
-                  <button onClick={() => handleDelete(f.name)}>Delete</button>
-                </div>
+          {paragraphs.map((p, idx) => (
+            <div key={p.id} className="about-paragraph">
+              <textarea
+                value={p.content}
+                onChange={(e) => updateParagraph(p.id, e.target.value)}
+              />
+              <div className="paragraph-actions">
+                <button
+                  onClick={() => moveParagraph(p.id, "up")}
+                  disabled={idx === 0}
+                >
+                  {buttonStatus[`${p.id}-move`] || "↑"}
+                </button>
+                <button
+                  onClick={() => moveParagraph(p.id, "down")}
+                  disabled={idx === paragraphs.length - 1}
+                >
+                  {buttonStatus[`${p.id}-move`] || "↓"}
+                </button>
+                <button onClick={() => saveParagraph(p.id)}>
+                  {buttonStatus[`${p.id}-save`] || "Save"}
+                </button>
+                <button onClick={() => deleteParagraph(p.id)}>
+                  {buttonStatus[`${p.id}-delete`] || "Delete"}
+                </button>
               </div>
-            ))
-          )}
+            </div>
+          ))}
+
+          <button className="add-paragraph-btn" onClick={addParagraph}>
+            {buttonStatus["add"] || "+ Add Paragraph"}
+          </button>
+
+          <button className="save-order-btn" onClick={savePositions}>
+            {buttonStatus["save-order"] || "Save Paragraph Order"}
+          </button>
         </div>
       </div>
       <Footer />

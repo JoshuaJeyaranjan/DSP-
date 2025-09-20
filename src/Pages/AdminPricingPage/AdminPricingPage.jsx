@@ -311,7 +311,7 @@ export default function AdminPricingPage() {
 
         {/* ------------------- CATEGORY CRUD ------------------- */}
         <div className="category-section">
-          <h2>Categories</h2>
+          <h2>Add Category</h2>
           <div className="add-category">
             <input
               type="text"
@@ -329,7 +329,7 @@ export default function AdminPricingPage() {
                 setNewCategory({ ...newCategory, slug: e.target.value })
               }
             />
-            <input
+            <textarea
               type="text"
               placeholder="Description"
               value={newCategory.description}
@@ -351,6 +351,7 @@ export default function AdminPricingPage() {
             <button onClick={handleAddCategory}>Add Category</button>
           </div>
 
+              <h2>Existing Categories</h2>
           {categories.map((c) => (
             <div className="category-item" key={c.id}>
               <input
@@ -373,7 +374,7 @@ export default function AdminPricingPage() {
                   }))
                 }
               />
-              <input
+              <textarea
                 type="text"
                 value={categoryEditStates[c.id]?.description || ""}
                 onChange={(e) =>
@@ -425,7 +426,7 @@ export default function AdminPricingPage() {
                 setNewPlan({ ...newPlan, title: e.target.value })
               }
             />
-            <input
+            <textarea
               type="text"
               placeholder="Description"
               value={newPlan.description}
@@ -442,7 +443,7 @@ export default function AdminPricingPage() {
                 setNewPlan({ ...newPlan, price: e.target.value })
               }
             />
-            <input
+            <textarea
               type="text"
               placeholder="Deliverables (comma-separated)"
               value={newPlan.deliverables}
@@ -453,8 +454,9 @@ export default function AdminPricingPage() {
             <button onClick={handleAddPlan}>Add Plan</button>
           </div>
 
-          <h2>Existing Plans</h2>
+          <h2 className="existing-plans-title">Existing Plans</h2>
           <div className="plan-filter">
+            
             <label>Filter Plans by Category:</label>
             <select
               value={selectedCategory || ""}
@@ -504,7 +506,7 @@ export default function AdminPricingPage() {
                     }))
                   }
                 />
-                <input
+                <textarea
                   type="text"
                   value={planEditStates[p.id]?.description || ""}
                   onChange={(e) =>
@@ -525,7 +527,7 @@ export default function AdminPricingPage() {
                     }))
                   }
                 />
-                <input
+                <textarea
                   type="text"
                   value={planEditStates[p.id]?.deliverables || ""}
                   onChange={(e) =>

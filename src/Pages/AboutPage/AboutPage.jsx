@@ -10,27 +10,39 @@ const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 function AboutPage() {
   const [aboutImage, setAboutImage] = useState(null);
+  const [paragraphs, setParagraphs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchAboutImage() {
+    async function fetchAboutData() {
+      setLoading(true);
       try {
-        const { data, error } = await supabase
+        // Fetch the "About" hero image
+        const { data: imageData, error: imageError } = await supabase
           .from("images")
           .select("*")
           .eq("is_about_image", true)
           .maybeSingle();
 
-        if (error) throw error;
-        setAboutImage(data);
+        if (imageError) throw imageError;
+        setAboutImage(imageData);
+
+        // Fetch all paragraphs for the About section
+        const { data: aboutParagraphs, error: paragraphError } = await supabase
+          .from("about")
+          .select("*")
+          .order("position", { ascending: true });
+
+        if (paragraphError) throw paragraphError;
+        setParagraphs(aboutParagraphs || []);
       } catch (err) {
-        console.error("Error fetching about image:", err.message);
+        console.error("Error fetching About page data:", err.message);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchAboutImage();
+    fetchAboutData();
   }, []);
 
   if (loading) return <p>Loading About Page...</p>;
@@ -58,26 +70,23 @@ function AboutPage() {
               }
             />
             <div className="about-text">
-              <p>
-                I started filming five years ago, experimenting with short films
-                and music videos. Since then, I’ve grown into a full-fledged
-                videographer working with clients across various industries.
-              </p>
-              <p>
-                I’m a passionate videographer specializing in capturing moments
-                that tell a story. From landscapes to events, my goal is to make
-                every frame memorable.
-              </p>
-              <p>
-                Every project is unique. I strive to understand the vision of my
-                clients and translate it into stunning visual narratives that
-                resonate.
-              </p>
+              {paragraphs.length > 0 ? (
+                paragraphs.map((p) => (
+                  <p key={p.id}>{p.content}</p>
+                ))
+              ) : (
+                <p>
+                  I started filming five years ago, experimenting with short
+                  films and music videos. Since then, I’ve grown into a
+                  full-fledged videographer working with clients across various
+                  industries.
+                </p>
+              )}
             </div>
           </div>
         </div>
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 }
