@@ -140,6 +140,14 @@ function Nav({ overlay = false }) {
               >
                 Contact
               </NavLink>
+                      <NavLink
+                to="/packages"
+                end={true}
+                className={({ isActive }) => `nav__link ${isActive ? "nav__link--active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                Packages
+              </NavLink>
 
               <a
                 href="https://www.instagram.com/dfs.vision/"

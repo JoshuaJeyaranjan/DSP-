@@ -15,6 +15,9 @@ import AdminVideoPage from './Pages/AdminVideoPage/AdminVideoPage'
 import NotFoundPage from './Pages/NotFoundPage/NotFoundPage'
 import AdminReviewsPage from './Pages/AdminReviewsPage/AdminReviewsPage'
 import AdminMiscPage from './Pages/AdminMiscPage/AdminMiscPage'
+import PricingPage from './Pages/PricingPage/PricingPage'
+import PricingCategoryPage from './Pages/PricingCategoryPage/PricingCategoryPage'
+import AdminPricingPage from './Pages/AdminPricingPage/AdminPricingPage'
 
 function App() {
   return (
@@ -26,6 +29,7 @@ function App() {
           <Route path='/admin' element={<AdminPage />} />
           <Route path='/admin-video' element={<AdminVideoPage />} />
           <Route path='/admin-review' element={<AdminReviewsPage />} />
+          <Route path='/admin-pricing' element={<AdminPricingPage />} />
           <Route path='/admin-misc' element={<AdminMiscPage />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
@@ -38,7 +42,9 @@ function App() {
           {/* Photography Section */}
           <Route path='/photography' element={<PhotoHubPage />} />
           <Route path='/photography/:category' element={<PhotoCategoryPage />} />
-
+          {/* Pricing Section */}
+          <Route path='/packages' element={<PricingPage />} />
+          <Route path='/packages/:category' element={<PricingCategoryPage />} />
           {/* Fallback */}
           <Route path='*' element={<NotFoundPage />} />
         </Routes>
