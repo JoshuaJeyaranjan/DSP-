@@ -9,6 +9,7 @@
 
   h1, h2 {
     color: #222;
+    font-weight: 200;
   }
 
   .error {
@@ -82,6 +83,7 @@
 
       .category-item {
         display: flex;
+        flex-direction: column;
         align-items: center;
         flex-wrap: wrap;
         margin-bottom: 0.5rem;
@@ -124,8 +126,9 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      padding: 0.5rem 0;
+      padding: 2rem 0;
       border-bottom: 1px solid #eee;
+      
 
       select, input {
         margin-right: 0.5rem;

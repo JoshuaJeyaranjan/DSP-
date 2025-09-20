@@ -1,4 +1,5 @@
-/* AdminReviewsPage.scss */
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;/* AdminReviewsPage.scss */
 
 .admin-reviews-page {
   max-width: 1200px;
@@ -11,9 +12,13 @@
     text-align: center;
     font-size: 2.2rem;
     margin-bottom: 2rem;
+    color: black;
+    font-weight: 200;
   }
 
   h2 {
+        color: black;
+    font-weight: 200;
     font-size: 1.5rem;
     margin-bottom: 1rem;
     border-bottom: 2px solid #1890ff;
@@ -123,7 +128,7 @@
       }
 
       button {
-        background-color: #ff4d4f;
+        
         color: #fff;
         border: none;
         padding: 0.5rem 1rem;
@@ -133,7 +138,7 @@
         transition: background 0.2s ease;
 
         &:hover {
-          background-color: #ff7875;
+          background-color: goldenrod;
         }
       }
     }
@@ -164,4 +169,12 @@
     height: 100%;
     object-fit: cover;
   }
+}
+
+.update-button {
+    background-color: #52c41a;
+}
+
+.delete-button {
+    background-color: #ff4d4f;
 }

@@ -258,6 +258,7 @@ export default function AdminVideoPage() {
               <button onClick={handleUpdateCategoryThumbnail}>Update Thumbnail</button>
               {categoryThumbnail && (
                 <img
+                  className="category-thumbnail"
                   src={categoryThumbnail || DEFAULT_THUMB}
                   alt={`${selectedCategory.name} thumbnail`}
                   onError={(e) => (e.currentTarget.src = DEFAULT_THUMB)}
@@ -299,7 +300,7 @@ export default function AdminVideoPage() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <button onClick={() => handleDeleteVideo(v.id)}>Delete</button>
+                  <button className="delete-category" onClick={() => handleDeleteVideo(v.id)}>Delete</button>
                 </div>
               ))}
             </div>

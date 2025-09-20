@@ -1,0 +1,48 @@
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
+// src/styles/admin.scss
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+
+  .admin-sidebar {
+    width: 220px;
+    background: #222;
+    color: #fff;
+    padding: 1rem;
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      a {
+        color: #bbb;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+
+        &.active {
+          background: #444;
+          color: #fff;
+        }
+
+        &:hover {
+          background: #333;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .admin-content {
+    flex: 1;
+    padding: 2rem;
+    
+  }
+}

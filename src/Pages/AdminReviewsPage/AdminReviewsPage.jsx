@@ -195,8 +195,8 @@ export default function AdminReviewsPage() {
                     setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], content: e.target.value } }))
                   }
                 />
-                <button onClick={() => handleUpdateReview(r.id)}>Update</button>
-                <button onClick={() => handleDeleteReview(r.id)}>Delete</button>
+                <button className="update-button" onClick={() => handleUpdateReview(r.id)}>Update</button>
+                <button className="delete-button" onClick={() => handleDeleteReview(r.id)}>Delete</button>
               </div>
             ))
           )}

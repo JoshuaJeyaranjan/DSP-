@@ -394,13 +394,17 @@ async function handleDelete(job) {
         </div>
 
         <div className="filter-controls">
-          <label>
-            Filter by category:{" "}
+          <div className="filter-subcontainer">
+               <label className="filter-label">
+            <p>Filter by category:</p>{" "}
+          
+         
             <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
               <option value="all">All</option>
               {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </label>
+        </div>
         </div>
 
         <div className="jobs-grid">
