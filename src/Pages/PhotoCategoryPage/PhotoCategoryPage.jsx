@@ -17,20 +17,38 @@ const categoryMap = {
   portraits: "portrait",
   drones: "drone",
   sports: "sports",
+  product: "product",
+};
+
+// Responsive breakpoints
+const getSize = (width) => {
+  if (width >= 1024) return "large";
+  if (width >= 768) return "medium";
+  return "small";
+};
+
+// Hook to track window width
+const useWindowWidth = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
 };
 
 function PhotoCategoryPage() {
   const { category } = useParams();
+  const windowWidth = useWindowWidth();
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadPhotos = async () => {
-      console.log(`Loading photos for category: ${category}`);
       setLoading(true);
       try {
         const dbCategory = categoryMap[category] || category;
-        console.log(`Mapped category to database category: ${dbCategory}`);
 
         const { data, error } = await supabase
           .from("images")
@@ -38,63 +56,56 @@ function PhotoCategoryPage() {
           .eq("category", dbCategory)
           .order("created_at", { ascending: false });
 
-        if (!error) {
-          console.log(
-            `Fetched ${data.length} images for category "${dbCategory}"`
-          );
+        if (error || !data) throw error || new Error("No data returned");
 
-          // Filter for medium webp or medium jpeg/avif if you want fallback
-    const mappedPhotos = [];
+        const size = getSize(windowWidth);
 
-// Use a Set to track which original filenames we've already added
-const seenOriginals = new Set();
+        const mappedPhotos = [];
+        const seenOriginals = new Set();
 
-data.forEach(img => {
-  // Derive a "base name" from the original file
-  const baseName = img.path.replace(/^.*[\\/]/, '').replace(/\.[^/.]+$/, '');
-  
-  if (seenOriginals.has(baseName)) return; // skip duplicates
-  seenOriginals.add(baseName);
+        data.forEach((img) => {
+          const baseName = img.path.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, "");
+          if (seenOriginals.has(baseName)) return;
+          seenOriginals.add(baseName);
 
-  // Construct a single canonical derived path
-  const derivedPath = `medium/${baseName}.webp`;
+          const avifPath = `${size}/${baseName}.avif`;
+          const webpPath = `${size}/${baseName}.webp`;
+          const fallbackPath = `${size}/${baseName}.jpg`;
 
-  const { data: publicUrlData } = supabase
-    .storage
-    .from("photos-derived")
-    .getPublicUrl(derivedPath);
+          const { data: avifData } = supabase.storage.from("photos-derived").getPublicUrl(avifPath);
+          const { data: webpData } = supabase.storage.from("photos-derived").getPublicUrl(webpPath);
+          const { data: fallbackData } = supabase.storage.from("photos-derived").getPublicUrl(fallbackPath);
 
-  mappedPhotos.push({
-    id: img.id,
-    src: publicUrlData.publicUrl,
-    title: img.title || img.path,
-    fallbackSrc: "/placeholder.jpg",
-  });
-});
-          setPhotos(mappedPhotos);
-        }
+          mappedPhotos.push({
+            id: img.id,
+            avifSrc: avifData?.publicUrl,
+            webpSrc: webpData?.publicUrl,
+            fallbackSrc: fallbackData?.publicUrl || "/placeholder.jpg",
+            title: img.title || img.path,
+            largeSrc: supabase.storage.from("photos-derived").getPublicUrl(`large/${baseName}.avif`)?.data?.publicUrl,
+          });
+        });
+
+        setPhotos(mappedPhotos);
       } catch (err) {
         console.error("Unexpected error fetching images:", err);
         setPhotos([]);
       } finally {
         setLoading(false);
-        console.log("Finished loading photos");
       }
     };
 
     loadPhotos();
-  }, [category]);
+  }, [category, windowWidth]);
 
-  if (loading) return <LoadingSkeleton/>;
+  if (loading) return <LoadingSkeleton />;
   if (!photos.length) return <p>No images found for this category.</p>;
 
   return (
     <>
       <Nav />
       <div className="photo-category-page">
-        <h1 className="title">
-          {category.charAt(0).toUpperCase() + category.slice(1)}
-        </h1>
+        <h1 className="title">{category.charAt(0).toUpperCase() + category.slice(1)}</h1>
         <PhotoGallery photos={photos} />
       </div>
       <Footer />

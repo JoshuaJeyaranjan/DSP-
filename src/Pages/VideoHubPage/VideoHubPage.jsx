@@ -14,83 +14,114 @@ const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
+const HERO_LARGE_BREAKPOINT = 1024; // px
+
+// Hook to track window width
+const useWindowWidth = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
+};
+
 function VideoHubPage() {
+    const windowWidth = useWindowWidth();
+  const heroSize = windowWidth >= HERO_LARGE_BREAKPOINT ? "large" : "medium";
   const [categories, setCategories] = useState([]);
   const [heroUrl, setHeroUrl] = useState(null);
   const [loading, setLoading] = useState({ categories: true, hero: true });
   const [error, setError] = useState({ categories: null, hero: null });
   const [loadedHero, setLoadedHero] = useState(false); // fade-in effect
 
-  useEffect(() => {
-    let mounted = true;
+// -----------------------------
+// Fetch categories
+// -----------------------------
+useEffect(() => {
+  let mounted = true;
 
-    // -----------------------------
-    // Fetch categories from Render video service
-    // -----------------------------
-    const fetchCategories = async () => {
-      setLoading(prev => ({ ...prev, categories: true }));
-      try {
-        const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const data = await res.json();
+  const fetchCategories = async () => {
+    setLoading(prev => ({ ...prev, categories: true }));
+    try {
+      const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      const data = await res.json();
 
-        // data should be an array of categories with { name, categoryThumbnail }
-        const categoryArr = data.map(cat => ({
-          name: cat.name,
-          path: `/video/${cat.name}`,
-          thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
-        }));
+      const categoryArr = data.map(cat => ({
+        name: cat.name,
+        path: `/video/${cat.name}`,
+        thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
+      }));
 
-        if (mounted) setCategories(categoryArr);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-        if (mounted) setError(prev => ({ ...prev, categories: err.message }));
-      } finally {
-        if (mounted) setLoading(prev => ({ ...prev, categories: false }));
-      }
-    };
+      if (mounted) setCategories(categoryArr);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      if (mounted) setError(prev => ({ ...prev, categories: err.message }));
+    } finally {
+      if (mounted) setLoading(prev => ({ ...prev, categories: false }));
+    }
+  };
 
-    // -----------------------------
-    // Fetch hero image from Supabase
-    // -----------------------------
-    const fetchHero = async () => {
-      setLoading(prev => ({ ...prev, hero: true }));
-      setError(prev => ({ ...prev, hero: null }));
+  fetchCategories();
+  return () => { mounted = false; };
+}, []);
 
-      try {
-        const { data: row, error } = await supabase
-          .from("images")
-          .select("path")
-          .eq("is_video_hero", true)
-          .maybeSingle();
+// -----------------------------
+// Fetch hero image (AVIF + WebP)
+// -----------------------------
+useEffect(() => {
+  let mounted = true;
 
-        if (error) {
-          console.warn("Supabase hero fetch error:", error);
-          if (mounted) setError(prev => ({ ...prev, hero: error.message }));
-          return;
+  const fetchHero = async () => {
+    setLoading(prev => ({ ...prev, hero: true }));
+    setError(prev => ({ ...prev, hero: null }));
+
+    try {
+      const { data: row, error } = await supabase
+        .from("images")
+        .select("path")
+        .eq("is_video_hero", true)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (row?.path && mounted) {
+        const heroFolder = heroSize;
+        const baseFilename = row.path.split("/").pop().replace(/\.[^/.]+$/, "");
+
+        const avifPath = `${heroFolder}/${baseFilename}.avif`;
+        const { data: avifData } = supabase.storage
+          .from("photos-derived")
+          .getPublicUrl(avifPath);
+
+        if (avifData?.publicUrl) {
+          setHeroUrl(avifData.publicUrl);
+        } else {
+          const webpPath = `${heroFolder}/${baseFilename}.webp`;
+          const { data: webpData } = supabase.storage
+            .from("photos-derived")
+            .getPublicUrl(webpPath);
+
+          if (webpData?.publicUrl) setHeroUrl(webpData.publicUrl);
+          else {
+            console.warn("Hero not found:", avifPath, webpPath);
+            setHeroUrl(null);
+          }
         }
-
-        if (row?.path && mounted) {
-          const { data: pubData } = supabase.storage
-            .from("photos-original")
-            .getPublicUrl(row.path);
-
-          if (pubData?.publicUrl) setHeroUrl(pubData.publicUrl);
-        }
-      } catch (err) {
-        console.error("Error fetching hero:", err);
-        if (mounted) setError(prev => ({ ...prev, hero: err.message }));
-      } finally {
-        if (mounted) setLoading(prev => ({ ...prev, hero: false }));
       }
-    };
+    } catch (err) {
+      console.error("Error fetching hero:", err);
+      if (mounted) setError(prev => ({ ...prev, hero: err.message }));
+    } finally {
+      if (mounted) setLoading(prev => ({ ...prev, hero: false }));
+    }
+  };
 
-    fetchCategories();
-    fetchHero();
-
-    return () => { mounted = false; };
-  }, []);
-
+  fetchHero();
+  return () => { mounted = false; };
+}, [heroSize]); // refetch when heroSize changes
   const handleHeroLoad = () => setLoadedHero(true);
 
   const backgroundStyle = heroUrl

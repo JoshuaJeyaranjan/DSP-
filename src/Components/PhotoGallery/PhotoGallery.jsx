@@ -10,12 +10,7 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
 
   const startIdx = currentPage * photosPerPage;
   const endIdx = startIdx + photosPerPage;
-
-  const currentPhotos = useMemo(
-    () => photos.slice(startIdx, endIdx),
-    [photos, startIdx, endIdx]
-  );
-
+  const currentPhotos = useMemo(() => photos.slice(startIdx, endIdx), [photos, startIdx, endIdx]);
   const totalPages = Math.ceil(photos.length / photosPerPage);
 
   return (
@@ -24,27 +19,25 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
         {currentPhotos.map((photo) => (
           <div
             className="photo-card"
-            key={photo.id} // stable unique key
+            key={photo.id}
             onClick={() => {
-              const idx = photos.findIndex(p => p.id === photo.id);
+              const idx = photos.findIndex((p) => p.id === photo.id);
               setCurrentIndex(idx);
               setLightboxOpen(true);
             }}
           >
-            <img
-              className="photo"
-              src={photo.src}
-              alt={photo.title}
-              loading="lazy"
-              onError={(e) => {
-                if (e.target.src !== photo.fallbackSrc) {
-                  console.warn(`Failed to load ${photo.src}, using fallback`);
-                  e.target.src = photo.fallbackSrc;
-                } else {
-                  console.error(`Fallback also failed for ${photo.fallbackSrc}`);
-                }
-              }}
-            />
+            <picture>
+              {photo.avifSrc && <source type="image/avif" srcSet={photo.avifSrc} />}
+              {photo.webpSrc && <source type="image/webp" srcSet={photo.webpSrc} />}
+              <img
+                src={photo.fallbackSrc}
+                alt={photo.title}
+                loading="lazy"
+                onError={(e) => {
+                  if (e.target.src !== "/placeholder.jpg") e.target.src = "/placeholder.jpg";
+                }}
+              />
+            </picture>
           </div>
         ))}
       </div>
@@ -67,7 +60,7 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
         open={lightboxOpen}
         index={currentIndex}
         close={() => setLightboxOpen(false)}
-        slides={photos.map((p) => ({ src: p.src, title: p.title }))}
+        slides={photos.map((p) => ({ src: p.largeSrc || p.fallbackSrc, title: p.title }))}
       />
     </div>
   );

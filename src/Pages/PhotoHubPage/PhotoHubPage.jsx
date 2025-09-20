@@ -10,17 +10,32 @@ const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 const CATEGORIES = ["car", "sports", "drone", "portrait", "product"];
-const PREFERRED_SIZE = "medium";
+const THUMBNAIL_SIZE = "medium";
+const HERO_LARGE_BREAKPOINT = 1024; // px
+
+// Hook to track window width
+const useWindowWidth = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
+};
 
 export default function PhotoHub() {
+  const windowWidth = useWindowWidth();
+  const heroSize = windowWidth >= HERO_LARGE_BREAKPOINT ? "large" : "medium";
+
   const [thumbnails, setThumbnails] = useState({});
   const [heroUrl, setHeroUrl] = useState(null);
   const [loading, setLoading] = useState({ thumbnails: true, hero: true });
   const [error, setError] = useState({ thumbnails: null, hero: null });
-  const [loadedHero, setLoadedHero] = useState(false); // fade-in effect
+  const [loadedHero, setLoadedHero] = useState(false);
 
   // -----------------------------
-  // Load thumbnails in parallel
+  // Load thumbnails
   // -----------------------------
   useEffect(() => {
     const fetchThumbnails = async () => {
@@ -37,16 +52,11 @@ export default function PhotoHub() {
             .limit(1)
             .maybeSingle();
 
-          if (fetchErr) {
-            console.warn(`Error fetching thumbnail for ${category}:`, fetchErr);
-            return [category, null];
-          }
-
-          if (!image?.path) return [category, null];
+          if (fetchErr || !image?.path) return [category, null];
 
           const { data: pubData } = supabase.storage
             .from("photos-derived")
-            .getPublicUrl(`${PREFERRED_SIZE}/${image.path.replace(/\.[^/.]+$/, ".webp")}`);
+            .getPublicUrl(`${THUMBNAIL_SIZE}/${image.path.replace(/\.[^/.]+$/, ".webp")}`);
 
           return [category, pubData?.publicUrl ?? null];
         });
@@ -64,69 +74,86 @@ export default function PhotoHub() {
     fetchThumbnails();
   }, []);
 
-  // -----------------------------
-  // Load hero image with fade-in
-  // -----------------------------
-  useEffect(() => {
-    let mounted = true;
 
-    const fetchHero = async () => {
-      setLoading(prev => ({ ...prev, hero: true }));
-      setError(prev => ({ ...prev, hero: null }));
+// -----------------------------
+// Load hero image with AVIF + WebP fallback
+// -----------------------------
+useEffect(() => {
+  let mounted = true;
 
-      try {
-        const { data: row, error } = await supabase
-          .from("images")
-          .select("path")
-          .eq("is_photo_hero", true)
-          .maybeSingle();
+  const fetchHero = async () => {
+    setLoading(prev => ({ ...prev, hero: true }));
+    setError(prev => ({ ...prev, hero: null }));
 
-        if (error) {
-          console.warn("Supabase hero fetch error:", error);
-          if (mounted) setError(prev => ({ ...prev, hero: error.message }));
-          return;
+    try {
+      const { data: row, error } = await supabase
+        .from("images")
+        .select("path")
+        .eq("is_photo_hero", true)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (row?.path && mounted) {
+        const heroFolder = heroSize; // 'large' or 'medium'
+        const baseFilename = row.path.split("/").pop().replace(/\.[^/.]+$/, "");
+
+        // AVIF first
+        const avifPath = `${heroFolder}/${baseFilename}.avif`;
+        const { data: avifData } = supabase.storage
+          .from("photos-derived")
+          .getPublicUrl(avifPath);
+
+        if (avifData?.publicUrl) {
+          setHeroUrl(avifData.publicUrl);
+        } else {
+          // Fallback to WebP
+          const webpPath = `${heroFolder}/${baseFilename}.webp`;
+          const { data: webpData } = supabase.storage
+            .from("photos-derived")
+            .getPublicUrl(webpPath);
+
+          if (webpData?.publicUrl) setHeroUrl(webpData.publicUrl);
+          else {
+            console.warn("Hero image not found in AVIF or WebP:", avifPath, webpPath);
+            setHeroUrl(null);
+          }
         }
-
-        if (row?.path && mounted) {
-          const { data: pubData } = supabase.storage
-            .from("photos-original")
-            .getPublicUrl(row.path);
-          if (pubData?.publicUrl) setHeroUrl(pubData.publicUrl);
-        }
-      } catch (err) {
-        console.error("Error fetching hero:", err);
-        if (mounted) setError(prev => ({ ...prev, hero: err.message }));
-      } finally {
-        if (mounted) setLoading(prev => ({ ...prev, hero: false }));
       }
-    };
+    } catch (err) {
+      console.error("Error fetching hero:", err);
+      if (mounted) setError(prev => ({ ...prev, hero: err.message }));
+    } finally {
+      if (mounted) setLoading(prev => ({ ...prev, hero: false }));
+    }
+  };
 
-    fetchHero();
-    return () => { mounted = false; };
-  }, []);
-
+  fetchHero();
+  return () => { mounted = false; };
+}, [heroSize]); // refetch whenever heroSize changes
   const handleHeroLoad = () => setLoadedHero(true);
 
   const backgroundStyle = heroUrl
-    ? { backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.45)), url("${heroUrl}")`,
+    ? {
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.45)), url("${heroUrl}")`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
       }
     : {};
 
-  if (loading.thumbnails) return <PageLoader/>;
+  if (loading.thumbnails) return <PageLoader />;
   if (error.thumbnails) return <p className="error">{error.thumbnails}</p>;
 
   return (
     <>
       <Nav />
       <div className="photo-hub-page">
-        <section className={`hero ${loadedHero ? "loaded" : ""}`} style={backgroundStyle} aria-label="">
+        <section className={`hero ${loadedHero ? "loaded" : ""}`} style={backgroundStyle}>
           {!loadedHero && <div className="hero-skeleton" />}
           {heroUrl && <img src={heroUrl} alt="Photo hero" onLoad={handleHeroLoad} style={{ display: "none" }} />}
           <div className="overlay" />
-          {loading.hero && <PageLoader/>}
+          {loading.hero && <PageLoader />}
           {error.hero && <p className="error">Hero load error: {error.hero}</p>}
           <h1 className="title">STILLS</h1>
         </section>
