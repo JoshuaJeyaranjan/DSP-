@@ -17,6 +17,12 @@ export default function AdminPricingPage() {
   const [message, setMessage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+
+const filteredPlans = selectedCategory
+  ? plans.filter((p) => p.category_id === selectedCategory)
+  : plans;
+
+
   const [newCategory, setNewCategory] = useState({
     name: "",
     slug: "",
@@ -44,6 +50,11 @@ export default function AdminPricingPage() {
         .order("name");
       if (error) throw error;
       setCategories(data);
+
+// Default selected category to the first one
+if (data.length > 0) {
+  setSelectedCategory(data[0].id);
+}
 
       // Initialize category edit states
       const initialCategoryEdits = {};
@@ -256,7 +267,6 @@ export default function AdminPricingPage() {
     }
   };
 
-  
 
   /* ----------------------- RENDER ----------------------- */
   return (
@@ -295,6 +305,23 @@ export default function AdminPricingPage() {
         <div className="plan-section">
           <h2>Plans</h2>
 
+          <div className="plan-filter">
+  <label>Filter Plans by Category:</label>
+<select
+  value={selectedCategory || ""}
+  onChange={(e) =>
+    setSelectedCategory(e.target.value || null)
+  }
+>
+  <option value="">All Categories</option>
+  {categories.map((c) => (
+    <option key={c.id} value={c.id}>
+      {c.name}
+    </option>
+  ))}
+</select>
+</div>
+
           <div className="add-plan">
             <select value={newPlan.category_id || ""} onChange={(e)=>setNewPlan({...newPlan, category_id: Number(e.target.value)})}>
               <option value="">-- Select Category --</option>
@@ -307,19 +334,75 @@ export default function AdminPricingPage() {
             <button onClick={handleAddPlan}>Add Plan</button>
           </div>
 
-          {loading ? <p>Loading plans...</p> : plans.map(p => (
-            <div className="plan-item" key={p.id}>
-              <select value={planEditStates[p.id]?.category_id || ""} onChange={(e)=>setPlanEditStates(prev=>({...prev,[p.id]:{...prev[p.id], category_id:Number(e.target.value)}}))}>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <input type="text" value={planEditStates[p.id]?.title || ""} onChange={(e)=>setPlanEditStates(prev=>({...prev,[p.id]:{...prev[p.id], title:e.target.value}}))} />
-              <input type="text" value={planEditStates[p.id]?.description || ""} onChange={(e)=>setPlanEditStates(prev=>({...prev,[p.id]:{...prev[p.id], description:e.target.value}}))} />
-              <input type="number" step="0.01" value={planEditStates[p.id]?.price || ""} onChange={(e)=>setPlanEditStates(prev=>({...prev,[p.id]:{...prev[p.id], price:e.target.value}}))} />
-              <input type="text" value={planEditStates[p.id]?.deliverables || ""} onChange={(e)=>setPlanEditStates(prev=>({...prev,[p.id]:{...prev[p.id], deliverables:e.target.value}}))} />
-              <button onClick={()=>handleUpdatePlan(p.id)}>Update</button>
-              <button onClick={()=>handleDeletePlan(p.id)}>Delete</button>
-            </div>
-          ))}
+       // Render plans using filteredPlans instead of plans
+{loading ? (
+  <p>Loading plans...</p>
+) : filteredPlans.length === 0 ? (
+  <p>No plans found for this category.</p>
+) : (
+  filteredPlans.map((p) => (
+    <div className="plan-item" key={p.id}>
+      <select
+        value={planEditStates[p.id]?.category_id || ""}
+        onChange={(e) =>
+          setPlanEditStates((prev) => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], category_id: Number(e.target.value) },
+          }))
+        }
+      >
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        value={planEditStates[p.id]?.title || ""}
+        onChange={(e) =>
+          setPlanEditStates((prev) => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], title: e.target.value },
+          }))
+        }
+      />
+      <input
+        type="text"
+        value={planEditStates[p.id]?.description || ""}
+        onChange={(e) =>
+          setPlanEditStates((prev) => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], description: e.target.value },
+          }))
+        }
+      />
+      <input
+        type="number"
+        step="0.01"
+        value={planEditStates[p.id]?.price || ""}
+        onChange={(e) =>
+          setPlanEditStates((prev) => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], price: e.target.value },
+          }))
+        }
+      />
+      <input
+        type="text"
+        value={planEditStates[p.id]?.deliverables || ""}
+        onChange={(e) =>
+          setPlanEditStates((prev) => ({
+            ...prev,
+            [p.id]: { ...prev[p.id], deliverables: e.target.value },
+          }))
+        }
+      />
+      <button onClick={() => handleUpdatePlan(p.id)}>Update</button>
+      <button onClick={() => handleDeletePlan(p.id)}>Delete</button>
+    </div>
+  ))
+)}
         </div>
       </div>
       <Footer />
