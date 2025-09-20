@@ -171,12 +171,21 @@
           }
         }
 
-        button:nth-child(1) {
+        button:nth-child(7) {
           background: #dc3545;
           color: white;
 
           &:hover {
             background: #a71d2a;
+          }
+        }
+
+        button:nth-child(1) {
+          background: #28a745;
+          color: white;
+
+          &:hover {
+            background: #1e7e34;
           }
         }
 
@@ -265,3 +274,65 @@
   color: #333;
 }
 
+.job-meta {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.job-meta h4 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #111;
+}
+
+.job-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 16px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.meta-value {
+  font-weight: 600;
+}
+
+.contact-button{
+  background-color: #28a745;
+}
+
+.about-button {
+  background-color: orchid;
+}
+
+.copy-btn {
+  width: 90%;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: #0056b3;
+}
+
+.copy-btn.copied {
+  background-color: #28a745;
+  color: #fff;
+}
