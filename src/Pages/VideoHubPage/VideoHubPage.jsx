@@ -36,8 +36,9 @@ function VideoHubPage() {
   const [error, setError] = useState({ categories: null, hero: null });
   const [loadedHero, setLoadedHero] = useState(false); // fade-in effect
 
+
 // -----------------------------
-// Fetch categories
+// Fetch categories (from Supabase)
 // -----------------------------
 useEffect(() => {
   let mounted = true;
@@ -45,27 +46,30 @@ useEffect(() => {
   const fetchCategories = async () => {
     console.time("Fetch categories total");
     setLoading((prev) => ({ ...prev, categories: true }));
+    setError((prev) => ({ ...prev, categories: null }));
 
     try {
-      console.time("Fetch categories API call");
-      const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
-      console.timeEnd("Fetch categories API call");
+      console.time("Supabase select categories");
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, thumbnail_url")
+        .order("name", { ascending: true }); // alphabetical for nice UX
+      console.timeEnd("Supabase select categories");
 
-      if (!res.ok) throw new Error("Failed to fetch categories");
+      if (error) throw error;
 
-      console.time("Parse categories JSON");
-      const data = await res.json();
-      console.timeEnd("Parse categories JSON");
+      if (data && mounted) {
+        console.time("Transform categories array");
+        const categoryArr = data.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+          path: `/video/${cat.id}`, // since no slug column, use id in URL
+          thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
+        }));
+        console.timeEnd("Transform categories array");
 
-      console.time("Transform categories array");
-      const categoryArr = data.map((cat) => ({
-        name: cat.name,
-        path: `/video/${cat.name}`,
-        thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
-      }));
-      console.timeEnd("Transform categories array");
-
-      if (mounted) setCategories(categoryArr);
+        setCategories(categoryArr);
+      }
     } catch (err) {
       console.error("Error fetching categories:", err);
       if (mounted) setError((prev) => ({ ...prev, categories: err.message }));

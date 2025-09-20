@@ -4,65 +4,87 @@ import VideoGallery from "../../Components/VideoGallery/VideoGallery";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 import { createClient } from "@supabase/supabase-js";
-import LoadingSkeleton from "../../Components/LoadingSkeleton/LoadingSkeleton";
 import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
-
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 function VideoCategoryPage() {
-  const { category } = useParams();
+  const { category } = useParams(); // this is the category ID from the URL
   const [videos, setVideos] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-useEffect(() => {
-  const fetchVideos = async () => {
-    setLoading(true);
-    try {
-      // 1️⃣ Get category ID
-      const { data: catData, error: catError } = await supabase
-        .from("categories")
-        .select("id")
-        .eq("name", category)
-        .single();
+  // Fetch category name (for the page title)
+  useEffect(() => {
+    const fetchCategoryName = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("categories")
+          .select("name")
+          .eq("id", category)
+          .maybeSingle();
 
-      if (catError || !catData) throw new Error(catError?.message || "Category not found");
+        if (error) throw error;
+        if (data) setCategoryName(data.name);
+      } catch (err) {
+        console.error("Error fetching category name:", err);
+        setError(err.message);
+      }
+    };
 
-      const categoryId = catData.id;
+    if (category) fetchCategoryName();
+  }, [category]);
 
-      // 2️⃣ Get videos by category_id
-      const { data: videosData, error: videosError } = await supabase
-        .from("videos")
-        .select("*")
-        .eq("category_id", categoryId)
-        .order("created_at", { ascending: true });
+  // Fetch videos for this category
+  useEffect(() => {
+    const fetchVideos = async () => {
+      setLoading(true);
+      try {
+        const { data: videosData, error: videosError } = await supabase
+          .from("videos")
+          .select("*")
+          .eq("category_id", category)
+          .order("created_at", { ascending: true });
 
-      if (videosError) throw new Error(videosError.message);
+        if (videosError) throw videosError;
 
-      setVideos(Array.isArray(videosData) ? videosData : []);
-    } catch (err) {
-      console.error("Error fetching videos:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setVideos(Array.isArray(videosData) ? videosData : []);
+      } catch (err) {
+        console.error("Error fetching videos:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchVideos();
-}, [category]);
+    if (category) fetchVideos();
+  }, [category]);
 
-  if (loading) return <PageLoader/>;
+  // ----------------------------
+  // Render states
+  // ----------------------------
+  if (loading) return <PageLoader />;
   if (error) return <p>Error: {error}</p>;
-  if (!videos || videos.length === 0) return <p>No videos found for this category.</p>;
+  if (!videos || videos.length === 0)
+    return (
+      <>
+        <Nav />
+        <div className="video-category-page">
+          <h1 className="title">{categoryName || "Category"}</h1>
+          <p>No videos found for this category.</p>
+        </div>
+        <Footer />
+      </>
+    );
 
   return (
     <>
       <Nav />
       <div className="video-category-page">
-        <h1 className="title">{category.charAt(0).toUpperCase() + category.slice(1)} </h1>
+        <h1 className="title">{categoryName || "Category"}</h1>
         <VideoGallery videos={videos} loading={loading} />
       </div>
       <Footer />
