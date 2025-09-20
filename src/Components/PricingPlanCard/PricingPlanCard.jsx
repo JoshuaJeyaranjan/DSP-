@@ -1,5 +1,5 @@
 import './PricingPlanCard.scss'
-
+import { Link } from 'react-router-dom';
 
 export default function PricingPlanCard({ title, description, price, deliverables }) {
   const deliverablesList = deliverables || [];
@@ -18,7 +18,10 @@ export default function PricingPlanCard({ title, description, price, deliverable
           ))}
         </ul>
       )}
-      <button className="select-plan-btn">Select Plan</button>
+      <Link to='/contact'>
+      <button className="select-plan-btn">Contact Me</button>
+      </Link>
+      
     </div>
   );
 }

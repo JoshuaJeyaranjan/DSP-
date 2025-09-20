@@ -1,211 +1,52 @@
 .video-gallery {
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-  
-    .video-card {
-      background: var(--color-bg);
-      border: 1px solid var(--color-text-secondary);
-      border-radius: 8px;
-      padding: 0.5rem;
-  
-      .video-wrapper {
-        position: relative;
-        padding-bottom: 56.25%; // 16:9 aspect ratio
-        height: 0;
-        overflow: hidden;
-        border-radius: 6px;
-  
-        iframe {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: none;
-        }
-      }
-  
-      h3 {
-        margin: 0.5rem 0 0;
-        color: var(--color-text-primary);
-        font-size: 1rem;
-      }
-  
-      p {
-        margin: 0.25rem 0 0;
-        color: var(--color-text-secondary);
-        font-size: 0.85rem;
-      }
-    }
-  
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-  
-      button {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid var(--color-text-secondary);
-        border-radius: 4px;
-        background: none;
-        color: var(--color-text-primary);
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-  
-        &.active {
-          background: var(--color-primary);
-          color: var(--color-bg);
-        }
-  
-        &:hover:not(.active) {
-          background: var(--color-text-secondary);
-          color: var(--color-bg);
-        }
-      }
-    }
-  }
+  padding: 1rem;
 
-  .video-gallery {
-    padding: 1rem;
-  
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-  
-    .video-card {
-      background: var(--color-bg);
-      border: 1px solid var(--color-text-secondary);
-      border-radius: 8px;
-      padding: 0.5rem;
-      transition: transform 0.2s ease-in-out;
-  
-      &:hover {
-        transform: scale(1.02);
-      }
-  
-      .video-wrapper {
-        position: relative;
-        padding-bottom: 56.25%; // 16:9 aspect ratio
-        height: 0;
-        overflow: hidden;
-        border-radius: 6px;
-  
-        iframe {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: none;
-        }
-      }
-  
-      h3 {
-        margin: 0.5rem 0 0;
-        font-size: 1rem;
-        color: var(--color-text-primary);
-      }
-  
-      p {
-        margin: 0.25rem 0 0;
-        font-size: 0.85rem;
-        color: var(--color-text-secondary);
-      }
-    }
-  
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 1rem;
-      gap: 0.5rem;
-  
-      button {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid var(--color-text-secondary);
-        border-radius: 4px;
-        background: none;
-        color: var(--color-text-primary);
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-  
-        &:hover:not(.active) {
-          background: var(--color-text-secondary);
-          color: var(--color-bg);
-        }
-  
-        &.active {
-          background: var(--color-primary);
-          color: var(--color-bg);
-        }
-      }
-    }
-  }
-
-  .video-gallery {
   .video-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: column; // force column layout
+    gap: 2rem; // spacing between videos
+    align-items: center; // center horizontally
   }
 
   .video-card {
-    background: #fff;
+    width: 100%;
+    max-width: 1000px; // keeps videos from being TOO wide on huge screens
+    background: var(--color-bg);
+    border: 1px solid var(--color-text-secondary);
     border-radius: 12px;
-    overflow: hidden;
+    padding: 0.75rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; // 16:9 aspect ratio
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    }
+
+    h3 {
+      margin: 0.5rem 0 0;
+      font-size: 1.2rem;
+      color: var(--color-text-primary);
+      text-align: center;
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      text-align: center;
     }
   }
 }
-
-//   /* Skeletons */
-//   .skeleton {
-//     .skeleton-box {
-//       background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
-//       background-size: 200% 100%;
-//       animation: shimmer 1.5s infinite;
-//       border-radius: 12px;
-//       width: 100%;
-//       padding-bottom: 56.25%; // same aspect ratio
-//     }
-
-//     .skeleton-line {
-//       margin-top: 8px;
-//       height: 16px;
-//       border-radius: 8px;
-//       background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
-//       background-size: 200% 100%;
-//       animation: shimmer 1.5s infinite;
-//     }
-//   }
-
-//   /* Fade-in animation for loaded videos */
-//   .fade-in {
-//     animation: fadeInUp 0.6s ease forwards;
-//     opacity: 0;
-//     transform: translateY(20px);
-//   }
-// }
-
-// @keyframes shimmer {
-//   100% {
-//     background-position: -200% 0;
-//   }
-// }
-
-// @keyframes fadeInUp {
-//   to {
-//     opacity: 1;
-//     transform: translateY(0);
-//   }
-// }

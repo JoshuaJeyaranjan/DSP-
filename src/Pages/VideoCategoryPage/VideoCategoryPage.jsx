@@ -62,7 +62,7 @@ useEffect(() => {
     <>
       <Nav />
       <div className="video-category-page">
-        <h1>{category.charAt(0).toUpperCase() + category.slice(1)} Videos</h1>
+        <h1 className="title">{category.charAt(0).toUpperCase() + category.slice(1)} </h1>
         <VideoGallery videos={videos} loading={loading} />
       </div>
       <Footer />

@@ -43,51 +43,68 @@ useEffect(() => {
   let mounted = true;
 
   const fetchCategories = async () => {
-    setLoading(prev => ({ ...prev, categories: true }));
-    try {
-      const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
-      if (!res.ok) throw new Error("Failed to fetch categories");
-      const data = await res.json();
+    console.time("Fetch categories total");
+    setLoading((prev) => ({ ...prev, categories: true }));
 
-      const categoryArr = data.map(cat => ({
+    try {
+      console.time("Fetch categories API call");
+      const res = await fetch(`${VIDEO_SERVICE_URL}/api/categories`);
+      console.timeEnd("Fetch categories API call");
+
+      if (!res.ok) throw new Error("Failed to fetch categories");
+
+      console.time("Parse categories JSON");
+      const data = await res.json();
+      console.timeEnd("Parse categories JSON");
+
+      console.time("Transform categories array");
+      const categoryArr = data.map((cat) => ({
         name: cat.name,
         path: `/video/${cat.name}`,
         thumbnail: cat.thumbnail_url || DEFAULT_THUMB,
       }));
+      console.timeEnd("Transform categories array");
 
       if (mounted) setCategories(categoryArr);
     } catch (err) {
       console.error("Error fetching categories:", err);
-      if (mounted) setError(prev => ({ ...prev, categories: err.message }));
+      if (mounted) setError((prev) => ({ ...prev, categories: err.message }));
     } finally {
-      if (mounted) setLoading(prev => ({ ...prev, categories: false }));
+      if (mounted) setLoading((prev) => ({ ...prev, categories: false }));
+      console.timeEnd("Fetch categories total");
     }
   };
 
   fetchCategories();
-  return () => { mounted = false; };
+  return () => {
+    mounted = false;
+  };
 }, []);
 
 // -----------------------------
-// Fetch hero image (AVIF + WebP)
+// Fetch hero image
 // -----------------------------
 useEffect(() => {
   let mounted = true;
 
   const fetchHero = async () => {
-    setLoading(prev => ({ ...prev, hero: true }));
-    setError(prev => ({ ...prev, hero: null }));
+    console.time("Fetch hero total");
+    setLoading((prev) => ({ ...prev, hero: true }));
+    setError((prev) => ({ ...prev, hero: null }));
 
     try {
+      console.time("Supabase select image");
       const { data: row, error } = await supabase
         .from("images")
         .select("path")
         .eq("is_video_hero", true)
         .maybeSingle();
+      console.timeEnd("Supabase select image");
 
       if (error) throw error;
 
       if (row?.path && mounted) {
+        console.time("Generate hero URL");
         const heroFolder = heroSize;
         const baseFilename = row.path.split("/").pop().replace(/\.[^/.]+$/, "");
 
@@ -110,18 +127,24 @@ useEffect(() => {
             setHeroUrl(null);
           }
         }
+        console.timeEnd("Generate hero URL");
       }
     } catch (err) {
       console.error("Error fetching hero:", err);
-      if (mounted) setError(prev => ({ ...prev, hero: err.message }));
+      if (mounted) setError((prev) => ({ ...prev, hero: err.message }));
     } finally {
-      if (mounted) setLoading(prev => ({ ...prev, hero: false }));
+      if (mounted) setLoading((prev) => ({ ...prev, hero: false }));
+      console.timeEnd("Fetch hero total");
     }
   };
 
   fetchHero();
-  return () => { mounted = false; };
-}, [heroSize]); // refetch when heroSize changes
+  return () => {
+    mounted = false;
+  };
+}, [heroSize]);
+
+
   const handleHeroLoad = () => setLoadedHero(true);
 
   const backgroundStyle = heroUrl

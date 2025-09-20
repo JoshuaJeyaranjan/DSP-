@@ -17,17 +17,15 @@ export default function AdminPricingPage() {
   const [message, setMessage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-
-const filteredPlans = selectedCategory
-  ? plans.filter((p) => p.category_id === selectedCategory)
-  : plans;
-
+  const filteredPlans = selectedCategory
+    ? plans.filter((p) => p.category_id === selectedCategory)
+    : plans;
 
   const [newCategory, setNewCategory] = useState({
     name: "",
     slug: "",
     description: "",
-    thumbnail: "",
+    thumbnail_url: "",
   });
 
   const [categoryEditStates, setCategoryEditStates] = useState({});
@@ -51,10 +49,10 @@ const filteredPlans = selectedCategory
       if (error) throw error;
       setCategories(data);
 
-// Default selected category to the first one
-if (data.length > 0) {
-  setSelectedCategory(data[0].id);
-}
+      // Default selected category to the first one
+      if (data.length > 0) {
+        setSelectedCategory(data[0].id);
+      }
 
       // Initialize category edit states
       const initialCategoryEdits = {};
@@ -122,7 +120,12 @@ if (data.length > 0) {
         ...prev,
         [data[0].id]: { ...data[0] },
       }));
-      setNewCategory({ name: "", slug: "", description: "", thumbnail: "" });
+      setNewCategory({
+        name: "",
+        slug: "",
+        description: "",
+        thumbnail_url: "",
+      });
       setMessage("Category added successfully!");
     } catch (err) {
       console.error("Error adding category:", err);
@@ -144,9 +147,7 @@ if (data.length > 0) {
         .select();
       if (error) throw error;
 
-      setCategories((prev) =>
-        prev.map((c) => (c.id === id ? data[0] : c))
-      );
+      setCategories((prev) => prev.map((c) => (c.id === id ? data[0] : c)));
       setCategoryEditStates((prev) => ({
         ...prev,
         [id]: data[0],
@@ -159,7 +160,12 @@ if (data.length > 0) {
   };
 
   const handleDeleteCategory = async (id) => {
-    if (!window.confirm("Delete this category? This will NOT delete associated plans.")) return;
+    if (
+      !window.confirm(
+        "Delete this category? This will NOT delete associated plans."
+      )
+    )
+      return;
     try {
       const { error } = await supabase
         .from("pricing_categories")
@@ -184,7 +190,8 @@ if (data.length > 0) {
 
   const handleAddPlan = async () => {
     const { title, price, category_id, deliverables, description } = newPlan;
-    if (!title || !price || !category_id) return setError("Title, price, and category are required.");
+    if (!title || !price || !category_id)
+      return setError("Title, price, and category are required.");
 
     const priceValue = parseFloat(price);
     if (isNaN(priceValue) || priceValue < 0)
@@ -193,22 +200,38 @@ if (data.length > 0) {
     try {
       const { data, error } = await supabase
         .from("pricing_plans")
-        .insert([{
-          title,
-          description: description || "",
-          price: priceValue,
-          deliverables: deliverables ? deliverables.split(",").map(d => d.trim()) : [],
-          category_id
-        }])
+        .insert([
+          {
+            title,
+            description: description || "",
+            price: priceValue,
+            deliverables: deliverables
+              ? deliverables.split(",").map((d) => d.trim())
+              : [],
+            category_id,
+          },
+        ])
         .select();
       if (error) throw error;
 
       setPlans((prev) => [...prev, data[0]]);
       setPlanEditStates((prev) => ({
         ...prev,
-        [data[0].id]: { ...data[0], price: data[0].price.toString(), deliverables: Array.isArray(data[0].deliverables) ? data[0].deliverables.join(", ") : "" }
+        [data[0].id]: {
+          ...data[0],
+          price: data[0].price.toString(),
+          deliverables: Array.isArray(data[0].deliverables)
+            ? data[0].deliverables.join(", ")
+            : "",
+        },
       }));
-      setNewPlan({ title: "", description: "", price: "", deliverables: "", category_id: null });
+      setNewPlan({
+        title: "",
+        description: "",
+        price: "",
+        deliverables: "",
+        category_id: null,
+      });
       setMessage("Plan added successfully!");
     } catch (err) {
       console.error("Error adding plan:", err);
@@ -219,7 +242,8 @@ if (data.length > 0) {
   const handleUpdatePlan = async (id) => {
     const updated = planEditStates[id];
     const priceValue = parseFloat(updated.price);
-    if (isNaN(priceValue) || priceValue < 0) return setError("Price must be a valid positive number.");
+    if (isNaN(priceValue) || priceValue < 0)
+      return setError("Price must be a valid positive number.");
 
     try {
       const { data, error } = await supabase
@@ -227,7 +251,9 @@ if (data.length > 0) {
         .update({
           ...updated,
           price: priceValue,
-          deliverables: updated.deliverables ? updated.deliverables.split(",").map(d => d.trim()) : [],
+          deliverables: updated.deliverables
+            ? updated.deliverables.split(",").map((d) => d.trim())
+            : [],
         })
         .eq("id", id)
         .select();
@@ -236,7 +262,13 @@ if (data.length > 0) {
       setPlans((prev) => prev.map((p) => (p.id === id ? data[0] : p)));
       setPlanEditStates((prev) => ({
         ...prev,
-        [id]: { ...data[0], price: data[0].price.toString(), deliverables: Array.isArray(data[0].deliverables) ? data[0].deliverables.join(", ") : "" }
+        [id]: {
+          ...data[0],
+          price: data[0].price.toString(),
+          deliverables: Array.isArray(data[0].deliverables)
+            ? data[0].deliverables.join(", ")
+            : "",
+        },
       }));
       setMessage("Plan updated successfully!");
     } catch (err) {
@@ -267,7 +299,6 @@ if (data.length > 0) {
     }
   };
 
-
   /* ----------------------- RENDER ----------------------- */
   return (
     <>
@@ -282,127 +313,233 @@ if (data.length > 0) {
         <div className="category-section">
           <h2>Categories</h2>
           <div className="add-category">
-            <input type="text" placeholder="Name" value={newCategory.name} onChange={(e)=>setNewCategory({...newCategory, name:e.target.value})} />
-            <input type="text" placeholder="Slug" value={newCategory.slug} onChange={(e)=>setNewCategory({...newCategory, slug:e.target.value})} />
-            <input type="text" placeholder="Description" value={newCategory.description} onChange={(e)=>setNewCategory({...newCategory, description:e.target.value})} />
-            <input type="text" placeholder="Thumbnail URL" value={newCategory.thumbnail} onChange={(e)=>setNewCategory({...newCategory, thumbnail:e.target.value})} />
+            <input
+              type="text"
+              placeholder="Name"
+              value={newCategory.name}
+              onChange={(e) =>
+                setNewCategory({ ...newCategory, name: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Slug"
+              value={newCategory.slug}
+              onChange={(e) =>
+                setNewCategory({ ...newCategory, slug: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newCategory.description}
+              onChange={(e) =>
+                setNewCategory({ ...newCategory, description: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Thumbnail URL"
+              value={newCategory.thumbnail_url}
+              onChange={(e) =>
+                setNewCategory({
+                  ...newCategory,
+                  thumbnail_url: e.target.value,
+                })
+              }
+            />
             <button onClick={handleAddCategory}>Add Category</button>
           </div>
 
-          {categories.map(c => (
+          {categories.map((c) => (
             <div className="category-item" key={c.id}>
-              <input type="text" value={categoryEditStates[c.id]?.name || ""} onChange={(e)=>setCategoryEditStates(prev=>({...prev,[c.id]:{...prev[c.id], name:e.target.value}}))} />
-              <input type="text" value={categoryEditStates[c.id]?.slug || ""} onChange={(e)=>setCategoryEditStates(prev=>({...prev,[c.id]:{...prev[c.id], slug:e.target.value}}))} />
-              <input type="text" value={categoryEditStates[c.id]?.description || ""} onChange={(e)=>setCategoryEditStates(prev=>({...prev,[c.id]:{...prev[c.id], description:e.target.value}}))} />
-              <input type="text" value={categoryEditStates[c.id]?.thumbnail || ""} onChange={(e)=>setCategoryEditStates(prev=>({...prev,[c.id]:{...prev[c.id], thumbnail:e.target.value}}))} />
-              <button onClick={()=>handleUpdateCategory(c.id)}>Update</button>
-              <button onClick={()=>handleDeleteCategory(c.id)}>Delete</button>
+              <input
+                type="text"
+                value={categoryEditStates[c.id]?.name || ""}
+                onChange={(e) =>
+                  setCategoryEditStates((prev) => ({
+                    ...prev,
+                    [c.id]: { ...prev[c.id], name: e.target.value },
+                  }))
+                }
+              />
+              <input
+                type="text"
+                value={categoryEditStates[c.id]?.slug || ""}
+                onChange={(e) =>
+                  setCategoryEditStates((prev) => ({
+                    ...prev,
+                    [c.id]: { ...prev[c.id], slug: e.target.value },
+                  }))
+                }
+              />
+              <input
+                type="text"
+                value={categoryEditStates[c.id]?.description || ""}
+                onChange={(e) =>
+                  setCategoryEditStates((prev) => ({
+                    ...prev,
+                    [c.id]: { ...prev[c.id], description: e.target.value },
+                  }))
+                }
+              />
+              <input
+                type="text"
+                value={categoryEditStates[c.id]?.thumbnail_url || ""}
+                onChange={(e) =>
+                  setCategoryEditStates((prev) => ({
+                    ...prev,
+                    [c.id]: { ...prev[c.id], thumbnail_url: e.target.value },
+                  }))
+                }
+              />
+              <button onClick={() => handleUpdateCategory(c.id)}>Update</button>
+              <button onClick={() => handleDeleteCategory(c.id)}>Delete</button>
             </div>
           ))}
         </div>
 
         {/* ------------------- PLAN CRUD ------------------- */}
         <div className="plan-section">
-          <h2>Plans</h2>
-
-          <div className="plan-filter">
-  <label>Filter Plans by Category:</label>
-<select
-  value={selectedCategory || ""}
-  onChange={(e) =>
-    setSelectedCategory(e.target.value || null)
-  }
->
-  <option value="">All Categories</option>
-  {categories.map((c) => (
-    <option key={c.id} value={c.id}>
-      {c.name}
-    </option>
-  ))}
-</select>
-</div>
+          <h2>Create New Plan</h2>
 
           <div className="add-plan">
-            <select value={newPlan.category_id || ""} onChange={(e)=>setNewPlan({...newPlan, category_id: Number(e.target.value)})}>
+            <select
+              value={newPlan.category_id || ""}
+              onChange={(e) =>
+                setNewPlan({ ...newPlan, category_id: e.target.value })
+              }
+            >
               <option value="">-- Select Category --</option>
-              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
-            <input type="text" placeholder="Title" value={newPlan.title} onChange={(e)=>setNewPlan({...newPlan,title:e.target.value})} />
-            <input type="text" placeholder="Description" value={newPlan.description} onChange={(e)=>setNewPlan({...newPlan,description:e.target.value})} />
-            <input type="number" placeholder="Price" step="0.01" value={newPlan.price} onChange={(e)=>setNewPlan({...newPlan,price:e.target.value})} />
-            <input type="text" placeholder="Deliverables (comma-separated)" value={newPlan.deliverables} onChange={(e)=>setNewPlan({...newPlan,deliverables:e.target.value})} />
+            <input
+              type="text"
+              placeholder="Title"
+              value={newPlan.title}
+              onChange={(e) =>
+                setNewPlan({ ...newPlan, title: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newPlan.description}
+              onChange={(e) =>
+                setNewPlan({ ...newPlan, description: e.target.value })
+              }
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              step="0.01"
+              value={newPlan.price}
+              onChange={(e) =>
+                setNewPlan({ ...newPlan, price: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Deliverables (comma-separated)"
+              value={newPlan.deliverables}
+              onChange={(e) =>
+                setNewPlan({ ...newPlan, deliverables: e.target.value })
+              }
+            />
             <button onClick={handleAddPlan}>Add Plan</button>
           </div>
 
-       // Render plans using filteredPlans instead of plans
-{loading ? (
-  <p>Loading plans...</p>
-) : filteredPlans.length === 0 ? (
-  <p>No plans found for this category.</p>
-) : (
-  filteredPlans.map((p) => (
-    <div className="plan-item" key={p.id}>
-      <select
-        value={planEditStates[p.id]?.category_id || ""}
-        onChange={(e) =>
-          setPlanEditStates((prev) => ({
-            ...prev,
-            [p.id]: { ...prev[p.id], category_id: Number(e.target.value) },
-          }))
-        }
-      >
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        value={planEditStates[p.id]?.title || ""}
-        onChange={(e) =>
-          setPlanEditStates((prev) => ({
-            ...prev,
-            [p.id]: { ...prev[p.id], title: e.target.value },
-          }))
-        }
-      />
-      <input
-        type="text"
-        value={planEditStates[p.id]?.description || ""}
-        onChange={(e) =>
-          setPlanEditStates((prev) => ({
-            ...prev,
-            [p.id]: { ...prev[p.id], description: e.target.value },
-          }))
-        }
-      />
-      <input
-        type="number"
-        step="0.01"
-        value={planEditStates[p.id]?.price || ""}
-        onChange={(e) =>
-          setPlanEditStates((prev) => ({
-            ...prev,
-            [p.id]: { ...prev[p.id], price: e.target.value },
-          }))
-        }
-      />
-      <input
-        type="text"
-        value={planEditStates[p.id]?.deliverables || ""}
-        onChange={(e) =>
-          setPlanEditStates((prev) => ({
-            ...prev,
-            [p.id]: { ...prev[p.id], deliverables: e.target.value },
-          }))
-        }
-      />
-      <button onClick={() => handleUpdatePlan(p.id)}>Update</button>
-      <button onClick={() => handleDeletePlan(p.id)}>Delete</button>
-    </div>
-  ))
-)}
+          <h2>Existing Plans</h2>
+          <div className="plan-filter">
+            <label>Filter Plans by Category:</label>
+            <select
+              value={selectedCategory || ""}
+              onChange={(e) => setSelectedCategory(e.target.value || null)}
+            >
+              <option value="">All Categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {loading ? (
+            <p>Loading plans...</p>
+          ) : filteredPlans.length === 0 ? (
+            <p>No plans found for this category.</p>
+          ) : (
+            filteredPlans.map((p) => (
+              <div className="plan-item" key={p.id}>
+                <select
+                  value={planEditStates[p.id]?.category_id || ""}
+                  onChange={(e) =>
+                    setPlanEditStates((prev) => ({
+                      ...prev,
+                      [p.id]: {
+                        ...prev[p.id],
+                        category_id: Number(e.target.value),
+                      },
+                    }))
+                  }
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  value={planEditStates[p.id]?.title || ""}
+                  onChange={(e) =>
+                    setPlanEditStates((prev) => ({
+                      ...prev,
+                      [p.id]: { ...prev[p.id], title: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  value={planEditStates[p.id]?.description || ""}
+                  onChange={(e) =>
+                    setPlanEditStates((prev) => ({
+                      ...prev,
+                      [p.id]: { ...prev[p.id], description: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  value={planEditStates[p.id]?.price || ""}
+                  onChange={(e) =>
+                    setPlanEditStates((prev) => ({
+                      ...prev,
+                      [p.id]: { ...prev[p.id], price: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  value={planEditStates[p.id]?.deliverables || ""}
+                  onChange={(e) =>
+                    setPlanEditStates((prev) => ({
+                      ...prev,
+                      [p.id]: { ...prev[p.id], deliverables: e.target.value },
+                    }))
+                  }
+                />
+                <button onClick={() => handleUpdatePlan(p.id)}>Update</button>
+                <button onClick={() => handleDeletePlan(p.id)}>Delete</button>
+              </div>
+            ))
+          )}
         </div>
       </div>
       <Footer />

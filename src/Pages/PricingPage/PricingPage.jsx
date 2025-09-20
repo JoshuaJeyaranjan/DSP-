@@ -31,7 +31,7 @@ export default function PricingPage() {
     <Nav/>
     
     <div className="pricing-page">
-      <h1 className="page-title">Our Pricing</h1>
+      <h1 className="title">Packages</h1>
       <div className="categories-grid">
         {categories.map((cat) => (
           <Link key={cat.id} to={`/packages/${cat.slug}`}>
