@@ -1,7 +1,10 @@
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
+
 .pricing-plan-card {
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: var(--color-white);
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 24px;
@@ -15,9 +18,9 @@
 
   .plan-title {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 200;
     margin-bottom: 8px;
-    color: #111827;
+    color: var(--color-black);
   }
 
   .plan-description {
@@ -28,9 +31,9 @@
 
   .plan-price {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 200;
     margin-bottom: 16px;
-    color: #111827;
+    color: var(--color-black);
   }
 
   .plan-deliverables {
@@ -42,7 +45,7 @@
       display: flex;
       align-items: flex-start;
       font-size: 0.9rem;
-      color: #374151;
+      color: #6b7280;
       margin-bottom: 8px;
 
       .checkmark {
@@ -54,7 +57,7 @@
   }
 
   .select-plan-btn {
-    background-color: #3b82f6;
+    background-color: goldenrod;
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -64,7 +67,7 @@
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #2563eb;
+      background-color: #16a34a;
     }
   }
 }
