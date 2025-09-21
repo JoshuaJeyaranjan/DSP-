@@ -25,6 +25,7 @@ export default function AdminPricingPage() {
     name: "",
     slug: "",
     description: "",
+    alt_description: "",
     thumbnail_url: "",
   });
 
@@ -39,7 +40,6 @@ export default function AdminPricingPage() {
   const [planEditStates, setPlanEditStates] = useState({});
 
   /* ----------------------- FETCH DATA ----------------------- */
-
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
@@ -49,12 +49,10 @@ export default function AdminPricingPage() {
       if (error) throw error;
       setCategories(data);
 
-      // Default selected category to the first one
       if (data.length > 0) {
         setSelectedCategory(data[0].id);
       }
 
-      // Initialize category edit states
       const initialCategoryEdits = {};
       data.forEach((c) => {
         initialCategoryEdits[c.id] = { ...c };
@@ -76,7 +74,6 @@ export default function AdminPricingPage() {
       if (error) throw error;
       setPlans(data);
 
-      // Initialize plan edit states
       const initialPlanEdits = {};
       data.forEach((p) => {
         initialPlanEdits[p.id] = {
@@ -102,7 +99,6 @@ export default function AdminPricingPage() {
   }, []);
 
   /* ----------------------- CATEGORY CRUD ----------------------- */
-
   const handleAddCategory = async () => {
     if (!newCategory.name || !newCategory.slug) {
       return setError("Name and slug are required.");
@@ -124,6 +120,7 @@ export default function AdminPricingPage() {
         name: "",
         slug: "",
         description: "",
+        alt_description: "",
         thumbnail_url: "",
       });
       setMessage("Category added successfully!");
@@ -187,7 +184,6 @@ export default function AdminPricingPage() {
   };
 
   /* ----------------------- PLAN CRUD ----------------------- */
-
   const handleAddPlan = async () => {
     const { title, price, category_id, deliverables, description } = newPlan;
     if (!title || !price || !category_id)
@@ -337,6 +333,17 @@ export default function AdminPricingPage() {
                 setNewCategory({ ...newCategory, description: e.target.value })
               }
             />
+            <textarea
+              type="text"
+              placeholder="Alt Description"
+              value={newCategory.alt_description}
+              onChange={(e) =>
+                setNewCategory({
+                  ...newCategory,
+                  alt_description: e.target.value,
+                })
+              }
+            />
             <input
               type="text"
               placeholder="Thumbnail URL"
@@ -351,7 +358,7 @@ export default function AdminPricingPage() {
             <button onClick={handleAddCategory}>Add Category</button>
           </div>
 
-              <h2>Existing Categories</h2>
+          <h2>Existing Categories</h2>
           {categories.map((c) => (
             <div className="category-item" key={c.id}>
               <input
@@ -384,13 +391,29 @@ export default function AdminPricingPage() {
                   }))
                 }
               />
+              <textarea
+                type="text"
+                value={categoryEditStates[c.id]?.alt_description || ""}
+                onChange={(e) =>
+                  setCategoryEditStates((prev) => ({
+                    ...prev,
+                    [c.id]: {
+                      ...prev[c.id],
+                      alt_description: e.target.value,
+                    },
+                  }))
+                }
+              />
               <input
                 type="text"
                 value={categoryEditStates[c.id]?.thumbnail_url || ""}
                 onChange={(e) =>
                   setCategoryEditStates((prev) => ({
                     ...prev,
-                    [c.id]: { ...prev[c.id], thumbnail_url: e.target.value },
+                    [c.id]: {
+                      ...prev[c.id],
+                      thumbnail_url: e.target.value,
+                    },
                   }))
                 }
               />
@@ -456,7 +479,6 @@ export default function AdminPricingPage() {
 
           <h2 className="existing-plans-title">Existing Plans</h2>
           <div className="plan-filter">
-            
             <label>Filter Plans by Category:</label>
             <select
               value={selectedCategory || ""}
