@@ -1,7 +1,6 @@
 import { useTheme } from '../../context/ThemeContext';
 import './ThemeToggle.scss'
-import darkIcon from '../../../public/photoAssets/toggle-dark.svg'
-import lightIcon from '../../../public/photoAssets/toggle-light.svg'
+
 
 
 function ThemeToggle() {
