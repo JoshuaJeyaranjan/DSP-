@@ -169,7 +169,7 @@ useEffect(() => {
 
   return (
     <>
-      <Nav />
+      <Nav overlay />
       <div className="video-hub-page">
         <section
           className={`hero ${loadedHero ? "loaded" : ""}`}

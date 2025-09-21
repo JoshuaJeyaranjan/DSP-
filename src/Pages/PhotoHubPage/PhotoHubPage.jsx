@@ -147,7 +147,7 @@ useEffect(() => {
 
   return (
     <>
-      <Nav />
+      <Nav overlay />
       <div className="photo-hub-page">
         <section className={`hero ${loadedHero ? "loaded" : ""}`} style={backgroundStyle}>
           {!loadedHero && <div className="hero-skeleton" />}

@@ -59,7 +59,7 @@ export default function PricingCategoryPage() {
           alt={categoryData.name}
           className="category-thumbnail"
         />
-        <h1 className="category-title">{categoryData.name} Pricing</h1>
+        <h1 className="category-title">{categoryData.name} Packages</h1>
         {categoryData.description && (
           <p className="category-description">{categoryData.alt_description}</p>
         )}
