@@ -23,6 +23,7 @@ import AdminVideoPage from './Pages/AdminVideoPage/AdminVideoPage';
 import AdminReviewsPage from './Pages/AdminReviewsPage/AdminReviewsPage';
 import AdminPricingPage from './Pages/AdminPricingPage/AdminPricingPage';
 import AdminMiscPage from './Pages/AdminMiscPage/AdminMiscPage';
+import LoginPage from './Pages/LoginPage/LoginPage';
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/reviews' element={<ReviewPage />} />
+          <Route path='/login' element={<LoginPage />} />
+
 
           {/* Video Section */}
           <Route path='/video' element={<VideoHubPage />} />

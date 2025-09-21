@@ -1,8 +1,25 @@
-// src/Layouts/AdminLayout.jsx
-import { NavLink, Outlet } from "react-router-dom";
-import './AdminLayout.scss';
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { useEffect } from "react";
+import "./AdminLayout.scss";
 
 function AdminLayout() {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  if (!isAuthenticated) return null; // avoids flashing content
+
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
@@ -14,10 +31,13 @@ function AdminLayout() {
           <NavLink to="/admin/pricing">Pricing</NavLink>
           <NavLink to="/admin/misc">Misc</NavLink>
         </nav>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </aside>
 
       <main className="admin-content">
-        <Outlet /> {/* Nested route content will render here */}
+        <Outlet />
       </main>
     </div>
   );
