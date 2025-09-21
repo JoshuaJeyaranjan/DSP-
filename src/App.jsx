@@ -24,6 +24,7 @@ import AdminReviewsPage from './Pages/AdminReviewsPage/AdminReviewsPage';
 import AdminPricingPage from './Pages/AdminPricingPage/AdminPricingPage';
 import AdminMiscPage from './Pages/AdminMiscPage/AdminMiscPage';
 import LoginPage from './Pages/LoginPage/LoginPage';
+import AdminPhotoCategoriesPage from './Pages/AdminPhotoCategoriesPage/AdminPhotoCategoriesPage';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
             <Route path='reviews' element={<AdminReviewsPage />} />
             <Route path='pricing' element={<AdminPricingPage />} />
             <Route path='misc' element={<AdminMiscPage />} />
+            <Route path='photo-categories' element={<AdminPhotoCategoriesPage />} />
           </Route>
 
           {/* Fallback */}

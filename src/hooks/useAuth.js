@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD; // 🔒 from .env
-console.log("VITE_ADMIN_PASSWORD loaded:", ADMIN_PASSWORD); // DEBUG
+const ADMIN_PASSWORD = import.meta.env.VITE_SUPER_SECRET; // 🔒 from .env
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

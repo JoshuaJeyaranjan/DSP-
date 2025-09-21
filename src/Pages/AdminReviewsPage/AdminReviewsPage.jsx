@@ -25,10 +25,16 @@ export default function AdminReviewsPage() {
     content: "",
   });
 
-  // Local state for editing reviews
   const [editStates, setEditStates] = useState({});
+  const [buttonStatus, setButtonStatus] = useState({});
 
-  // Fetch reviews
+  const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
+    setButtonStatus((prev) => ({ ...prev, [key]: label }));
+    setTimeout(() => {
+      setButtonStatus((prev) => ({ ...prev, [key]: null }));
+    }, duration);
+  };
+
   const fetchReviews = async () => {
     setLoading(true);
     try {
@@ -39,10 +45,9 @@ export default function AdminReviewsPage() {
       if (error) throw error;
       setReviews(data);
 
-      // Initialize editStates
       const initialEdits = {};
       data.forEach((r) => {
-        initialEdits[r.id] = { ...r }; // copy current values
+        initialEdits[r.id] = { ...r };
       });
       setEditStates(initialEdits);
     } catch (err) {
@@ -57,11 +62,11 @@ export default function AdminReviewsPage() {
     fetchReviews();
   }, []);
 
-  // Add new review
+  /* ----------------------- CRUD ----------------------- */
+
   const handleAddReview = async () => {
     const { name, company, image_url, content } = newReview;
-    if (!name || !company || !content)
-      return setError("Name, company, and text are required.");
+    if (!name || !company || !content) return setError("Name, company, and text are required.");
 
     try {
       const { data, error } = await supabase
@@ -71,32 +76,23 @@ export default function AdminReviewsPage() {
       if (error) throw error;
 
       setReviews((prev) => [...prev, data[0]]);
-      setMessage("Review added successfully!");
+      setEditStates((prev) => ({ ...prev, [data[0].id]: data[0] }));
       setNewReview({ name: "", company: "", image_url: "", content: "" });
+      setMessage("Review added successfully!");
+      triggerButtonStatus("add-review", "Added!");
     } catch (err) {
-      console.error("Error adding review:", err);
+      console.error(err);
       setError(err.message);
     }
   };
 
-  // Delete review
-  const handleDeleteReview = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this review?")) return;
-    try {
-      const { error } = await supabase.from("reviews").delete().eq("id", id);
-      if (error) throw error;
-      setReviews((prev) => prev.filter((r) => r.id !== id));
-      setMessage("Review deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting review:", err);
-      setError(err.message);
-    }
-  };
-
-  // Update review
   const handleUpdateReview = async (id) => {
     try {
-      const updatedFields = editStates[id];
+      const updatedFields = {
+        ...editStates[id],
+        image_url: editStates[id].image_url || DEFAULT_PHOTO,
+      };
+
       const { data, error } = await supabase
         .from("reviews")
         .update(updatedFields)
@@ -105,12 +101,37 @@ export default function AdminReviewsPage() {
       if (error) throw error;
 
       setReviews((prev) => prev.map((r) => (r.id === id ? data[0] : r)));
+      setEditStates((prev) => ({ ...prev, [id]: data[0] }));
       setMessage("Review updated successfully!");
+      triggerButtonStatus(`update-review-${id}`, "Updated!");
     } catch (err) {
-      console.error("Error updating review:", err);
+      console.error(err);
       setError(err.message);
     }
   };
+
+  const handleDeleteReview = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this review?")) return;
+
+    try {
+      const { error } = await supabase.from("reviews").delete().eq("id", id);
+      if (error) throw error;
+
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+      setEditStates((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+      setMessage("Review deleted successfully!");
+      triggerButtonStatus(`delete-review-${id}`, "Deleted!");
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
+  /* ----------------------- RENDER ----------------------- */
 
   return (
     <>
@@ -122,8 +143,8 @@ export default function AdminReviewsPage() {
         {message && <div className="success">{message}</div>}
 
         {/* Add new review */}
+        <h2>Add New Review</h2>
         <div className="review-form">
-          <h2>Add New Review</h2>
           <input
             type="text"
             placeholder="Name"
@@ -147,7 +168,7 @@ export default function AdminReviewsPage() {
             value={newReview.content}
             onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
           />
-          <button onClick={handleAddReview}>Add Review</button>
+          <button onClick={handleAddReview}>{buttonStatus["add-review"] || "Add Review"}</button>
         </div>
 
         {/* Existing reviews */}
@@ -195,8 +216,13 @@ export default function AdminReviewsPage() {
                     setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], content: e.target.value } }))
                   }
                 />
-                <button className="update-button" onClick={() => handleUpdateReview(r.id)}>Update</button>
-                <button className="delete-button" onClick={() => handleDeleteReview(r.id)}>Delete</button>
+
+                <button className="update-button" onClick={() => handleUpdateReview(r.id)}>
+                  {buttonStatus[`update-review-${r.id}`] || "Update"}
+                </button>
+                <button className="delete-button" onClick={() => handleDeleteReview(r.id)}>
+                  {buttonStatus[`delete-review-${r.id}`] || "Delete"}
+                </button>
               </div>
             ))
           )}

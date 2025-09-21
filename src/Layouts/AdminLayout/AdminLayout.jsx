@@ -26,6 +26,7 @@ function AdminLayout() {
         <h2 className="title">Admin</h2>
         <nav>
           <NavLink to="/admin/dashboard">Dashboard</NavLink>
+          <NavLink to="/admin/photo-categories">Photo Categories</NavLink>
           <NavLink to="/admin/videos">Videos</NavLink>
           <NavLink to="/admin/reviews">Reviews</NavLink>
           <NavLink to="/admin/pricing">Pricing</NavLink>

@@ -6,19 +6,11 @@ import Footer from "../../Components/Footer/Footer";
 import { createClient } from "@supabase/supabase-js";
 import "./PhotoCategoryPage.scss";
 import LoadingSkeleton from "../../Components/LoadingSkeleton/LoadingSkeleton";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
-
-// Map route categories to database categories
-const categoryMap = {
-  cars: "car",
-  portraits: "portrait",
-  drones: "drone",
-  sports: "sports",
-  product: "product",
-};
 
 // Responsive breakpoints
 const getSize = (width) => {
@@ -39,31 +31,45 @@ const useWindowWidth = () => {
 };
 
 function PhotoCategoryPage() {
-  const { category } = useParams();
+  const { category: categorySlug } = useParams(); // e.g. "cars", "portraits"
   const windowWidth = useWindowWidth();
+
+  const [category, setCategory] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch category + images
   useEffect(() => {
-    const loadPhotos = async () => {
+    const loadCategoryAndPhotos = async () => {
       setLoading(true);
       try {
-        const dbCategory = categoryMap[category] || category;
+        // 1. Find category row by slug
+        const { data: categoryRow, error: catErr } = await supabase
+          .from("image_categories")
+          .select("*")
+          .eq("slug", categorySlug)
+          .maybeSingle();
 
-        const { data, error } = await supabase
+        if (catErr || !categoryRow) throw catErr || new Error("Category not found");
+
+        setCategory(categoryRow);
+
+        // 2. Fetch images by category_id
+        const { data: images, error: imgErr } = await supabase
           .from("images")
           .select("*")
-          .eq("category", dbCategory)
+          .eq("category_id", categoryRow.id)
           .order("created_at", { ascending: false });
 
-        if (error || !data) throw error || new Error("No data returned");
+        if (imgErr || !images) throw imgErr || new Error("No images found");
 
         const size = getSize(windowWidth);
 
+        // 3. Map images to gallery format
         const mappedPhotos = [];
         const seenOriginals = new Set();
 
-        data.forEach((img) => {
+        images.forEach((img) => {
           const baseName = img.path.replace(/^.*[\\/]/, "").replace(/\.[^/.]+$/, "");
           if (seenOriginals.has(baseName)) return;
           seenOriginals.add(baseName);
@@ -88,24 +94,30 @@ function PhotoCategoryPage() {
 
         setPhotos(mappedPhotos);
       } catch (err) {
-        console.error("Unexpected error fetching images:", err);
+        console.error("Error loading category/photos:", err);
         setPhotos([]);
+        setCategory(null);
       } finally {
         setLoading(false);
       }
     };
 
-    loadPhotos();
-  }, [category, windowWidth]);
+    loadCategoryAndPhotos();
+  }, [categorySlug, windowWidth]);
 
-  if (loading) return <LoadingSkeleton />;
+  if (loading) return <PageLoader />;
+  if (!category) return <p>Category not found.</p>;
   if (!photos.length) return <p>No images found for this category.</p>;
 
   return (
     <>
       <Nav />
       <div className="photo-category-page">
-        <h1 className="title">{category.charAt(0).toUpperCase() + category.slice(1)}</h1>
+        <h1 className="title">
+  {category?.name
+    ? category.name.charAt(0).toUpperCase() + category.name.slice(1)
+    : category}
+</h1>
         <PhotoGallery photos={photos} />
       </div>
       <Footer />

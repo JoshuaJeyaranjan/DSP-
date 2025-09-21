@@ -13,12 +13,12 @@
     text-align: center;
     font-size: 2.2rem;
     margin-bottom: 2rem;
-    color: black;
+    color: var(--color-black);
     font-weight: 200;
   }
 
   h2 {
-        color: black;
+        color: var(--color-black);
     font-weight: 200;
     font-size: 1.5rem;
     margin-bottom: 1rem;
@@ -139,7 +139,7 @@
         transition: background 0.2s ease;
 
         &:hover {
-          background-color: goldenrod;
+          
         }
       }
     }
@@ -174,10 +174,16 @@
 
 .update-button {
     background-color: #52c41a;
+    &:hover {
+          background-color: #3c8e13;
+        }
 }
 
 .delete-button {
     background-color: #ff4d4f;
+    &:hover {
+         background-color: rgb(194, 0, 0); 
+        }
 }
 
 .add-category{

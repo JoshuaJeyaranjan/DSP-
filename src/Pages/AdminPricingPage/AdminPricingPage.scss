@@ -1,16 +1,23 @@
 /* AdminPricingPage.scss */
-
+@use "../../styles/partials/variables" as *;
+@use "../../styles/partials/mixins" as *;
 /* Reset some basic elements */
 .admin-pricing-page {
   padding: 2rem;
   font-family: 'Montserrat', sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
+  
+  
 
-  h1, h2 {
-    color: #222;
+  h1 {
+    color: var(--color-black);
     font-weight: 200;
   }
+
+  h2 {
+    color: var(--color-white);
+    font-weight: 200;
+  }
+
 
   .error {
     background-color: #fdd;

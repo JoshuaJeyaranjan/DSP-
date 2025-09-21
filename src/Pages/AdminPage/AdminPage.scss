@@ -171,7 +171,7 @@
           }
         }
 
-        button:nth-child(7) {
+        button:nth-child(6) {
           background: #dc3545;
           color: white;
 
@@ -199,11 +199,11 @@
         }
 
         button:nth-child(3) {
-          background: #17a2b8;
+          background: rgb(255, 123, 0);
           color: white;
 
           &:hover {
-            background: #117a8b;
+           background: rgb(203, 98, 0);
           }
         }
 
@@ -217,11 +217,11 @@
         }
 
         button:nth-child(5) {
-          background: #ffc107;
-          color: black;
+          background: #e600ff;
+          color: white;
 
           &:hover {
-            background: #d39e00;
+            background: #a300b5;
           }
         }
       }

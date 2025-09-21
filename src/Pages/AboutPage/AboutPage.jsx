@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./AboutPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
+import PageLoader from "../../Components/PageLoader/PageLoader";
 import { createClient } from "@supabase/supabase-js";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
@@ -45,7 +46,7 @@ function AboutPage() {
     fetchAboutData();
   }, []);
 
-  if (loading) return <p>Loading About Page...</p>;
+  if (loading) return <PageLoader/>;
 
   return (
     <>

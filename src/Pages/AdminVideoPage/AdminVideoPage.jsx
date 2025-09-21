@@ -20,6 +20,15 @@ export default function AdminVideoPage() {
   const [categoryThumbnail, setCategoryThumbnail] = useState("");
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [buttonStatus, setButtonStatus] = useState({});
+
+  // ---------------------------
+  // Button feedback helper
+  // ---------------------------
+  const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
+    setButtonStatus((prev) => ({ ...prev, [key]: label }));
+    setTimeout(() => setButtonStatus((prev) => ({ ...prev, [key]: null })), duration);
+  };
 
   // ---------------------------
   // Fetch categories
@@ -30,7 +39,6 @@ export default function AdminVideoPage() {
         .from("categories")
         .select("*")
         .order("created_at", { ascending: true });
-
       if (error) throw error;
       setCategories(data);
 
@@ -56,7 +64,6 @@ export default function AdminVideoPage() {
         .select("*")
         .eq("category_id", categoryId)
         .order("created_at", { ascending: true });
-
       if (error) throw error;
       setVideos(data || []);
     } catch (err) {
@@ -69,10 +76,7 @@ export default function AdminVideoPage() {
   // ---------------------------
   // Effects
   // ---------------------------
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
+  useEffect(() => { fetchCategories(); }, []);
   useEffect(() => {
     if (selectedCategory) {
       fetchVideos(selectedCategory.id);
@@ -95,10 +99,11 @@ export default function AdminVideoPage() {
         .insert([{ name: newCategoryName.trim() }])
         .select()
         .single();
-
       if (error) throw error;
+
       setNewCategoryName("");
       setMessage("Category added successfully!");
+      triggerButtonStatus("add-category", "Added!");
       fetchCategories();
     } catch (err) {
       console.error(err);
@@ -114,6 +119,7 @@ export default function AdminVideoPage() {
       if (error) throw error;
 
       setMessage("Category deleted successfully!");
+      triggerButtonStatus(`delete-category-${categoryId}`, "Deleted!");
       setSelectedCategory(null);
       fetchCategories();
     } catch (err) {
@@ -130,10 +136,10 @@ export default function AdminVideoPage() {
         .from("categories")
         .update({ thumbnail_url: categoryThumbnail })
         .eq("id", selectedCategory.id);
-
       if (error) throw error;
 
       setMessage("Category thumbnail updated!");
+      triggerButtonStatus(`update-category-thumb-${selectedCategory.id}`, "Updated!");
       fetchCategories();
     } catch (err) {
       console.error(err);
@@ -157,13 +163,13 @@ export default function AdminVideoPage() {
         .insert([{ title, url: embedUrl, category_id: selectedCategory.id }])
         .select()
         .single();
-
       if (error) throw error;
 
       setVideos((prev) => [...prev, data]);
       setTitle("");
       setUrl("");
       setMessage("Video added successfully!");
+      triggerButtonStatus("add-video", "Added!");
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -179,6 +185,7 @@ export default function AdminVideoPage() {
 
       setVideos((prev) => prev.filter((v) => v.id !== videoId));
       setMessage("Video deleted successfully!");
+      triggerButtonStatus(`delete-video-${videoId}`, "Deleted!");
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -193,9 +200,10 @@ export default function AdminVideoPage() {
         .from("videos")
         .update({ thumbnail_url: thumbUrl })
         .eq("id", videoId);
-
       if (error) throw error;
+
       setMessage("Video thumbnail updated!");
+      triggerButtonStatus(`update-video-thumb-${videoId}`, "Updated!");
       fetchVideos(selectedCategory.id);
     } catch (err) {
       console.error(err);
@@ -211,7 +219,6 @@ export default function AdminVideoPage() {
       <Nav />
       <div className="video-admin-page">
         <h1>Video Admin Dashboard</h1>
-
         {error && <div className="error">{error}</div>}
         {message && <div className="success">{message}</div>}
 
@@ -224,14 +231,14 @@ export default function AdminVideoPage() {
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
           />
-          <button onClick={handleAddCategory}>Add Category</button>
+          <button onClick={handleAddCategory}>{buttonStatus["add-category"] || "Add Category"}</button>
 
           <ul>
             {categories.map((cat) => (
               <li key={cat.id}>
                 <span
                   style={{
-                    color: "rgba(0,0,0,1)", 
+                    color: "rgba(0,0,0,1)",
                     cursor: "pointer",
                     fontWeight: selectedCategory?.id === cat.id ? "bold" : "normal",
                   }}
@@ -240,7 +247,7 @@ export default function AdminVideoPage() {
                   {cat.name}
                 </span>
                 <button className="delete-category" onClick={() => handleDeleteCategory(cat.id)}>
-                  Delete
+                  {buttonStatus[`delete-category-${cat.id}`] || "Delete"}
                 </button>
               </li>
             ))}
@@ -255,7 +262,9 @@ export default function AdminVideoPage() {
                 value={categoryThumbnail}
                 onChange={(e) => setCategoryThumbnail(e.target.value)}
               />
-              <button onClick={handleUpdateCategoryThumbnail}>Update Thumbnail</button>
+              <button onClick={handleUpdateCategoryThumbnail}>
+                {buttonStatus[`update-category-thumb-${selectedCategory.id}`] || "Update Thumbnail"}
+              </button>
               {categoryThumbnail && (
                 <img
                   className="category-thumbnail"
@@ -285,7 +294,7 @@ export default function AdminVideoPage() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
-              <button onClick={handleAddVideo}>Add Video</button>
+              <button onClick={handleAddVideo}>{buttonStatus["add-video"] || "Add Video"}</button>
             </div>
 
             <div className="video-list">
@@ -300,7 +309,9 @@ export default function AdminVideoPage() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <button className="delete-category" onClick={() => handleDeleteVideo(v.id)}>Delete</button>
+                  <button className="delete-category" onClick={() => handleDeleteVideo(v.id)}>
+                    {buttonStatus[`delete-video-${v.id}`] || "Delete"}
+                  </button>
                 </div>
               ))}
             </div>

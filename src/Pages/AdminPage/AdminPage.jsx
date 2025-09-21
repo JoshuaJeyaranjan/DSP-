@@ -16,7 +16,7 @@ const supabaseAdmin = createClient(
   import.meta.env.VITE_SERVICE_ROLE_KEY
 );
 
-const CATEGORIES = ["car", "sports", "drone", "portrait", "product", "misc"];
+
 const HERO_COLUMN_FOR_TYPE = {
   home: "is_home_hero",
   photo: "is_photo_hero",
@@ -39,7 +39,6 @@ function makeUniqueName(name) {
 
 export default function AdminPage() {
   const [files, setFiles] = useState([]);
-  const [category, setCategory] = useState(CATEGORIES[0]);
   const [filterCategory, setFilterCategory] = useState("all");
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +46,34 @@ export default function AdminPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [buttonStatus, setButtonStatus] = useState({});
   const [copiedJobId, setCopiedJobId] = useState(null);
+const [allCategories, setAllCategories] = useState([]);
+const [visibleCategories, setVisibleCategories] = useState([]);
+const [category, setCategory] = useState("uncategorized"); // current upload category
+
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("image_categories")
+        .select("name")
+        .order("name");
+      if (error) throw error;
+
+      const names = data?.map(c => c.name) || [];
+      setAllCategories(names); // for filter dropdown
+      setVisibleCategories(data?.filter(c => c.visible_on_hub).map(c => c.name) || []);
+      
+      // Default upload selection: first visible category
+      setCategory(data?.find(c => c.visible_on_hub)?.name || "uncategorized");
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+      setAllCategories(["uncategorized"]);
+      setVisibleCategories(["uncategorized"]);
+      setCategory("uncategorized");
+    }
+  };
+  fetchCategories();
+}, []);
 
   // ---------------- BUTTON FEEDBACK ----------------
   const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
@@ -174,14 +201,14 @@ export default function AdminPage() {
           .maybeSingle();
 
         const userResp = await supabase.auth.getUser();
-        const dbPayload = {
-          title: f.file.name,
-          category,
-          bucket: "photos-original",
-          path: f.id,
-          uploaded_by: userResp?.data?.user?.id ?? null,
-          derived_paths: derivedPathsObj,
-        };
+    const dbPayload = {
+  title: f.file.name,
+  category, // <- dynamic from dropdown
+  bucket: "photos-original",
+  path: f.id,
+  uploaded_by: userResp?.data?.user?.id ?? null,
+  derived_paths: derivedPathsObj,
+};
 
         if (!existing) await supabase.from("images").insert([dbPayload]);
         else await supabase.from("images").update(dbPayload).eq("id", existing.id);
@@ -254,23 +281,7 @@ export default function AdminPage() {
     }
   };
 
-  const setThumbnailForCategory = async (job) => {
-    if (!job.dbRow?.id || !job.dbRow.category) return;
-    if (!window.confirm(`Make "${job.name}" the thumbnail for "${job.dbRow.category}"?`)) return;
 
-    try {
-      await supabase
-        .from("images")
-        .update({ thumbnail: false })
-        .eq("category", job.dbRow.category)
-        .eq("thumbnail", true);
-      await supabase.from("images").update({ thumbnail: true }).eq("id", job.dbRow.id);
-      triggerButtonStatus(`thumbnail-${job.id}`, "Set!");
-      await loadImagesAndDerived();
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const setSpecialImage = async (job, type) => {
     if (!job.dbRow?.id) return;
@@ -350,13 +361,13 @@ export default function AdminPage() {
             </div>
           )}
 
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </select>
+<select value={category} onChange={(e) => setCategory(e.target.value)}>
+  {allCategories.map((catName) => (
+    <option key={catName} value={catName}>
+      {catName.charAt(0).toUpperCase() + catName.slice(1)}
+    </option>
+  ))}
+</select>
 
           <button
             onClick={handleUploadAll}
@@ -372,13 +383,18 @@ export default function AdminPage() {
 
         <div className="filter-controls">
           <label>
-            Filter by category:{" "}
-            <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-              <option value="all">All</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+            
+<select
+  value={filterCategory}
+  onChange={(e) => setFilterCategory(e.target.value)}
+>
+  <option value="all">All</option>
+  {allCategories.map((cat) => (
+    <option key={cat} value={cat}>
+      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+    </option>
+  ))}
+</select>
           </label>
         </div>
 
@@ -418,9 +434,7 @@ export default function AdminPage() {
                   <button onClick={() => setHeroFor(job, "video")}>
                     {buttonStatus[`hero-${job.id}-video`] || "Make Video Hero"}
                   </button>
-                  <button onClick={() => setThumbnailForCategory(job)}>
-                    {buttonStatus[`thumbnail-${job.id}`] || "Make Category Thumbnail"}
-                  </button>
+             
                   <button className="contact-button" onClick={() => setSpecialImage(job, "contact")}>
                     {buttonStatus[`special-${job.id}-contact`] || "Make Contact Image"}
                   </button>

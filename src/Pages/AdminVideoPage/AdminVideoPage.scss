@@ -61,14 +61,14 @@
     transition: background 0.2s;
 
     &:hover {
-      background: goldenrod;
+      background-color: #3c8e13;
     }
 
     &.delete-category {
-      background: #dc3545;
+      background-color: #ff4d4f;
 
       &:hover {
-        background: #a71d2a;
+       background-color: rgb(194, 0, 0); 
       }
     }
   }

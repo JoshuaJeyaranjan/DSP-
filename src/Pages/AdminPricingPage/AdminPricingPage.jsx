@@ -16,6 +16,14 @@ export default function AdminPricingPage() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [buttonStatus, setButtonStatus] = useState({});
+
+const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
+  setButtonStatus((prev) => ({ ...prev, [key]: label }));
+  setTimeout(() => {
+    setButtonStatus((prev) => ({ ...prev, [key]: null }));
+  }, duration);
+};
 
   const filteredPlans = selectedCategory
     ? plans.filter((p) => p.category_id === selectedCategory)
@@ -99,89 +107,62 @@ export default function AdminPricingPage() {
   }, []);
 
   /* ----------------------- CATEGORY CRUD ----------------------- */
-  const handleAddCategory = async () => {
-    if (!newCategory.name || !newCategory.slug) {
-      return setError("Name and slug are required.");
-    }
+const handleAddCategory = async () => {
+  if (!newCategory.name || !newCategory.slug) return setError("Name and slug required.");
 
-    try {
-      const { data, error } = await supabase
-        .from("pricing_categories")
-        .insert([newCategory])
-        .select();
-      if (error) throw error;
+  try {
+    const { data, error } = await supabase.from("pricing_categories").insert([newCategory]).select();
+    if (error) throw error;
 
-      setCategories((prev) => [...prev, data[0]]);
-      setCategoryEditStates((prev) => ({
-        ...prev,
-        [data[0].id]: { ...data[0] },
-      }));
-      setNewCategory({
-        name: "",
-        slug: "",
-        description: "",
-        alt_description: "",
-        thumbnail_url: "",
-      });
-      setMessage("Category added successfully!");
-    } catch (err) {
-      console.error("Error adding category:", err);
-      setError(err.message);
-    }
-  };
+    setCategories((prev) => [...prev, data[0]]);
+    setCategoryEditStates((prev) => ({ ...prev, [data[0].id]: { ...data[0] } }));
+    setNewCategory({ name: "", slug: "", description: "", alt_description: "", thumbnail_url: "" });
+    
+    triggerButtonStatus("add-category", "Added!"); // <--- NEW
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+  }
+};
 
-  const handleUpdateCategory = async (id) => {
-    const updated = categoryEditStates[id];
-    if (!updated.name || !updated.slug) {
-      return setError("Name and slug are required.");
-    }
+const handleUpdateCategory = async (id) => {
+  const updated = categoryEditStates[id];
+  if (!updated.name || !updated.slug) return setError("Name and slug required.");
 
-    try {
-      const { data, error } = await supabase
-        .from("pricing_categories")
-        .update(updated)
-        .eq("id", id)
-        .select();
-      if (error) throw error;
+  try {
+    const { data, error } = await supabase.from("pricing_categories").update(updated).eq("id", id).select();
+    if (error) throw error;
 
-      setCategories((prev) => prev.map((c) => (c.id === id ? data[0] : c)));
-      setCategoryEditStates((prev) => ({
-        ...prev,
-        [id]: data[0],
-      }));
-      setMessage("Category updated successfully!");
-    } catch (err) {
-      console.error("Error updating category:", err);
-      setError(err.message);
-    }
-  };
+    setCategories((prev) => prev.map((c) => (c.id === id ? data[0] : c)));
+    setCategoryEditStates((prev) => ({ ...prev, [id]: data[0] }));
 
-  const handleDeleteCategory = async (id) => {
-    if (
-      !window.confirm(
-        "Delete this category? This will NOT delete associated plans."
-      )
-    )
-      return;
-    try {
-      const { error } = await supabase
-        .from("pricing_categories")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
+    triggerButtonStatus(`update-category-${id}`, "Updated!"); // <--- NEW
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+  }
+};
 
-      setCategories((prev) => prev.filter((c) => c.id !== id));
-      setCategoryEditStates((prev) => {
-        const copy = { ...prev };
-        delete copy[id];
-        return copy;
-      });
-      setMessage("Category deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting category:", err);
-      setError(err.message);
-    }
-  };
+const handleDeleteCategory = async (id) => {
+  if (!window.confirm("Delete this category? This will NOT delete associated plans.")) return;
+
+  try {
+    const { error } = await supabase.from("pricing_categories").delete().eq("id", id);
+    if (error) throw error;
+
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+    setCategoryEditStates((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
+
+    triggerButtonStatus(`delete-category-${id}`, "Deleted!"); // <--- NEW
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+  }
+};
 
   /* ----------------------- PLAN CRUD ----------------------- */
   const handleAddPlan = async () => {
@@ -229,6 +210,7 @@ export default function AdminPricingPage() {
         category_id: null,
       });
       setMessage("Plan added successfully!");
+      triggerButtonStatus("add-plan", "Added!"); // <--- NEW
     } catch (err) {
       console.error("Error adding plan:", err);
       setError(err.message);
@@ -267,6 +249,7 @@ export default function AdminPricingPage() {
         },
       }));
       setMessage("Plan updated successfully!");
+      triggerButtonStatus(`update-plan-${id}`, "Updated!");
     } catch (err) {
       console.error("Error updating plan:", err);
       setError(err.message);
@@ -289,6 +272,8 @@ export default function AdminPricingPage() {
         return copy;
       });
       setMessage("Plan deleted successfully!");
+      
+triggerButtonStatus(`delete-plan-${id}`, "Deleted!");// <--- NEW
     } catch (err) {
       console.error("Error deleting plan:", err);
       setError(err.message);
@@ -355,7 +340,7 @@ export default function AdminPricingPage() {
                 })
               }
             />
-            <button onClick={handleAddCategory}>Add Category</button>
+            <button onClick={handleAddCategory}> {buttonStatus["add-category"] || "Add Category"}</button>
           </div>
 
           <h2>Existing Categories</h2>
@@ -417,8 +402,8 @@ export default function AdminPricingPage() {
                   }))
                 }
               />
-              <button onClick={() => handleUpdateCategory(c.id)}>Update</button>
-              <button onClick={() => handleDeleteCategory(c.id)}>Delete</button>
+              <button onClick={() => handleUpdateCategory(c.id)}> {buttonStatus[`update-category-${c.id}`] || "Update"}</button>
+              <button onClick={() => handleDeleteCategory(c.id)}>  {buttonStatus[`delete-category-${c.id}`] || "Delete"}</button>
             </div>
           ))}
         </div>
@@ -474,12 +459,12 @@ export default function AdminPricingPage() {
                 setNewPlan({ ...newPlan, deliverables: e.target.value })
               }
             />
-            <button onClick={handleAddPlan}>Add Plan</button>
+            <button onClick={handleAddPlan}> {buttonStatus["add-plan"] || "Add Plan"}</button>
           </div>
 
           <h2 className="existing-plans-title">Existing Plans</h2>
           <div className="plan-filter">
-            <label>Filter Plans by Category:</label>
+            <label className="filter-label">Filter Plans by Category:</label>
             <select
               value={selectedCategory || ""}
               onChange={(e) => setSelectedCategory(e.target.value || null)}
@@ -559,8 +544,13 @@ export default function AdminPricingPage() {
                     }))
                   }
                 />
-                <button onClick={() => handleUpdatePlan(p.id)}>Update</button>
-                <button onClick={() => handleDeletePlan(p.id)}>Delete</button>
+                <button onClick={() => handleUpdatePlan(p.id)}>
+  {buttonStatus[`update-plan-${p.id}`] || "Update"}
+</button>
+
+<button onClick={() => handleDeletePlan(p.id)}>
+  {buttonStatus[`delete-plan-${p.id}`] || "Delete"}
+</button>
               </div>
             ))
           )}
