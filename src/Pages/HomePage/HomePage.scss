@@ -88,3 +88,28 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+.link-container {
+  display: flex;
+  flex-wrap: wrap;       /* allows links to wrap to next line */
+  gap: 1rem;             /* space between buttons */
+  justify-content: center; /* center buttons horizontally */
+}
+
+.home__link {
+  padding: 0.75rem 1.5rem;
+  
+  color: white;
+  text-decoration: none;
+  white-space: nowrap;
+  text-align: center;
+  flex: 1 1 200px; /* grow/shrink, minimum width 200px */
+  max-width: 300px; /* optional max width */
+  transition: background-color 0.3s;
+  overflow: hidden;    /* optional: hides text overflow */
+  text-overflow: ellipsis; /* optional: adds "..." if text is too long */
+}
+
+.home__link:hover {
+  background-color: goldenrod;
+}

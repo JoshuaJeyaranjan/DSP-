@@ -74,12 +74,20 @@ export default function HomePage() {
           {loading && <PageLoader/>}
           {err && <p className="error">{err}</p>}
 
-          <h1 className="home__title">D|F|S V|S|ON</h1>
+          <h1 className="home__title">D|F|S VISION</h1>
           <h3 className="home__subtitle">VIDEOGRAPHER & PHOTOGRAPHER</h3>
 
+          <div className="link-container">
           <Link className="home__link" to="/photography">
-            View Work
+            View Photography Work
           </Link>
+          
+
+          <Link className="home__link" to="/video">
+            View Videography Work
+          </Link>
+          </div>
+          
         </div>
       </section>
 
