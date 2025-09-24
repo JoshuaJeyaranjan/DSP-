@@ -1,41 +1,58 @@
 .theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    border: none;
-    background: var(--color-black);
-    cursor: pointer;
-    border-radius: 50%;
-    transition: transform 150ms ease, opacity 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 150ms ease, opacity 150ms ease;
   
-    &:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
-    }
-  
-    &:active {
-      transform: translateY(0);
-    }
-  
-    &:focus {
-      outline: none;
-      
-    }
-  
-    &__icon {
-      width: 22px;
-      height: 22px;
-      display: block;
-      object-fit: contain;
-      pointer-events: none; // image shouldn't capture mouse events
-    }
+  background: none;
+
+  &:hover {
+    transform: translateY(-2px);
+    opacity: 0.95;
   }
-  
-  /* Respect reduced-motion preference */
-  @media (prefers-reduced-motion: reduce) {
-    .theme-toggle {
-      transition: none;
-    }
+
+  &:active {
+    transform: translateY(0);
   }
-  
+
+  &:focus {
+    outline: none;
+  }
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+    transition: filter 0.3s ease;
+  }
+}
+
+
+/* Dark mode inversion using data-theme on html */
+[data-theme='dark'] .theme-toggle__icon {
+  filter: invert(1); /* keeps black SVG white in dark mode */
+  transform: rotate(0deg); /* normal orientation */
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+[data-theme='light'] .theme-toggle__icon {
+  filter: invert(0); /* normal black SVG */
+  transform: rotate(-180deg); /* flip upside down */
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+  .theme-toggle__icon {
+    transition: none;
+  }
+}
