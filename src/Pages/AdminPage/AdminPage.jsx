@@ -208,8 +208,7 @@ useEffect(() => {
   path: f.id,
   uploaded_by: userResp?.data?.user?.id ?? null,
   derived_paths: derivedPathsObj,
-};
-
+};      
         if (!existing) await supabase.from("images").insert([dbPayload]);
         else await supabase.from("images").update(dbPayload).eq("id", existing.id);
 
@@ -231,7 +230,8 @@ useEffect(() => {
         );
       }
     }
-
+    setFiles([]);
+    setCategory("uncategorized")
     setIsUploading(false);
     triggerButtonStatus("upload-all", "Uploaded!");
     await loadImagesAndDerived();
