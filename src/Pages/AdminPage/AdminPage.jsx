@@ -159,84 +159,113 @@ useEffect(() => {
   };
 
   // ---------------- UPLOAD ----------------
-  const handleUploadAll = async () => {
-    if (!files.length) return;
-    setIsUploading(true);
+const handleUploadAll = async () => {
+  if (!files.length) return;
+  setIsUploading(true);
 
-    for (const f of files) {
-      setFiles((prev) =>
-        prev.map((fileObj) =>
-          fileObj.id === f.id
-            ? { ...fileObj, status: "uploading", progress: 0 }
-            : fileObj
+  for (const f of files) {
+    setFiles(prev =>
+      prev.map(fileObj =>
+        fileObj.id === f.id
+          ? { ...fileObj, status: "uploading", progress: 0 }
+          : fileObj
+      )
+    );
+
+    try {
+      // 1️⃣ Upload to Supabase storage
+      const { error: uploadErr } = await supabase.storage
+        .from("photos-original")
+        .upload(f.id, f.file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+
+      setFiles(prev =>
+        prev.map(fileObj =>
+          fileObj.id === f.id ? { ...fileObj, progress: 50 } : fileObj
         )
       );
 
-      try {
-        const { error: uploadErr } = await supabase.storage
-          .from("photos-original")
-          .upload(f.id, f.file, { upsert: true });
-        if (uploadErr) throw uploadErr;
+      // 2️⃣ Generate thumbnails via backend service
+      const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket: "photos-original", file: f.id }),
+      });
+      if (!resp.ok) throw new Error(resp.statusText);
+      const respJson = await resp.json();
+      const derivedPathsObj = respJson.generatedPaths || {};
 
-        setFiles((prev) =>
-          prev.map((fileObj) =>
-            fileObj.id === f.id ? { ...fileObj, progress: 50 } : fileObj
-          )
-        );
+      // 3️⃣ Resolve category_id from category name
+      const { data: categoryData, error: categoryErr } = await supabase
+        .from("image_categories")
+        .select("id")
+        .eq("name", category)
+        .single();
 
-        const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bucket: "photos-original", file: f.id }),
-        });
-        if (!resp.ok) throw new Error(resp.statusText);
-        const respJson = await resp.json();
-        const derivedPathsObj = respJson.generatedPaths || {};
-
-        const { data: existing } = await supabase
-          .from("images")
-          .select("id")
-          .eq("path", f.id)
-          .limit(1)
-          .maybeSingle();
-
-        const userResp = await supabase.auth.getUser();
-    const dbPayload = {
-  title: f.file.name,
-  category, // <- dynamic from dropdown
-  bucket: "photos-original",
-  path: f.id,
-  uploaded_by: userResp?.data?.user?.id ?? null,
-  derived_paths: derivedPathsObj,
-};      
-        if (!existing) await supabase.from("images").insert([dbPayload]);
-        else await supabase.from("images").update(dbPayload).eq("id", existing.id);
-
-        setFiles((prev) =>
-          prev.map((fileObj) =>
-            fileObj.id === f.id
-              ? { ...fileObj, status: "done", progress: 100 }
-              : fileObj
-          )
-        );
-      } catch (err) {
-        console.error(err);
-        setFiles((prev) =>
-          prev.map((fileObj) =>
-            fileObj.id === f.id
-              ? { ...fileObj, status: "error", progress: 0 }
-              : fileObj
-          )
-        );
+      if (categoryErr || !categoryData) {
+        console.warn("Category not found, defaulting to uncategorized");
       }
-    }
-    setFiles([]);
-    setCategory("uncategorized")
-    setIsUploading(false);
-    triggerButtonStatus("upload-all", "Uploaded!");
-    await loadImagesAndDerived();
-  };
 
+      const category_id = categoryData?.id ?? null;
+
+      // 4️⃣ Check if image already exists
+      const { data: existing } = await supabase
+        .from("images")
+        .select("id")
+        .eq("path", f.id)
+        .limit(1)
+        .maybeSingle();
+
+      const userResp = await supabase.auth.getUser();
+
+      // 5️⃣ Build the database payload
+      const dbPayload = {
+        title: f.file.name,
+        category_id, // ✅ the actual foreign key
+        bucket: "photos-original",
+        path: f.id,
+        uploaded_by: userResp?.data?.user?.id ?? null,
+        derived_paths: derivedPathsObj,
+      };
+
+      // 6️⃣ Insert or update image row
+      if (!existing)
+        await supabase.from("images").insert([dbPayload]);
+      else
+        await supabase.from("images").update(dbPayload).eq("id", existing.id);
+
+      // 7️⃣ Update UI
+      setFiles(prev =>
+        prev.map(fileObj =>
+          fileObj.id === f.id
+            ? { ...fileObj, status: "done", progress: 100 }
+            : fileObj
+        )
+      );
+    } catch (err) {
+      console.error("Upload failed for file:", f.file.name, err);
+      setFiles(prev =>
+        prev.map(fileObj =>
+          fileObj.id === f.id
+            ? { ...fileObj, status: "error", progress: 0 }
+            : fileObj
+        )
+      );
+    }
+  }
+
+  // 8️⃣ Clear UI after successful batch
+  setFiles([]);
+  setCategory("uncategorized");
+  setIsUploading(false);
+  triggerButtonStatus("upload-all", "Uploaded!");
+
+  // 9️⃣ Reload data from Supabase
+  await loadImagesAndDerived();
+
+  // 🔁 Optional: refresh the page if admin state lingers
+  // window.location.reload();
+};
   // ---------------- DELETE ----------------
   async function handleDelete(job) {
     if (!job) return;
