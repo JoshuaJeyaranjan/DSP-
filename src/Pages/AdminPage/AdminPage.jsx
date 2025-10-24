@@ -438,18 +438,18 @@ console.log("[DEBUG] category selected:", category);
           )}
 
 <select
-  value={filterCategory}
-  onChange={(e) => setFilterCategory(e.target.value)}
+  value={category || ""}
+  onChange={(e) => setCategory(Number(e.target.value))}
 >
-  <option value="all">All</option>
   {allCategories
-    .filter(cat => cat && typeof cat.name === "string")
+    .filter(cat => cat && typeof cat.id === "number" && typeof cat.name === "string")
     .map(cat => (
-      <option key={cat.id} value={cat.name}>
+      <option key={cat.id} value={cat.id}>
         {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
       </option>
     ))}
 </select>
+
 
           <button
             onClick={handleUploadAll}
