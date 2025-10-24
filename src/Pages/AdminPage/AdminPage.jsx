@@ -396,24 +396,27 @@ const handleUploadAll = async () => {
         <div className="filter-controls">
           <label>
             
-<select
-  value={filterCategory}
-  onChange={(e) => setFilterCategory(e.target.value)}
->
-  <option value="all">All</option>
-  {visibleCategories.map(cat => (
-    <option key={cat.id} value={String(cat.id)}>
-      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-    </option>
-  ))}
-</select>
+<label>
+  Filter by Category:
+  <select
+    value={filterCategory}
+    onChange={(e) => setFilterCategory(e.target.value)}
+  >
+    <option value="all">All</option>
+    {visibleCategories.map(cat => (
+      <option key={cat.id} value={cat.id}>
+        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+      </option>
+    ))}
+  </select>
+</label>
           </label>
         </div>
 
         <div className="jobs-grid">
           {jobs.length === 0 && <p>No uploads / images found.</p>}
           {jobs
-            .filter((job) => filterCategory === "all" ? true : job.dbRow?.category === filterCategory)
+            .filter((job) => filterCategory === "all" ? true : String(job.dbRow?.category_id) === filterCategory)
             .map((job) => (
               <div key={job.id} className="job-card">
                 <div className="job-info">
