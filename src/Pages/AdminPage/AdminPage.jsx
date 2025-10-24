@@ -401,13 +401,11 @@ const handleUploadAll = async () => {
   onChange={(e) => setFilterCategory(e.target.value)}
 >
   <option value="all">All</option>
-  {allCategories
-    .filter(cat => cat && typeof cat.name === "string")
-    .map(cat => (
-      <option key={cat.id} value={String(cat.id)}>
-        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-      </option>
-    ))}
+  {visibleCategories.map(cat => (
+    <option key={cat.id} value={String(cat.id)}>
+      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+    </option>
+  ))}
 </select>
           </label>
         </div>
