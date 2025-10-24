@@ -55,26 +55,27 @@ useEffect(() => {
     try {
       const { data, error } = await supabase
         .from("image_categories")
-        .select("name")
+        .select("id, name, visible_on_hub")
         .order("name");
       if (error) throw error;
 
-      const names = data?.map(c => c.name) || [];
-      setAllCategories(names); // for filter dropdown
-      setVisibleCategories(data?.filter(c => c.visible_on_hub).map(c => c.name) || []);
-      
-      // Default upload selection: first visible category
-      setCategory(data?.find(c => c.visible_on_hub)?.name || "uncategorized");
+      setAllCategories(data || []);
+      setVisibleCategories(
+        data?.filter(c => c.visible_on_hub) || []
+      );
+
+      // default to the first visible category or fallback
+      setCategory(data?.find(c => c.visible_on_hub)?.id || null);
     } catch (err) {
       console.error("Failed to fetch categories:", err);
-      setAllCategories(["uncategorized"]);
-      setVisibleCategories(["uncategorized"]);
-      setCategory("uncategorized");
+      setAllCategories([]);
+      setVisibleCategories([]);
+      setCategory(null);
     }
   };
+
   fetchCategories();
 }, []);
-
   // ---------------- BUTTON FEEDBACK ----------------
   const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
     setButtonStatus((prev) => ({ ...prev, [key]: label }));
@@ -169,11 +170,7 @@ const handleUploadAll = async () => {
     console.log("[CATEGORY] Current selected category (name):", category);
 
     // Attempt to find id for the selected category
-    const { data: catData, error: catErr } = await supabase
-      .from("image_categories")
-      .select("id, name")
-      .eq("name", category)
-      .maybeSingle();
+    const category_id = category; // we already stored the ID directly
 
     if (catErr) {
       console.warn("[CATEGORY] Error querying image_categories:", catErr);
@@ -439,10 +436,13 @@ const handleUploadAll = async () => {
             </div>
           )}
 
-<select value={category} onChange={(e) => setCategory(e.target.value)}>
-  {allCategories.map((catName) => (
-    <option key={catName} value={catName}>
-      {catName.charAt(0).toUpperCase() + catName.slice(1)}
+<select
+  value={category || ""}
+  onChange={(e) => setCategory(Number(e.target.value))}
+>
+  {allCategories.map((cat) => (
+    <option key={cat.id} value={cat.id}>
+      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
     </option>
   ))}
 </select>
