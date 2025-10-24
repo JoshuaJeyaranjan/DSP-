@@ -163,52 +163,109 @@ const handleUploadAll = async () => {
   if (!files.length) return;
   setIsUploading(true);
 
+  // Resolve category_id once and cache it
+  let category_id = null;
+  try {
+    console.log("[CATEGORY] Current selected category (name):", category);
+
+    // Attempt to find id for the selected category
+    const { data: catData, error: catErr } = await supabase
+      .from("image_categories")
+      .select("id, name")
+      .eq("name", category)
+      .maybeSingle();
+
+    if (catErr) {
+      console.warn("[CATEGORY] Error querying image_categories:", catErr);
+    } else if (catData) {
+      category_id = catData.id;
+      console.log("[CATEGORY] Found category id:", category_id, "for name:", catData.name);
+    } else {
+      console.warn("[CATEGORY] No category row found for name:", category);
+    }
+
+    // If we still don't have one, try to use "uncategorized" row as fallback
+    if (!category_id) {
+      const { data: uncData, error: uncErr } = await supabase
+        .from("image_categories")
+        .select("id, name")
+        .eq("name", "uncategorized")
+        .maybeSingle();
+
+      if (uncErr) {
+        console.warn("[CATEGORY] Error querying uncategorized row:", uncErr);
+      } else if (uncData) {
+        category_id = uncData.id;
+        console.log("[CATEGORY] Using fallback 'uncategorized' id:", category_id);
+      } else {
+        console.warn("[CATEGORY] No 'uncategorized' row found. category_id will be null.");
+      }
+    }
+  } catch (err) {
+    console.error("[CATEGORY] Unexpected error resolving category_id:", err);
+  }
+
+  // Upload loop
   for (const f of files) {
-    setFiles(prev =>
-      prev.map(fileObj =>
-        fileObj.id === f.id
-          ? { ...fileObj, status: "uploading", progress: 0 }
-          : fileObj
+    // UI state: mark uploading
+    setFiles((prev) =>
+      prev.map((fileObj) =>
+        fileObj.id === f.id ? { ...fileObj, status: "uploading", progress: 0 } : fileObj
       )
     );
 
     try {
-      // 1️⃣ Upload to Supabase storage
-      const { error: uploadErr } = await supabase.storage
+      console.log(`\n[UPLOAD] Starting upload for ${f.file.name} (path: ${f.id})`);
+      console.log("[UPLOAD] file size:", f.file.size, "type:", f.file.type);
+
+      // 1) Upload file to storage
+      const { data: uploadData, error: uploadErr } = await supabase.storage
         .from("photos-original")
         .upload(f.id, f.file, { upsert: true });
-      if (uploadErr) throw uploadErr;
 
-      setFiles(prev =>
-        prev.map(fileObj =>
+      if (uploadErr) {
+        console.error("[UPLOAD] Storage upload error:", uploadErr);
+        throw uploadErr;
+      }
+      console.log("[UPLOAD] Storage upload success:", uploadData);
+
+      setFiles((prev) =>
+        prev.map((fileObj) =>
           fileObj.id === f.id ? { ...fileObj, progress: 50 } : fileObj
         )
       );
 
-      // 2️⃣ Generate thumbnails via backend service
-      const resp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
+      // 2) Generate thumbnails (you already have this working)
+      console.log("[UPLOAD] Requesting thumbnails generation...");
+      const thumbResp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bucket: "photos-original", file: f.id }),
       });
-      if (!resp.ok) throw new Error(resp.statusText);
-      const respJson = await resp.json();
-      const derivedPathsObj = respJson.generatedPaths || {};
 
-      // 3️⃣ Resolve category_id from category name
-      const { data: categoryData, error: categoryErr } = await supabase
-        .from("image_categories")
-        .select("id")
-        .eq("name", category)
-        .single();
-
-      if (categoryErr || !categoryData) {
-        console.warn("Category not found, defaulting to uncategorized");
+      if (!thumbResp.ok) {
+        const text = await thumbResp.text().catch(() => "");
+        console.error("[UPLOAD] Thumbnail service error:", thumbResp.status, thumbResp.statusText, text);
+        throw new Error("Thumbnail generation failed");
       }
 
-      const category_id = categoryData?.id ?? null;
+      const thumbJson = await thumbResp.json();
+      const derivedPathsObj = thumbJson.generatedPaths || {};
+      console.log("[UPLOAD] Thumbnails generated:", derivedPathsObj);
 
-      // 4️⃣ Check if image already exists
+      // 3) Prepare DB payload using category_id (not category string)
+      const userResp = await supabase.auth.getUser();
+      const dbPayload = {
+        title: f.file.name,
+        category_id,            // <- INT foreign key expected by images table
+        bucket: "photos-original",
+        path: f.id,
+        uploaded_by: userResp?.data?.user?.id ?? null,
+        derived_paths: derivedPathsObj,
+      };
+      console.log("[DB] dbPayload prepared:", dbPayload);
+
+      // 4) Insert or update the images row
       const { data: existing } = await supabase
         .from("images")
         .select("id")
@@ -216,54 +273,46 @@ const handleUploadAll = async () => {
         .limit(1)
         .maybeSingle();
 
-      const userResp = await supabase.auth.getUser();
+      if (!existing) {
+        const { data: insertData, error: insertErr } = await supabase.from("images").insert([dbPayload]);
+        if (insertErr) {
+          console.error("[DB] Insert error:", insertErr);
+          throw insertErr;
+        }
+        console.log("[DB] Insert succeeded:", insertData);
+      } else {
+        const { data: updateData, error: updateErr } = await supabase.from("images").update(dbPayload).eq("id", existing.id);
+        if (updateErr) {
+          console.error("[DB] Update error:", updateErr);
+          throw updateErr;
+        }
+        console.log("[DB] Update succeeded:", updateData);
+      }
 
-      // 5️⃣ Build the database payload
-      const dbPayload = {
-        title: f.file.name,
-        category_id, // ✅ the actual foreign key
-        bucket: "photos-original",
-        path: f.id,
-        uploaded_by: userResp?.data?.user?.id ?? null,
-        derived_paths: derivedPathsObj,
-      };
-
-      // 6️⃣ Insert or update image row
-      if (!existing)
-        await supabase.from("images").insert([dbPayload]);
-      else
-        await supabase.from("images").update(dbPayload).eq("id", existing.id);
-
-      // 7️⃣ Update UI
-      setFiles(prev =>
-        prev.map(fileObj =>
-          fileObj.id === f.id
-            ? { ...fileObj, status: "done", progress: 100 }
-            : fileObj
+      // 5) Mark done in UI
+      setFiles((prev) =>
+        prev.map((fileObj) =>
+          fileObj.id === f.id ? { ...fileObj, status: "done", progress: 100 } : fileObj
         )
       );
+      console.log(`[UPLOAD] Finished ${f.file.name}`);
     } catch (err) {
-      console.error("Upload failed for file:", f.file.name, err);
-      setFiles(prev =>
-        prev.map(fileObj =>
-          fileObj.id === f.id
-            ? { ...fileObj, status: "error", progress: 0 }
-            : fileObj
+      console.error(`[UPLOAD] Error with ${f.file.name}:`, err);
+      setFiles((prev) =>
+        prev.map((fileObj) =>
+          fileObj.id === f.id ? { ...fileObj, status: "error", progress: 0 } : fileObj
         )
       );
     }
   }
 
-  // 8️⃣ Clear UI after successful batch
+  // clear UI selection and refresh admin list
   setFiles([]);
   setCategory("uncategorized");
   setIsUploading(false);
   triggerButtonStatus("upload-all", "Uploaded!");
-
-  // 9️⃣ Reload data from Supabase
   await loadImagesAndDerived();
-
-  // 🔁 Optional: refresh the page if admin state lingers
+  // optional full reload if state still stale:
   // window.location.reload();
 };
   // ---------------- DELETE ----------------
