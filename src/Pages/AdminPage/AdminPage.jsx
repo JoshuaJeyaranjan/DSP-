@@ -48,7 +48,7 @@ export default function AdminPage() {
   const [copiedJobId, setCopiedJobId] = useState(null);
 const [allCategories, setAllCategories] = useState([]);
 const [visibleCategories, setVisibleCategories] = useState([]);
-const [category, setCategory] = useState("uncategorized"); // current upload category
+const [category, setCategory] = useState(""); // current upload category
 
 useEffect(() => {
   const fetchCategories = async () => {
@@ -65,10 +65,9 @@ useEffect(() => {
       setVisibleCategories(cats.filter(c => c.visible_on_hub));
 
       // Default upload category: first visible, fallback to "uncategorized"
-      const defaultCat = cats.find(c => c.visible_on_hub) 
-                         || cats.find(c => c.name.toLowerCase() === "uncategorized");
-
-      setCategory(defaultCat?.id || null);
+ const defaultCat = cats.find(c => c.visible_on_hub) 
+                   || cats.find(c => c.name.toLowerCase() === "uncategorized");
+setCategory(defaultCat?.id ? String(defaultCat.id) : "");
 
     } catch (err) {
       console.error("Failed to fetch categories:", err);
@@ -370,18 +369,17 @@ const handleUploadAll = async () => {
           )}
 
 <select
-  value={category || ""}
-  onChange={(e) => setCategory(Number(e.target.value))}
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
 >
   {allCategories
     .filter(cat => cat && typeof cat.name === "string")
     .map(cat => (
-      <option key={cat.id} value={cat.id}>
+      <option key={cat.id} value={String(cat.id)}>
         {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
       </option>
     ))}
 </select>
-
 
           <button
             onClick={handleUploadAll}
@@ -404,12 +402,12 @@ const handleUploadAll = async () => {
 >
   <option value="all">All</option>
   {allCategories
-  .filter(cat => cat && typeof cat.name == 'string')
-  .map((cat) => (
-    <option key={cat.id} value={cat.id}>
-      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-    </option>
-  ))}
+    .filter(cat => cat && typeof cat.name === "string")
+    .map(cat => (
+      <option key={cat.id} value={String(cat.id)}>
+        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+      </option>
+    ))}
 </select>
           </label>
         </div>
