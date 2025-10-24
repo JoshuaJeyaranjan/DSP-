@@ -168,7 +168,8 @@ const handleUploadAll = async () => {
   let category_id = null;
   try {
     console.log("[CATEGORY] Current selected category (name):", category);
-
+    console.log("[DEBUG] allCategories:", allCategories);
+console.log("[DEBUG] category selected:", category);
     // Attempt to find id for the selected category
     const category_id = category; // we already stored the ID directly
 
@@ -440,15 +441,15 @@ const handleUploadAll = async () => {
   value={category || ""}
   onChange={(e) => setCategory(Number(e.target.value))}
 >
-  {allCategories
-    .filter((cat) => cat && typeof cat.name === "string") // ✅ filter invalid entries
-    .map((cat) => (
-      <option key={cat.id} value={cat.id}>
-        {cat.name
-          ? cat.name.charAt(0).toUpperCase() + cat.name.slice(1)
-          : "Unnamed"}
-      </option>
-    ))}
+  {Array.isArray(allCategories) &&
+    allCategories
+      .filter(cat => cat && typeof cat.name === "string")
+      .map(cat => (
+        <option key={cat.id} value={cat.id}>
+          {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+        </option>
+      ))
+  }
 </select>
 
           <button
