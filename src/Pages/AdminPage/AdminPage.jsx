@@ -374,7 +374,7 @@ const handleUploadAll = async () => {
   onChange={(e) => setCategory(Number(e.target.value))}
 >
   {allCategories
-    .filter(cat => cat && typeof cat.name === "string" && typeof cat.id === "number")
+    .filter(cat => cat && typeof cat.name === "string")
     .map(cat => (
       <option key={cat.id} value={cat.id}>
         {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
@@ -403,9 +403,11 @@ const handleUploadAll = async () => {
   onChange={(e) => setFilterCategory(e.target.value)}
 >
   <option value="all">All</option>
-  {allCategories.map((cat) => (
-    <option key={cat} value={cat}>
-      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+  {allCategories
+  .filter(cat => cat && typeof cat.name == 'string')
+  .map((cat) => (
+    <option key={cat.id} value={cat.id}>
+      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
     </option>
   ))}
 </select>
