@@ -255,7 +255,7 @@ console.log("[DEBUG] category selected:", category);
       const userResp = await supabase.auth.getUser();
       const dbPayload = {
         title: f.file.name,
-        category_id,            // <- INT foreign key expected by images table
+        category_id: category,    // <- INT foreign key expected by images table
         bucket: "photos-original",
         path: f.id,
         uploaded_by: userResp?.data?.user?.id ?? null,
@@ -438,18 +438,17 @@ console.log("[DEBUG] category selected:", category);
           )}
 
 <select
-  value={category || ""}
-  onChange={(e) => setCategory(Number(e.target.value))}
+  value={filterCategory}
+  onChange={(e) => setFilterCategory(e.target.value)}
 >
-  {Array.isArray(allCategories) &&
-    allCategories
-      .filter(cat => cat && typeof cat.name === "string")
-      .map(cat => (
-        <option key={cat.id} value={cat.id}>
-          {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-        </option>
-      ))
-  }
+  <option value="all">All</option>
+  {allCategories
+    .filter(cat => cat && typeof cat.name === "string")
+    .map(cat => (
+      <option key={cat.id} value={cat.name}>
+        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+      </option>
+    ))}
 </select>
 
           <button
