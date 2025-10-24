@@ -440,11 +440,15 @@ const handleUploadAll = async () => {
   value={category || ""}
   onChange={(e) => setCategory(Number(e.target.value))}
 >
-  {allCategories.map((cat) => (
-    <option key={cat.id} value={cat.id}>
-      {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-    </option>
-  ))}
+  {allCategories
+    .filter((cat) => cat && typeof cat.name === "string") // ✅ filter invalid entries
+    .map((cat) => (
+      <option key={cat.id} value={cat.id}>
+        {cat.name
+          ? cat.name.charAt(0).toUpperCase() + cat.name.slice(1)
+          : "Unnamed"}
+      </option>
+    ))}
 </select>
 
           <button
