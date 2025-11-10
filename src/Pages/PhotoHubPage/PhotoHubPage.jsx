@@ -44,7 +44,7 @@ export default function PhotoHub() {
       try {
         const { data, error } = await supabase
           .from("image_categories")
-          .select("id, name, thumbnail_url")
+          .select("id, name, thumbnail_url, slug")
           .eq("visible_on_hub", true)
           .order("name");
 
