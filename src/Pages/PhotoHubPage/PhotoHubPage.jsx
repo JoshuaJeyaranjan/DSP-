@@ -195,7 +195,7 @@ export default function PhotoHub() {
             <div key={cat.id} className="photo-category-card">
               <h2 className="category-title">{cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}</h2>
               {thumbnails[cat.name] ? (
-                <Link to={`/photography/${cat.name}`} className="thumb-link">
+                <Link to={`/photography/${cat.slug}`} className="thumb-link">
                   <div className="thumb-wrapper">
                     <img
                       src={thumbnails[cat.name]}
