@@ -87,7 +87,7 @@ export default function HomePage() {
             View Videography Work
           </Link>
           </div>
-         
+        
         </div>
       </section>
 

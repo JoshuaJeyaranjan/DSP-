@@ -95,7 +95,6 @@
   justify-content: center;
   margin-top: 2rem;
 }
-
 .home__link {
   display: inline-flex;
   align-items: center;
@@ -109,36 +108,24 @@
   text-decoration: none;
   white-space: nowrap;
 
-  /* Subtle glass/metal gradient */
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.85),
-    rgba(218, 165, 32, 0.12)
-  );
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  /* Clean dark transparent background */
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #fff;
+  color: #fff;
 
-  color: #111;
+  /* Slight depth effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 
-  box-shadow: 
-    0 4px 10px rgba(0,0,0,0.08),
-    inset 0 1px 1px rgba(255,255,255,0.4);
-
-  transition:
+  transition: 
     transform 0.25s ease,
+    background 0.25s ease,
     box-shadow 0.25s ease,
-    background 0.25s ease;
+    color 0.25s ease;
 }
 
 .home__link:hover {
   transform: translateY(-3px);
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(218, 165, 32, 0.25)
-  );
-  box-shadow:
-    0 6px 18px rgba(0,0,0,0.12),
-    inset 0 1px 1px rgba(255,255,255,0.55);
+  background: rgba(0, 0, 0, 0.85); /* slightly darker on hover */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  color: #fff; /* ensures text stays white on hover */
 }
