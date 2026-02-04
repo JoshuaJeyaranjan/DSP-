@@ -1,5 +1,3 @@
-// src/Components/LoadingSkeleton/LoadingSkeleton.jsx
-import React from "react";
 import "./LoadingSkeleton.scss";
 
 export default function LoadingSkeleton({ count = 4, type = "card" }) {

@@ -1,6 +1,5 @@
-// src/Pages/AdminPhotoCategoriesPage/AdminPhotoCategoriesPage.jsx
 import React, { useEffect, useState } from "react";
-import { supabaseAdmin as supabase } from "../../utils/supabaseAdmin"; 
+import { supabaseAdmin as supabase } from "../../utils/supabaseAdmin";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 import "./AdminPhotoCategoriesPage.scss";
@@ -10,17 +9,13 @@ export default function AdminPhotoCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newCategory, setNewCategory] = useState({
-    name: "",    
+    name: "",
     thumbnail_url: "",
     visible_on_hub: true,
   });
 
-  // Local edits before committing
   const [edits, setEdits] = useState({});
 
-  // -------------------------
-  // Fetch categories
-  // -------------------------
   const fetchCategories = async () => {
     setLoading(true);
     setError(null);
@@ -44,32 +39,27 @@ export default function AdminPhotoCategoriesPage() {
     fetchCategories();
   }, []);
 
-  // -------------------------
-  // Add new category
-  // -------------------------
-const handleAdd = async (e) => {
-  e.preventDefault();
-  if (!newCategory.name) return;
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!newCategory.name) return;
 
-  const slug = newCategory.name.trim().toLowerCase().replace(/\s+/g, "-");
+    const slug = newCategory.name.trim().toLowerCase().replace(/\s+/g, "-");
 
-  try {
-    const { error } = await supabase.from("image_categories").insert([
-      { ...newCategory, slug },
-    ]);
-    if (error) throw error;
+    try {
+      const { error } = await supabase
+        .from("image_categories")
+        .insert([{ ...newCategory, slug }]);
+      if (error) throw error;
 
-    setNewCategory({ name: "", thumbnail_url: "", visible_on_hub: true });
-    fetchCategories();
-    triggerButtonStatus("add-category", "Added!");
-  } catch (err) {
-    console.error("[AdminPhotoCategoriesPage] Add error:", err);
-    setError("Failed to add category");
-  }
-};
-  // -------------------------
-  // Track field edits locally
-  // -------------------------
+      setNewCategory({ name: "", thumbnail_url: "", visible_on_hub: true });
+      fetchCategories();
+      triggerButtonStatus("add-category", "Added!");
+    } catch (err) {
+      console.error("[AdminPhotoCategoriesPage] Add error:", err);
+      setError("Failed to add category");
+    }
+  };
+
   const handleEditChange = (id, field, value) => {
     setEdits((prev) => ({
       ...prev,
@@ -80,80 +70,88 @@ const handleAdd = async (e) => {
     }));
   };
 
-  // -------------------------
-  // Commit update
-  // -------------------------
-const handleUpdate = async (id) => {
-  const updateData = edits[id];
-  if (!updateData) return;
+  const handleUpdate = async (id) => {
+    const updateData = edits[id];
+    if (!updateData) return;
 
-  try {
-    const { error } = await supabase
-      .from("image_categories")
-      .update(updateData)
-      .eq("id", id);
+    try {
+      const { error } = await supabase
+        .from("image_categories")
+        .update(updateData)
+        .eq("id", id);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    setEdits((prev) => {
-      const copy = { ...prev };
-      delete copy[id];
-      return copy;
-    });
+      setEdits((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
 
-    fetchCategories();
-    triggerButtonStatus(`update-${id}`, "Updated!");
-  } catch (err) {
-    console.error("[AdminPhotoCategoriesPage] Update error:", err);
-    setError("Failed to update category");
-  }
-};
+      fetchCategories();
+      triggerButtonStatus(`update-${id}`, "Updated!");
+    } catch (err) {
+      console.error("[AdminPhotoCategoriesPage] Update error:", err);
+      setError("Failed to update category");
+    }
+  };
 
-  // -------------------------
-  // Delete category
-  // -------------------------
-const handleDelete = async (id) => {
-  if (!window.confirm("Delete this category? This may orphan images.")) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this category? This may orphan images."))
+      return;
 
-  try {
-    const { error } = await supabase.from("image_categories").delete().eq("id", id);
-    if (error) throw error;
-    fetchCategories();
-    triggerButtonStatus(`delete-${id}`, "Deleted!");
-  } catch (err) {
-    console.error("[AdminPhotoCategoriesPage] Delete error:", err);
-    setError("Failed to delete category");
-  }
-};
+    try {
+      const { error } = await supabase
+        .from("image_categories")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+      fetchCategories();
+      triggerButtonStatus(`delete-${id}`, "Deleted!");
+    } catch (err) {
+      console.error("[AdminPhotoCategoriesPage] Delete error:", err);
+      setError("Failed to delete category");
+    }
+  };
 
   const [buttonStatus, setButtonStatus] = useState({});
 
-const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
-  setButtonStatus((prev) => ({ ...prev, [key]: label }));
-  setTimeout(() => {
-    setButtonStatus((prev) => ({ ...prev, [key]: null }));
-  }, duration);
-};
+  const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
+    setButtonStatus((prev) => ({ ...prev, [key]: label }));
+    setTimeout(() => {
+      setButtonStatus((prev) => ({ ...prev, [key]: null }));
+    }, duration);
+  };
   return (
     <>
       <Nav />
       <div className="admin-photo-categories-page">
-        <h1 className="admin-photo-categories-page__title">Admin: Photo Categories</h1>
+        <h1 className="admin-photo-categories-page__title">
+          Admin: Photo Categories
+        </h1>
 
         {error && <p className="admin-photo-categories-page__error">{error}</p>}
-        {loading && <p className="admin-photo-categories-page__loading">Loading categories...</p>}
+        {loading && (
+          <p className="admin-photo-categories-page__loading">
+            Loading categories...
+          </p>
+        )}
 
-        {/* Add new category form */}
-        <form onSubmit={handleAdd} className="admin-photo-categories-page__form category-form">
+        <form
+          onSubmit={handleAdd}
+          className="admin-photo-categories-page__form category-form"
+        >
           <input
             type="text"
             className="category-form__input"
             placeholder="Name"
             value={newCategory.name}
-            onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, name: e.target.value })
+            }
             required
           />
-  
+
           <input
             type="text"
             className="category-form__input"
@@ -169,26 +167,23 @@ const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
               className="category-form__checkbox"
               checked={newCategory.visible_on_hub}
               onChange={(e) =>
-                setNewCategory({ ...newCategory, visible_on_hub: e.target.checked })
+                setNewCategory({
+                  ...newCategory,
+                  visible_on_hub: e.target.checked,
+                })
               }
             />
             Visible on Hub
           </label>
-          <button
-  type="submit"
-  className="category-form__submit-btn"
->
-  {buttonStatus["add-category"] || "Add Category"}
-</button>
+          <button type="submit" className="category-form__submit-btn">
+            {buttonStatus["add-category"] || "Add Category"}
+          </button>
         </form>
 
-        {/* Category list */}
         {categories.length ? (
           <table className="admin-photo-categories-page__table categories-table">
             <thead>
               <tr>
-                
-                
                 <th>Name</th>
                 <th>Visible on Hub</th>
                 <th>Thumbnail URL</th>
@@ -200,22 +195,28 @@ const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
                 const draft = edits[cat.id] || {};
                 return (
                   <tr key={cat.id} className="categories-table__row">
-                    
-                
                     <td className="categories-table__cell">
                       <input
                         className="categories-table__input"
                         value={draft.name ?? cat.name}
-                        onChange={(e) => handleEditChange(cat.id, "name", e.target.value)}
+                        onChange={(e) =>
+                          handleEditChange(cat.id, "name", e.target.value)
+                        }
                       />
                     </td>
                     <td className="categories-table__cell">
                       <input
                         type="checkbox"
                         className="categories-table__checkbox"
-                        checked={draft.visible_on_hub ?? cat.visible_on_hub ?? false}
+                        checked={
+                          draft.visible_on_hub ?? cat.visible_on_hub ?? false
+                        }
                         onChange={(e) =>
-                          handleEditChange(cat.id, "visible_on_hub", e.target.checked)
+                          handleEditChange(
+                            cat.id,
+                            "visible_on_hub",
+                            e.target.checked,
+                          )
                         }
                       />
                     </td>
@@ -224,23 +225,27 @@ const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
                         className="categories-table__input"
                         value={(draft.thumbnail_url ?? cat.thumbnail_url) || ""}
                         onChange={(e) =>
-                          handleEditChange(cat.id, "thumbnail_url", e.target.value)
+                          handleEditChange(
+                            cat.id,
+                            "thumbnail_url",
+                            e.target.value,
+                          )
                         }
                       />
                     </td>
                     <td className="categories-table__cell categories-table__actions">
-              <button
-  className="categories-table__update-btn"
-  onClick={() => handleUpdate(cat.id)}
->
-  {buttonStatus[`update-${cat.id}`] || "Update"}
-</button>
-<button
-  className="categories-table__delete-btn"
-  onClick={() => handleDelete(cat.id)}
->
-  {buttonStatus[`delete-${cat.id}`] || "Delete"}
-</button>
+                      <button
+                        className="categories-table__update-btn"
+                        onClick={() => handleUpdate(cat.id)}
+                      >
+                        {buttonStatus[`update-${cat.id}`] || "Update"}
+                      </button>
+                      <button
+                        className="categories-table__delete-btn"
+                        onClick={() => handleDelete(cat.id)}
+                      >
+                        {buttonStatus[`delete-${cat.id}`] || "Delete"}
+                      </button>
                     </td>
                   </tr>
                 );
@@ -248,9 +253,12 @@ const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
             </tbody>
           </table>
         ) : (
-          <p className="admin-photo-categories-page__empty">No categories yet. Add one above.</p>
+          <p className="admin-photo-categories-page__empty">
+            No categories yet. Add one above.
+          </p>
         )}
       </div>
+
       <Footer />
     </>
   );

@@ -62,11 +62,10 @@ export default function AdminReviewsPage() {
     fetchReviews();
   }, []);
 
-  /* ----------------------- CRUD ----------------------- */
-
   const handleAddReview = async () => {
     const { name, company, image_url, content } = newReview;
-    if (!name || !company || !content) return setError("Name, company, and text are required.");
+    if (!name || !company || !content)
+      return setError("Name, company, and text are required.");
 
     try {
       const { data, error } = await supabase
@@ -131,8 +130,6 @@ export default function AdminReviewsPage() {
     }
   };
 
-  /* ----------------------- RENDER ----------------------- */
-
   return (
     <>
       <Nav />
@@ -142,36 +139,44 @@ export default function AdminReviewsPage() {
         {error && <div className="error">{error}</div>}
         {message && <div className="success">{message}</div>}
 
-        {/* Add new review */}
         <h2>Add New Review</h2>
         <div className="review-form">
           <input
             type="text"
             placeholder="Name"
             value={newReview.name}
-            onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+            onChange={(e) =>
+              setNewReview({ ...newReview, name: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Company"
             value={newReview.company}
-            onChange={(e) => setNewReview({ ...newReview, company: e.target.value })}
+            onChange={(e) =>
+              setNewReview({ ...newReview, company: e.target.value })
+            }
           />
           <input
             type="text"
             placeholder="Photo URL (optional)"
             value={newReview.image_url}
-            onChange={(e) => setNewReview({ ...newReview, image_url: e.target.value })}
+            onChange={(e) =>
+              setNewReview({ ...newReview, image_url: e.target.value })
+            }
           />
           <textarea
             placeholder="Review text"
             value={newReview.content}
-            onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
+            onChange={(e) =>
+              setNewReview({ ...newReview, content: e.target.value })
+            }
           />
-          <button onClick={handleAddReview}>{buttonStatus["add-review"] || "Add Review"}</button>
+          <button onClick={handleAddReview}>
+            {buttonStatus["add-review"] || "Add Review"}
+          </button>
         </div>
 
-        {/* Existing reviews */}
         <div className="review-list">
           <h2>Existing Reviews</h2>
           {loading ? (
@@ -193,34 +198,52 @@ export default function AdminReviewsPage() {
                   type="text"
                   value={editStates[r.id]?.name || ""}
                   onChange={(e) =>
-                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], name: e.target.value } }))
+                    setEditStates((prev) => ({
+                      ...prev,
+                      [r.id]: { ...prev[r.id], name: e.target.value },
+                    }))
                   }
                 />
                 <input
                   type="text"
                   value={editStates[r.id]?.company || ""}
                   onChange={(e) =>
-                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], company: e.target.value } }))
+                    setEditStates((prev) => ({
+                      ...prev,
+                      [r.id]: { ...prev[r.id], company: e.target.value },
+                    }))
                   }
                 />
                 <input
                   type="text"
                   value={editStates[r.id]?.image_url || ""}
                   onChange={(e) =>
-                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], image_url: e.target.value } }))
+                    setEditStates((prev) => ({
+                      ...prev,
+                      [r.id]: { ...prev[r.id], image_url: e.target.value },
+                    }))
                   }
                 />
                 <textarea
                   value={editStates[r.id]?.content || ""}
                   onChange={(e) =>
-                    setEditStates((prev) => ({ ...prev, [r.id]: { ...prev[r.id], content: e.target.value } }))
+                    setEditStates((prev) => ({
+                      ...prev,
+                      [r.id]: { ...prev[r.id], content: e.target.value },
+                    }))
                   }
                 />
 
-                <button className="update-button" onClick={() => handleUpdateReview(r.id)}>
+                <button
+                  className="update-button"
+                  onClick={() => handleUpdateReview(r.id)}
+                >
                   {buttonStatus[`update-review-${r.id}`] || "Update"}
                 </button>
-                <button className="delete-button" onClick={() => handleDeleteReview(r.id)}>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteReview(r.id)}
+                >
                   {buttonStatus[`delete-review-${r.id}`] || "Delete"}
                 </button>
               </div>

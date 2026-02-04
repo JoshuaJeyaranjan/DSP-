@@ -1,4 +1,3 @@
-// supabaseAdmin.js
 import { createClient } from "@supabase/supabase-js";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;

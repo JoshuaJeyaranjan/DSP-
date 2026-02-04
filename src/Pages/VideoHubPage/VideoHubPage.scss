@@ -1,13 +1,9 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
-/* ---------------------------
-   Video Hub Page
-   --------------------------- */
 .video-hub-page {
-  
   margin: 0 auto;
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,11 +22,10 @@
     color: var(--color-text-secondary);
   }
 
-  /* Categories container */
   .video-categories {
     width: 100%;
     display: flex;
-    
+
     gap: 1.5rem;
     padding: 1rem 0;
     margin: 0 auto;
@@ -46,13 +41,15 @@
     max-width: 320px;
     background: var(--color-bg);
     border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
     overflow: hidden;
     text-align: center;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    transition:
+      transform 0.28s ease,
+      box-shadow 0.28s ease;
     will-change: transform, box-shadow;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -60,7 +57,7 @@
 
     &:hover {
       transform: translateY(-6px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     }
 
     img,
@@ -106,15 +103,16 @@
       overflow: hidden;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      transition:
+        transform 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
       will-change: transform, box-shadow;
       transform: translateZ(0);
 
-
-    &:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-    }
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      }
 
       img,
       .category-thumbnail {
@@ -127,11 +125,10 @@
   }
 }
 
-/* ---------------- Hero Section ---------------- */
 .video-hub-page .hero {
   position: relative;
   min-height: 66vh;
-  // background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,7 +139,9 @@
     inset: 0;
     z-index: 1;
     width: 100%;
-    transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out;
+    transition:
+      background 0.35s ease-in-out,
+      opacity 0.35s ease-in-out;
     pointer-events: none;
     will-change: background, opacity;
     transform: translateZ(0);
@@ -160,14 +159,15 @@
   }
 }
 
-/* ---------------- Theme-aware overlays + titles ---------------- */
-/* Light mode */
 body:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .video-hub-page .hero .overlay,
 .theme-light .video-hub-page .hero .overlay,
 .light .video-hub-page .hero .overlay,
 [data-theme="light"] .video-hub-page .hero .overlay {
-  background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28));
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.28)
+  );
 }
 
 body:not([data-theme="dark"]) .video-hub-page .hero .title,
@@ -178,13 +178,12 @@ html:not([data-theme="dark"]) .video-hub-page .hero .title,
   color: black;
 }
 
-/* Dark mode */
 body[data-theme="dark"] .video-hub-page .hero .overlay,
 html[data-theme="dark"] .video-hub-page .hero .overlay,
 .theme-dark .video-hub-page .hero .overlay,
 .dark .video-hub-page .hero .overlay,
 [data-theme="dark"] .video-hub-page .hero .overlay {
-  background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65));
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65));
 }
 
 body[data-theme="dark"] .video-hub-page .hero .title,
@@ -195,12 +194,10 @@ html[data-theme="dark"] .video-hub-page .hero .title,
   color: white;
 }
 
-/* ---------------- Category title helpers ---------------- */
 .category-title {
   transition: color 0.25s ease-in-out;
 }
 
-/* Light mode */
 body:not([data-theme="dark"]) .category-title,
 html:not([data-theme="dark"]) .category-title,
 .theme-light .category-title,
@@ -210,7 +207,6 @@ html:not([data-theme="dark"]) .category-title,
   background: transparent !important;
 }
 
-/* Dark mode */
 body[data-theme="dark"] .category-title,
 html[data-theme="dark"] .category-title,
 .theme-dark .category-title,
@@ -218,7 +214,6 @@ html[data-theme="dark"] .category-title,
 [data-theme="dark"] .category-title {
   color: white !important;
 }
-
 
 .hero {
   position: relative;
@@ -251,6 +246,10 @@ html[data-theme="dark"] .category-title,
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

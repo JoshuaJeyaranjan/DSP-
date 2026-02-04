@@ -9,7 +9,6 @@ export default function AdminMiscPage() {
   const [loading, setLoading] = useState(true);
   const [buttonStatus, setButtonStatus] = useState({});
 
-  // ---------------- BUTTON FEEDBACK ----------------
   const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
     setButtonStatus((prev) => ({ ...prev, [key]: label }));
     setTimeout(() => {
@@ -17,7 +16,6 @@ export default function AdminMiscPage() {
     }, duration);
   };
 
-  // Fetch about paragraphs
   const loadParagraphs = async () => {
     setLoading(true);
     try {
@@ -38,14 +36,12 @@ export default function AdminMiscPage() {
     loadParagraphs();
   }, []);
 
-  // Update paragraph content
   const updateParagraph = (id, newContent) => {
     setParagraphs((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, content: newContent } : p))
+      prev.map((p) => (p.id === id ? { ...p, content: newContent } : p)),
     );
   };
 
-  // Save paragraph to DB
   const saveParagraph = async (id) => {
     triggerButtonStatus(`${id}-save`, "Saving...");
     try {
@@ -62,7 +58,6 @@ export default function AdminMiscPage() {
     }
   };
 
-  // Add a new paragraph
   const addParagraph = async () => {
     triggerButtonStatus("add", "Adding...");
     try {
@@ -83,7 +78,6 @@ export default function AdminMiscPage() {
     }
   };
 
-  // Delete a paragraph
   const deleteParagraph = async (id) => {
     if (!window.confirm("Are you sure you want to delete this paragraph?"))
       return;
@@ -99,9 +93,11 @@ export default function AdminMiscPage() {
     }
   };
 
-  // Move paragraph up/down
   const moveParagraph = (id, direction) => {
-    triggerButtonStatus(`${id}-move`, direction === "up" ? "Moving ↑" : "Moving ↓");
+    triggerButtonStatus(
+      `${id}-move`,
+      direction === "up" ? "Moving ↑" : "Moving ↓",
+    );
     setParagraphs((prev) => {
       const index = prev.findIndex((p) => p.id === id);
       if (index === -1) return prev;
@@ -114,13 +110,11 @@ export default function AdminMiscPage() {
         newArray[index],
       ];
 
-      // Update positions locally
       return newArray.map((p, i) => ({ ...p, position: i }));
     });
     triggerButtonStatus(`${id}-move`);
   };
 
-  // Save all positions
   const savePositions = async () => {
     triggerButtonStatus("save-order", "Saving...");
     try {
@@ -129,8 +123,8 @@ export default function AdminMiscPage() {
           supabase
             .from("about")
             .update({ position: p.position, updated_at: new Date() })
-            .eq("id", p.id)
-        )
+            .eq("id", p.id),
+        ),
       );
       triggerButtonStatus("save-order");
     } catch (err) {

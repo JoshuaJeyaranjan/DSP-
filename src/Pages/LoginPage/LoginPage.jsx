@@ -14,10 +14,9 @@ export default function LoginPage() {
     setPassword("");
   };
 
-  // Redirect when login is successful
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/admin/dashboard"); // ✅ redirect to admin dashboard
+      navigate("/admin/dashboard");
     }
   }, [isAuthenticated, navigate]);
 

@@ -1,13 +1,9 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
-/* ---------------------------
-   Photo Hub Page
-   --------------------------- */
 .photo-hub-page {
-  
   margin: 0 auto;
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,11 +22,6 @@
     margin-bottom: 2rem;
     color: var(--color-text-secondary);
   }
-
-  /* ---------------- Categories container ----------------
-     Use a constrained container + grid/flex that keeps the cards centered.
-     We prefer grid for equal-width responsive layout, but keep fallback to flex.
-  --------------------------------------------------------*/
   .photo-categories {
     width: 100%;
     max-width: 1100px;
@@ -39,7 +30,7 @@
     gap: 1.5rem;
     padding: 1rem 0;
     margin: 0 auto;
-    justify-items: center; /* center each card in its column */
+    justify-items: center;
     align-items: start;
   }
 
@@ -51,22 +42,23 @@
     overflow: hidden;
     background: var(--color-bg);
     border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
     align-items: stretch;
     text-align: left;
-    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    transition:
+      transform 0.28s ease,
+      box-shadow 0.28s ease;
     cursor: pointer;
 
-    /* compositing hints so hover doesn't force repaints in siblings */
     will-change: transform, box-shadow;
     transform: translateZ(0);
     backface-visibility: hidden;
     contain: paint;
 
     &:hover {
-      transform: translateY(-6px); /* compositor-friendly */
+      transform: translateY(-6px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     }
 
@@ -74,7 +66,7 @@
     .category-thumbnail {
       width: 100%;
       height: 180px;
-      object-fit: cover; /* keep image fully visible — see note below */
+      object-fit: cover;
       display: block;
     }
 
@@ -99,7 +91,6 @@
     }
   }
 
-  /* smaller screens: single column */
   @media (max-width: $tablet-breakpoint) {
     .photo-categories {
       grid-template-columns: 1fr;
@@ -117,9 +108,6 @@
   }
 }
 
-/* --------------------------
-   Shared hub fallbacks (video / photo)
-   -------------------------- */
 .photo-hub-page,
 .video-hub-page {
   h1 {
@@ -148,7 +136,9 @@
     overflow: hidden;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition:
+      transform 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
     will-change: transform, box-shadow;
     transform: translateZ(0);
 
@@ -173,50 +163,49 @@
   }
 }
 
-/* ---------------- Hero Section (isolated overlay & title) ---------------- */
 .photo-hub-page .hero {
   position: relative;
   min-height: 66vh;
-  // background: url("/photoAssets/home-hero.avif") center/cover no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
 
-  /* overlay: isolated layer, non-interactive */
   .overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
     width: 100%;
-    transition: background 0.35s ease-in-out, opacity 0.35s ease-in-out;
-    pointer-events: none;          /* ensure hover on cards isn't blocked */
+    transition:
+      background 0.35s ease-in-out,
+      opacity 0.35s ease-in-out;
+    pointer-events: none;
     will-change: background, opacity;
-    transform: translateZ(0);      /* promote to compositor layer */
+    transform: translateZ(0);
     backface-visibility: hidden;
     contain: paint;
   }
 
   .title {
     z-index: 2;
-    position: relative; /* above overlay */
+    position: relative;
     font-weight: 100;
     font-size: 3rem;
     text-align: center;
     transition: color 0.35s ease-in-out;
-    
   }
 }
 
-/* ---------------- Theme-aware overlays + titles ---------------- */
-
-/* Light mode: light overlay so black title reads */
 body:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 html:not([data-theme="dark"]) .photo-hub-page .hero .overlay,
 .theme-light .photo-hub-page .hero .overlay,
 .light .photo-hub-page .hero .overlay,
 [data-theme="light"] .photo-hub-page .hero .overlay {
-  background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.28));
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.28)
+  );
 }
 
 body:not([data-theme="dark"]) .photo-hub-page .hero .title,
@@ -227,13 +216,12 @@ html:not([data-theme="dark"]) .photo-hub-page .hero .title,
   color: black;
 }
 
-/* Dark mode: darker overlay so white title reads */
 body[data-theme="dark"] .photo-hub-page .hero .overlay,
 html[data-theme="dark"] .photo-hub-page .hero .overlay,
 .theme-dark .photo-hub-page .hero .overlay,
 .dark .photo-hub-page .hero .overlay,
 [data-theme="dark"] .photo-hub-page .hero .overlay {
-  background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65));
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65));
 }
 
 body[data-theme="dark"] .photo-hub-page .hero .title,
@@ -244,12 +232,10 @@ html[data-theme="dark"] .photo-hub-page .hero .title,
   color: white;
 }
 
-/* ---------------- Category title helpers ---------------- */
 .category-title {
   transition: color 0.25s ease-in-out;
 }
 
-/* Light mode titles */
 body:not([data-theme="dark"]) .category-title,
 html:not([data-theme="dark"]) .category-title,
 .theme-light .category-title,
@@ -258,7 +244,6 @@ html:not([data-theme="dark"]) .category-title,
   color: black !important;
 }
 
-/* Dark mode titles */
 body[data-theme="dark"] .category-title,
 html[data-theme="dark"] .category-title,
 .theme-dark .category-title,
@@ -267,11 +252,11 @@ html[data-theme="dark"] .category-title,
   color: white !important;
 }
 
-/* ---------------- Misc helpers / debug removal ---------------- */
-/* If you previously added a red debug background, remove it here */
-.category-title { background: transparent !important; }
+.category-title {
+  background: transparent !important;
+}
 
-.photo-hero{
+.photo-hero {
   width: 100vw;
   height: 60vh;
 }
@@ -307,6 +292,10 @@ html[data-theme="dark"] .category-title,
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

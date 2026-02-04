@@ -7,7 +7,9 @@
   overflow: hidden;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 12px rgba(var(--color-white) 0.8);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -26,10 +28,9 @@
 
   .category-content {
     padding: 16px;
-    
 
     .category-name {
-        text-decoration: none;
+      text-decoration: none;
       font-size: 1.75rem;
       font-weight: 100;
       color: var(--color-black);
@@ -43,4 +44,3 @@
     }
   }
 }
-

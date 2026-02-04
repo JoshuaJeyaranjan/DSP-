@@ -1,15 +1,9 @@
-// -------------------------------------------------------------
-// 1. BREAKPOINTS
-// -------------------------------------------------------------
 $mobile-breakpoint: 767px;
 $tablet-breakpoint: 768px;
-$desktop-breakpoint: 1024px; // Changed from 1280px for consistency
+$desktop-breakpoint: 1024px;
 
-// -------------------------------------------------------------
-// 2. FONT STACKS & TYPOGRAPHY
-// -------------------------------------------------------------
-$font-heading: 'Italiana', serif;
-$font-body: 'Poppins', sans-serif;
+$font-heading: "Italiana", serif;
+$font-body: "Poppins", sans-serif;
 
 $font-weight-light: 300;
 $font-weight-regular: 400;
@@ -30,9 +24,6 @@ $body-footer-size-mobile: 0.8125rem;
 $label-button-size: 0.75rem;
 $label-button-size-mobile: 0.625rem;
 
-// -------------------------------------------------------------
-// 3. LINE HEIGHTS
-// -------------------------------------------------------------
 $page-header-height: 2.75rem;
 $page-header-height-mobile: 2rem;
 
@@ -46,25 +37,18 @@ $sub-header-height-mobile: 1.125rem;
 $body-copy-height-mobile: 1.125rem;
 $footer-label-button-height-mobile: 1.125rem;
 
-// -------------------------------------------------------------
-// 4. COLORS
-// -------------------------------------------------------------
 $primary-dark: #323232;
-$primary-mid: #AFAFAF;
-$primary-light: #FFFFFF;
-// $primary-orange: #d55e15;
-$primary-green: #28a745 ;
+$primary-mid: #afafaf;
+$primary-light: #ffffff;
+
+$primary-green: #28a745;
 
 $secondary-dark: #000000;
-$secondary-mid: #E1E1E1;
-$secondary-light: #FAFAFA;
-// $secondary-orange: #f8eac6;
+$secondary-mid: #e1e1e1;
+$secondary-light: #fafafa;
 
-$form-field-error: #D22D2D;
+$form-field-error: #d22d2d;
 
-// -------------------------------------------------------------
-// 5. SPACING & UNITS
-// -------------------------------------------------------------
 $unit-1: 0.25rem;
 $unit-2: 0.5rem;
 $unit-3: 1rem;
@@ -84,23 +68,14 @@ $spacing-xl: $unit-5;
 $spacing-xxl: $unit-7;
 $spacing-xxxl: $unit-8;
 
-// -------------------------------------------------------------
-// 6. BUTTONS
-// -------------------------------------------------------------
 $button-height: 2.5rem;
 $button-min-width-tablet: 9.375rem;
 $button-min-padding-tablet: 2rem;
 $button-border-radius: 0.25rem;
 
-// -------------------------------------------------------------
-// 7. LOGO
-// -------------------------------------------------------------
 $logo-max-height: 1.5625rem;
 $logo-max-width: 7.5rem;
 
-// -------------------------------------------------------------
-// 8. FORM FIELDS
-// -------------------------------------------------------------
 $min-form-field-height-tablet: 2.5rem;
 $min-form-field-height-mobile: 2.25rem;
 $min-form-field-width: 15rem;
@@ -109,40 +84,21 @@ $form-field-padding-tablet: 1rem;
 $form-field-padding-mobile: 0.75rem;
 $form-field-top-margin: 0.25rem;
 
-// -------------------------------------------------------------
-// 9. AVATAR
-// -------------------------------------------------------------
 $avatar-max-radius-tablet: 2.5rem;
 $avatar-max-radius-mobile: 2.25rem;
 
-// -------------------------------------------------------------
-// 10. LAYOUT
-// -------------------------------------------------------------
 $nav-height: 80px;
 $footer-height: 150px;
 $container-max-width: 800px;
 
-// -------------------------------------------------------------
-// 11. BORDERS & SHADOWS
-// -------------------------------------------------------------
 $border-radius-sm: 4px;
 $border-radius-md: 8px;
 $box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
 $box-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-// -------------------------------------------------------------
-// 12. TRANSITIONS
-// -------------------------------------------------------------
 $transition-fast: 0.2s ease-in-out;
 $transition-medium: 0.4s ease-in-out;
 $transition-slow: 0.6s ease-out;
-
-// -------------------------------------------------------------
-// 13. THEMEABLE CSS CUSTOM PROPERTIES
-// -------------------------------------------------------------
-// -------------------------------------------------------------
-// 13. THEMEABLE CSS CUSTOM PROPERTIES
-// -------------------------------------------------------------
 
 :root {
   --color-primary-dark: #{$primary-dark};
@@ -156,15 +112,12 @@ $transition-slow: 0.6s ease-out;
 
   --color-error: #{$form-field-error};
 
-  // Light mode primary/secondary colors
   --color-primary: var(--color-primary-dark);
   --color-secondary: var(--color-secondary-dark);
 
-  // Mid colors for light mode
   --color-primary-mid-light: var(--color-primary-mid);
   --color-secondary-mid-light: var(--color-secondary-mid);
 
-  // Background and text colors
   --color-background: var(--color-primary-light);
   --color-background-secondary: var(--color-secondary-light);
   --color-surface: var(--color-primary-light);
@@ -183,8 +136,7 @@ $transition-slow: 0.6s ease-out;
   --color-error-background: #f8d7da;
 
   --color-white: #ffffff;
-  --color-success: $primary-green
-  --color-black: #000000;
+  --color-success: $primary-green --color-black: #000000;
   --color-overlay: rgba(0, 0, 0, 0.9);
 
   --nav-gradient: linear-gradient(
@@ -195,16 +147,15 @@ $transition-slow: 0.6s ease-out;
   );
 }
 
-[data-theme='dark'] {
-  // Swap primary and secondary dark colors
+[data-theme="dark"] {
   --color-primary: var(--color-secondary-dark);
   --color-secondary: var(--color-primary-dark);
-.nav__icon {
-  filter: brightness(0) invert(1);
-  transition: filter 0.3 ease;
-}
-  // Use adjusted mid colors for dark mode for proper contrast
-  --color-primary-mid-dark: #5a5a5a;   // You can tweak these values as needed
+  .nav__icon {
+    filter: brightness(0) invert(1);
+    transition: filter 0.3 ease;
+  }
+
+  --color-primary-mid-dark: #5a5a5a;
   --color-secondary-mid-dark: #7d7d7d;
 
   --color-primary-mid-light: var(--color-primary-mid-dark);

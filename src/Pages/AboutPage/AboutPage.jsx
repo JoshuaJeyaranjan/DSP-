@@ -18,7 +18,6 @@ function AboutPage() {
     async function fetchAboutData() {
       setLoading(true);
       try {
-        // Fetch the "About" hero image
         const { data: imageData, error: imageError } = await supabase
           .from("images")
           .select("*")
@@ -28,7 +27,6 @@ function AboutPage() {
         if (imageError) throw imageError;
         setAboutImage(imageData);
 
-        // Fetch all paragraphs for the About section
         const { data: aboutParagraphs, error: paragraphError } = await supabase
           .from("about")
           .select("*")
@@ -46,7 +44,7 @@ function AboutPage() {
     fetchAboutData();
   }, []);
 
-  if (loading) return <PageLoader/>;
+  if (loading) return <PageLoader />;
 
   return (
     <>
@@ -72,9 +70,7 @@ function AboutPage() {
             />
             <div className="about-text">
               {paragraphs.length > 0 ? (
-                paragraphs.map((p) => (
-                  <p key={p.id}>{p.content}</p>
-                ))
+                paragraphs.map((p) => <p key={p.id}>{p.content}</p>)
               ) : (
                 <p>
                   I started filming five years ago, experimenting with short

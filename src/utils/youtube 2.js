@@ -1,8 +1,6 @@
-// src/utils/youtube.js
 export function toEmbedUrl(link) {
   if (!link) return "";
 
-  // Already embed
   if (link.includes("/embed/")) return link;
 
   try {
@@ -23,9 +21,7 @@ export function toEmbedUrl(link) {
     if (videoId) {
       return `https://www.youtube.com/embed/${videoId}`;
     }
-  } catch {
-    // Fallback if URL parsing fails
-  }
+  } catch {}
 
   return link;
 }

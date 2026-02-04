@@ -28,7 +28,7 @@
 
     .about-section {
       display: flex;
-      flex-direction: column; // default: column for mobile
+      flex-direction: column;
       align-items: center;
       gap: 1rem;
 
@@ -50,10 +50,9 @@
       }
     }
 
-    // Desktop layout
     @media (min-width: 901px) {
       .about-section {
-        flex-direction: row; // image left, text right
+        flex-direction: row;
         align-items: center;
         text-align: left;
         gap: 2rem;
@@ -64,7 +63,6 @@
         .about-text {
           width: 50%;
           gap: 2rem;
-          
         }
 
         .about-text {

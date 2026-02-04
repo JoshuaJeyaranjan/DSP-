@@ -160,7 +160,9 @@
           border-radius: 6px;
           font-size: 0.85rem;
           cursor: pointer;
-          transition: background 0.2s ease, transform 0.1s ease;
+          transition:
+            background 0.2s ease,
+            transform 0.1s ease;
 
           &:hover {
             transform: translateY(-1px);
@@ -203,7 +205,7 @@
           color: white;
 
           &:hover {
-           background: rgb(203, 98, 0);
+            background: rgb(203, 98, 0);
           }
         }
 
@@ -239,7 +241,9 @@
   font-size: 0.9rem;
   text-align: center;
   cursor: pointer;
-  transition: border 0.2s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
 }
 
 .hover-preview-wrapper input:focus {
@@ -266,7 +270,7 @@
   background: #1f80ff;
 }
 
-.filename{
+.filename {
   color: black;
 }
 
@@ -309,7 +313,7 @@
   font-weight: 600;
 }
 
-.contact-button{
+.contact-button {
   background-color: #28a745;
 }
 

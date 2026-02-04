@@ -1,8 +1,6 @@
-// VideoGallery.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import "./VideoGallery.scss";
 import { toEmbedUrl } from "../../utils/youtube";
-import LoadingSkeleton from "../LoadingSkeleton/LoadingSkeleton";
 import PageLoader from "../PageLoader/PageLoader";
 
 function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
@@ -12,10 +10,9 @@ function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
 
   const totalPages = useMemo(
     () => Math.ceil(safeVideos.length / videosPerPage),
-    [safeVideos.length, videosPerPage]
+    [safeVideos.length, videosPerPage],
   );
 
-  // keep currentPage valid when videos change
   useEffect(() => {
     if (totalPages === 0) {
       setCurrentPage(0);
@@ -23,7 +20,6 @@ function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
       setCurrentPage(0);
       setPlayingIdx(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPages]);
 
   const startIdx = currentPage * videosPerPage;
@@ -31,15 +27,13 @@ function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
   const currentVideos = safeVideos.slice(startIdx, endIdx);
 
   const handlePlayVideo = (idx) => {
-    // toggle play: click once to play, click again to pause
     setPlayingIdx((prev) => (prev === idx ? null : idx));
   };
 
   return (
     <div className="video-gallery">
-      {/* Skeleton loaders while fetching */}
       {loading ? (
-       <PageLoader/>
+        <PageLoader />
       ) : (
         <>
           <div className="video-grid">
@@ -67,7 +61,8 @@ function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
                       tabIndex={0}
                       onClick={() => handlePlayVideo(videoKey)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") handlePlayVideo(videoKey);
+                        if (e.key === "Enter" || e.key === " ")
+                          handlePlayVideo(videoKey);
                       }}
                       style={{
                         position: "relative",
@@ -97,15 +92,12 @@ function VideoGallery({ videos, videosPerPage = 6, loading = false }) {
                         <div className="invalid-video">Invalid video URL</div>
                       )}
                     </div>
-
-                    {/* <div className="video-title">{video?.title || "Untitled Video"}</div> */}
                   </div>
                 );
               })
             )}
           </div>
 
-          {/* pagination */}
           {totalPages > 1 && (
             <div className="pagination">
               {Array.from({ length: totalPages }).map((_, idx) => (

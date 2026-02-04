@@ -1,6 +1,6 @@
 @use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
-// src/styles/admin.scss
+
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -43,7 +43,6 @@
   .admin-content {
     flex: 1;
     padding: 2rem;
-    
   }
 }
 

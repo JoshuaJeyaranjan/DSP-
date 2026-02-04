@@ -1,4 +1,4 @@
-@use "../../styles/partials/variables" as *; // keep theme tokens
+@use "../../styles/partials/variables" as *;
 @use "../../styles/partials/mixins" as *;
 
 .testimonial-page {
@@ -39,7 +39,6 @@
   }
 }
 
-/* Each testimonial card - default desktop layout (avatar left, bubble right) */
 .testimonial__card {
   display: flex;
   gap: 1rem;
@@ -48,12 +47,10 @@
   padding: 0.75rem;
   border-radius: 10px;
   background: transparent;
-  width: fit-content; /* stretch so cards align nicely */
+  width: fit-content;
   align-self: center;
   justify-self: center;
-//   
 
-  /* avatar */
   .testimonial__avatar {
     flex: 0 0 64px;
     width: 64px;
@@ -70,7 +67,6 @@
     }
   }
 
-  /* content area holds bubble + meta */
   .testimonial__content {
     display: flex;
     flex-direction: column;
@@ -80,7 +76,6 @@
     background-color: transparent;
   }
 
-  /* the message bubble */
   .testimonial__bubble {
     position: relative;
     padding: 0.85rem 1rem;
@@ -92,8 +87,10 @@
     line-height: 1.45;
     overflow: visible;
 
-    /* keep text above the tail */
-    & > * { position: relative; z-index: 1; }
+    & > * {
+      position: relative;
+      z-index: 1;
+    }
 
     .testimonial__text {
       margin: 0;
@@ -101,7 +98,6 @@
       color: var(--testimonial-bubble-text, var(--color-black));
     }
 
-    /* single tail: horizontal on desktop, centered-top on mobile */
     &::after {
       content: "";
       position: absolute;
@@ -113,7 +109,6 @@
       border-radius: 2px;
       z-index: 0;
 
-      /* default (avatar on left) -> tail on left edge pointing left */
       top: calc(50% - 6px);
       left: -6px;
     }
@@ -139,34 +134,28 @@
     }
   }
 
-  /* reversed layout (avatar on right) - keeps a class for manual control if needed */
   &.testimonial__card--reversed {
     flex-direction: row-reverse;
   }
 }
 
-/* --------------------------
-   Alternate every 2nd card
-   -------------------------- */
 .testimonial-page {
   &__grid {
     .testimonial__card {
-      /* Even-numbered cards (2,4,6...) -> avatar on right, tail on right */
       &:nth-child(even) {
         flex-direction: row-reverse;
 
-        /* bubble tail to the right */
         .testimonial__bubble::after {
           left: auto;
           right: -6px;
           top: calc(50% - 6px);
         }
 
-        /* keep text left-aligned in reversed cards */
-        .testimonial__content { text-align: left; }
+        .testimonial__content {
+          text-align: left;
+        }
       }
 
-      /* Odd-numbered cards -> ensure tail is on the left */
       &:nth-child(odd) {
         .testimonial__bubble::after {
           left: -6px;
@@ -178,7 +167,6 @@
   }
 }
 
-/* Small screens: stack neatly, center avatar & move tail on top center */
 @media (max-width: 720px) {
   .testimonial__card {
     flex-direction: column;
@@ -198,7 +186,6 @@
     .testimonial__bubble {
       max-width: 100%;
 
-      /* top-centered tail for stacked layout */
       &::after {
         width: 10px;
         height: 10px;
@@ -219,7 +206,6 @@
     padding: 2rem 1rem;
   }
 
-  /* On mobile, ensure nth-child rules don't interfere */
   .testimonial-page {
     &__grid {
       .testimonial__card {
@@ -239,7 +225,6 @@
   }
 }
 
-/* ---------------- Dark / Light theme specifics ---------------- */
 body:not([data-theme="dark"]) .testimonial__card,
 html:not([data-theme="dark"]) .testimonial__card,
 .theme-light .testimonial__card,
@@ -258,11 +243,16 @@ html[data-theme="dark"] .testimonial__card,
   background: rgba(255, 255, 255, 0.02);
   --testimonial-bubble-bg: #1e1e1e;
   --testimonial-bubble-text: #f5f5f5;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
-/* tiny fade-in animation */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -1,7 +1,12 @@
-import './PricingPlanCard.scss'
-import { Link } from 'react-router-dom';
+import "./PricingPlanCard.scss";
+import { Link } from "react-router-dom";
 
-export default function PricingPlanCard({ title, description, price, deliverables }) {
+export default function PricingPlanCard({
+  title,
+  description,
+  price,
+  deliverables,
+}) {
   const deliverablesList = deliverables || [];
 
   return (
@@ -18,10 +23,9 @@ export default function PricingPlanCard({ title, description, price, deliverable
           ))}
         </ul>
       )}
-      <Link to='/contact'>
-      <button className="select-plan-btn">Contact Me</button>
+      <Link to="/contact">
+        <button className="select-plan-btn">Contact Me</button>
       </Link>
-      
     </div>
   );
 }

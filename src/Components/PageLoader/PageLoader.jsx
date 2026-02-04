@@ -1,4 +1,3 @@
-// src/Components/PageLoader/PageLoader.jsx
 import React from "react";
 import "./PageLoader.scss";
 import Nav from "../Nav/Nav";

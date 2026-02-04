@@ -1,10 +1,9 @@
 .photo-gallery {
   padding: 1rem;
 
-  /* Use CSS columns for masonry-style layout */
   .photo-grid {
-    column-count: 4;          // Number of columns on desktop
-    column-gap: 1rem;         // Gap between columns
+    column-count: 4;
+    column-gap: 1rem;
     width: 100%;
 
     @media (max-width: 1200px) {
@@ -19,12 +18,14 @@
   }
 
   .photo-card {
-    break-inside: avoid;      // Prevent cards from breaking across columns
-    margin-bottom: 1rem;      // Gap between cards vertically
+    break-inside: avoid;
+    margin-bottom: 1rem;
     background: var(--color-bg);
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition:
+      transform 0.2s ease-in-out,
+      box-shadow 0.2s ease-in-out;
 
     &:hover {
       transform: scale(1.02);
@@ -33,9 +34,9 @@
 
     img {
       width: 100%;
-      height: auto;           // Preserve aspect ratio
+      height: auto;
       display: block;
-      object-fit: contain;    // Show full image without cropping
+      object-fit: contain;
       transition: transform 0.3s ease;
     }
 

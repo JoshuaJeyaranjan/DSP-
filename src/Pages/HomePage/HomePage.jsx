@@ -14,7 +14,7 @@ export default function HomePage() {
   const [heroUrl, setHeroUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
-  const [loaded, setLoaded] = useState(false); // hero image fade-in
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -47,7 +47,9 @@ export default function HomePage() {
     };
 
     loadHero();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleHeroLoad = () => setLoaded(true);
@@ -59,35 +61,33 @@ export default function HomePage() {
         className={`home ${loaded ? "loaded" : ""}`}
         style={{ backgroundImage: heroUrl ? `url("${heroUrl}")` : "none" }}
       >
-        {!loaded && <div className="hero-skeleton" />} {/* Skeleton */}
+        {!loaded && <div className="hero-skeleton" />}
         {heroUrl && (
           <img
             src={heroUrl}
             alt="Homepage hero"
             className="hero-img"
             onLoad={handleHeroLoad}
-            style={{ display: "none" }} // hidden, only triggers onLoad
+            style={{ display: "none" }}
           />
         )}
         <div className="home__overlay" />
         <div className="home__content">
-          {loading && <PageLoader/>}
+          {loading && <PageLoader />}
           {err && <p className="error">{err}</p>}
 
           <h1 className="home__title">D|F|S VISION</h1>
           <h3 className="home__subtitle">VIDEOGRAPHER & PHOTOGRAPHER</h3>
 
           <div className="link-container">
-          <Link className="home__link" to="/photography">
-            View Photography Work
-          </Link>
-          
+            <Link className="home__link" to="/photography">
+              View Photography Work
+            </Link>
 
-          <Link className="home__link" to="/video">
-            View Videography Work
-          </Link>
+            <Link className="home__link" to="/video">
+              View Videography Work
+            </Link>
           </div>
-        
         </div>
       </section>
 

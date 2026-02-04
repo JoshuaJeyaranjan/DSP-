@@ -10,7 +10,10 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
 
   const startIdx = currentPage * photosPerPage;
   const endIdx = startIdx + photosPerPage;
-  const currentPhotos = useMemo(() => photos.slice(startIdx, endIdx), [photos, startIdx, endIdx]);
+  const currentPhotos = useMemo(
+    () => photos.slice(startIdx, endIdx),
+    [photos, startIdx, endIdx],
+  );
   const totalPages = Math.ceil(photos.length / photosPerPage);
 
   return (
@@ -27,14 +30,19 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
             }}
           >
             <picture>
-              {photo.avifSrc && <source type="image/avif" srcSet={photo.avifSrc} />}
-              {photo.webpSrc && <source type="image/webp" srcSet={photo.webpSrc} />}
+              {photo.avifSrc && (
+                <source type="image/avif" srcSet={photo.avifSrc} />
+              )}
+              {photo.webpSrc && (
+                <source type="image/webp" srcSet={photo.webpSrc} />
+              )}
               <img
                 src={photo.fallbackSrc}
                 alt={photo.title}
                 loading="lazy"
                 onError={(e) => {
-                  if (e.target.src !== "/placeholder.jpg") e.target.src = "/placeholder.jpg";
+                  if (e.target.src !== "/placeholder.jpg")
+                    e.target.src = "/placeholder.jpg";
                 }}
               />
             </picture>
@@ -60,7 +68,10 @@ function PhotoGallery({ photos, photosPerPage = 20 }) {
         open={lightboxOpen}
         index={currentIndex}
         close={() => setLightboxOpen(false)}
-        slides={photos.map((p) => ({ src: p.largeSrc || p.fallbackSrc, title: p.title }))}
+        slides={photos.map((p) => ({
+          src: p.largeSrc || p.fallbackSrc,
+          title: p.title,
+        }))}
       />
     </div>
   );

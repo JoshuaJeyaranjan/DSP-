@@ -3,24 +3,24 @@
 
   .video-grid {
     display: flex;
-    flex-direction: column; // force column layout
-    gap: 2rem; // spacing between videos
-    align-items: center; // center horizontally
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
   }
 
   .video-card {
     width: 100%;
-    max-width: 1000px; // keeps videos from being TOO wide on huge screens
+    max-width: 1000px;
     background: var(--color-bg);
     border: 1px solid var(--color-text-secondary);
     border-radius: 12px;
     padding: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
     .video-wrapper {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%; // 16:9 aspect ratio
+      padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
       border-radius: 8px;

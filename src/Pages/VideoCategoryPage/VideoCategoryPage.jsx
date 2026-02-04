@@ -11,13 +11,12 @@ const ANON_KEY = import.meta.env.VITE_ANON_KEY;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
 function VideoCategoryPage() {
-  const { category } = useParams(); // this is the category ID from the URL
+  const { category } = useParams();
   const [videos, setVideos] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch category name (for the page title)
   useEffect(() => {
     const fetchCategoryName = async () => {
       try {
@@ -38,7 +37,6 @@ function VideoCategoryPage() {
     if (category) fetchCategoryName();
   }, [category]);
 
-  // Fetch videos for this category
   useEffect(() => {
     const fetchVideos = async () => {
       setLoading(true);
@@ -63,9 +61,6 @@ function VideoCategoryPage() {
     if (category) fetchVideos();
   }, [category]);
 
-  // ----------------------------
-  // Render states
-  // ----------------------------
   if (loading) return <PageLoader />;
   if (error) return <p>Error: {error}</p>;
   if (!videos || videos.length === 0)

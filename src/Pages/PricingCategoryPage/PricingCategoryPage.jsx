@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
 import PricingPlanCard from "../../Components/PricingPlanCard/PricingPlanCard";
-import './PricingCategoryPage.scss'
+import "./PricingCategoryPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
 
 export default function PricingCategoryPage() {
-  const { category } = useParams(); // ✅ matches your <Route path="/pricing/:category" />
+  const { category } = useParams();
   const [categoryData, setCategoryData] = useState(null);
   const [plans, setPlans] = useState([]);
 
@@ -15,7 +15,6 @@ export default function PricingCategoryPage() {
     if (!category) return;
 
     const fetchData = async () => {
-      // fetch category by slug
       const { data: catData, error: catError } = await supabase
         .from("pricing_categories")
         .select("*")
@@ -28,7 +27,6 @@ export default function PricingCategoryPage() {
       }
       setCategoryData(catData);
 
-      // fetch plans for category
       const { data: planData, error: planError } = await supabase
         .from("pricing_plans")
         .select("*")
@@ -51,31 +49,33 @@ export default function PricingCategoryPage() {
 
   return (
     <>
-    <Nav/>
-    <div className="pricing-category-page">
-      <div className="category-header">
-        <img
-          src={categoryData.thumbnail_url}
-          alt={categoryData.name}
-          className="category-thumbnail"
-        />
-        <h1 className="category-title">{categoryData.name} Packages</h1>
-        {categoryData.description && (
-          <p className="category-description">{categoryData.alt_description}</p>
+      <Nav />
+      <div className="pricing-category-page">
+        <div className="category-header">
+          <img
+            src={categoryData.thumbnail_url}
+            alt={categoryData.name}
+            className="category-thumbnail"
+          />
+          <h1 className="category-title">{categoryData.name} Packages</h1>
+          {categoryData.description && (
+            <p className="category-description">
+              {categoryData.alt_description}
+            </p>
+          )}
+        </div>
+
+        {plans.length === 0 ? (
+          <p className="no-plans">No plans available yet.</p>
+        ) : (
+          <div className="plans-grid">
+            {plans.map((plan) => (
+              <PricingPlanCard key={plan.id} {...plan} />
+            ))}
+          </div>
         )}
       </div>
-
-      {plans.length === 0 ? (
-        <p className="no-plans">No plans available yet.</p>
-      ) : (
-        <div className="plans-grid">
-          {plans.map((plan) => (
-            <PricingPlanCard key={plan.id} {...plan} />
-          ))}
-        </div>
-      )}
-    </div>
-    <Footer/>
+      <Footer />
     </>
   );
 }

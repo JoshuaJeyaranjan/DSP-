@@ -17,9 +17,6 @@ function ContactPage() {
   const [formStatus, setFormStatus] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // ---------------------------
-  // Fetch Contact Banner from Supabase
-  // ---------------------------
   useEffect(() => {
     async function fetchBanner() {
       try {
@@ -28,7 +25,7 @@ function ContactPage() {
           .select("*")
           .eq("is_contact_image", true)
           .limit(1)
-          .single(); // ensures we only get one
+          .single();
 
         if (error) throw error;
 
@@ -52,9 +49,6 @@ function ContactPage() {
     fetchBanner();
   }, []);
 
-  // ---------------------------
-  // EmailJS Form Submit
-  // ---------------------------
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -63,7 +57,7 @@ function ContactPage() {
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         e.target,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       )
       .then(
         () => {
@@ -73,13 +67,10 @@ function ContactPage() {
         (error) => {
           setFormStatus("Oops! Something went wrong.");
           console.error(error.text);
-        }
+        },
       );
   };
 
-  // ---------------------------
-  // Render
-  // ---------------------------
   return (
     <>
       <Nav />
@@ -112,7 +103,12 @@ function ContactPage() {
 
             <label>
               Email
-              <input type="email" name="email" placeholder="Your Email" required />
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                required
+              />
             </label>
 
             <label>

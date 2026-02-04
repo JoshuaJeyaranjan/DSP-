@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./ReviewPage.scss";
 import Nav from "../../Components/Nav/Nav";
 import Footer from "../../Components/Footer/Footer";
-import { supabase } from "../../utils/supabaseClient"; // make sure path is correct
+import { supabase } from "../../utils/supabaseClient";
 
 function TestimonialCard({ photo, name, company, text, reversed = false }) {
   return (
@@ -66,7 +66,8 @@ export default function ReviewPage() {
         <header className="testimonial-page__header">
           <h1>What clients say</h1>
           <p className="testimonial-page__lead">
-            Hand-picked quotes from recent projects — honest, short and to the point.
+            Hand-picked quotes from recent projects — honest, short and to the
+            point.
           </p>
         </header>
 

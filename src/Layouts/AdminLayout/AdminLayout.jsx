@@ -18,7 +18,7 @@ function AdminLayout() {
     navigate("/login");
   };
 
-  if (!isAuthenticated) return null; // avoids flashing content
+  if (!isAuthenticated) return null;
 
   return (
     <div className="admin-layout">

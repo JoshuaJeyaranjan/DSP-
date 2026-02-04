@@ -6,8 +6,10 @@
   border: none;
   cursor: pointer;
   border-radius: 50%;
-  transition: transform 150ms ease, opacity 150ms ease;
-  
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
+
   background: none;
 
   &:hover {
@@ -33,21 +35,22 @@
   }
 }
 
-
-/* Dark mode inversion using data-theme on html */
-[data-theme='dark'] .theme-toggle__icon {
-  filter: invert(1); /* keeps black SVG white in dark mode */
-  transform: rotate(0deg); /* normal orientation */
-  transition: filter 0.3s ease, transform 0.3s ease;
+[data-theme="dark"] .theme-toggle__icon {
+  filter: invert(1);
+  transform: rotate(0deg);
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
 }
 
-[data-theme='light'] .theme-toggle__icon {
-  filter: invert(0); /* normal black SVG */
-  transform: rotate(-180deg); /* flip upside down */
-  transition: filter 0.3s ease, transform 0.3s ease;
+[data-theme="light"] .theme-toggle__icon {
+  filter: invert(0);
+  transform: rotate(-180deg);
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
 }
 
-/* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle {
     transition: none;

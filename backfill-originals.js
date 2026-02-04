@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 
 const PROJECT_URL = process.env.VITE_PROJECT_URL;
@@ -8,7 +8,6 @@ const ADMIN_PASSWORD = process.env.VITE_ADMIN_PASSWORD;
 
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 
-// Valid categories from your CHECK constraint
 const VALID_CATEGORIES = ["car", "sports", "drone", "portrait", "product"];
 
 async function backfillOriginals() {
@@ -32,7 +31,6 @@ async function backfillOriginals() {
   }
   console.log(`Found ${files.length} files in photos-original`);
 
-  // Get existing image rows
   const { data: existingRows, error: dbErr } = await supabase
     .from("images")
     .select("path");
@@ -40,9 +38,8 @@ async function backfillOriginals() {
     console.error("❌ Error reading images table:", dbErr.message);
     return;
   }
-  const existingPaths = new Set(existingRows.map(r => r.path));
+  const existingPaths = new Set(existingRows.map((r) => r.path));
 
-  // Insert only missing files
   let inserted = 0;
   for (const file of files) {
     if (existingPaths.has(file.name)) {
@@ -50,7 +47,6 @@ async function backfillOriginals() {
       continue;
     }
 
-    // Safe fallback category
     const category = "sports";
 
     const { data: userResp } = await supabase.auth.getUser();
@@ -71,12 +67,9 @@ async function backfillOriginals() {
     if (insertErr) {
       console.error(`❌ Insert error for ${file.name}`, insertErr);
     } else {
-      console.log(`✅ Inserted ${file.name}`);
       inserted++;
     }
   }
-
-  console.log(`🎉 Done. Inserted ${inserted}, skipped ${files.length - inserted}`);
 }
 
 backfillOriginals();

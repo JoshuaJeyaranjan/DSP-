@@ -13,9 +13,8 @@ const SERVICE_URL = import.meta.env.VITE_NODE_THUMBNAIL_SERVICE_URL;
 const supabase = createClient(PROJECT_URL, ANON_KEY);
 const supabaseAdmin = createClient(
   PROJECT_URL,
-  import.meta.env.VITE_SERVICE_ROLE_KEY
+  import.meta.env.VITE_SERVICE_ROLE_KEY,
 );
-
 
 const HERO_COLUMN_FOR_TYPE = {
   home: "is_home_hero",
@@ -46,40 +45,39 @@ export default function AdminPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [buttonStatus, setButtonStatus] = useState({});
   const [copiedJobId, setCopiedJobId] = useState(null);
-const [allCategories, setAllCategories] = useState([]);
-const [visibleCategories, setVisibleCategories] = useState([]);
-const [category, setCategory] = useState(""); // current upload category
+  const [allCategories, setAllCategories] = useState([]);
+  const [visibleCategories, setVisibleCategories] = useState([]);
+  const [category, setCategory] = useState("");
 
-useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("image_categories")
-        .select("id, name, visible_on_hub")
-        .order("name");
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("image_categories")
+          .select("id, name, visible_on_hub")
+          .order("name");
 
-      if (error) throw error;
+        if (error) throw error;
 
-      const cats = Array.isArray(data) ? data : [];
-      setAllCategories(cats);
-      setVisibleCategories(cats.filter(c => c.visible_on_hub));
+        const cats = Array.isArray(data) ? data : [];
+        setAllCategories(cats);
+        setVisibleCategories(cats.filter((c) => c.visible_on_hub));
 
-      // Default upload category: first visible, fallback to "uncategorized"
- const defaultCat = cats.find(c => c.visible_on_hub) 
-                   || cats.find(c => c.name.toLowerCase() === "uncategorized");
-setCategory(defaultCat?.id ? String(defaultCat.id) : "");
+        const defaultCat =
+          cats.find((c) => c.visible_on_hub) ||
+          cats.find((c) => c.name.toLowerCase() === "uncategorized");
+        setCategory(defaultCat?.id ? String(defaultCat.id) : "");
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+        setAllCategories([]);
+        setVisibleCategories([]);
+        setCategory(null);
+      }
+    };
 
-    } catch (err) {
-      console.error("Failed to fetch categories:", err);
-      setAllCategories([]);
-      setVisibleCategories([]);
-      setCategory(null);
-    }
-  };
+    fetchCategories();
+  }, []);
 
-  fetchCategories();
-}, []);
-  // ---------------- BUTTON FEEDBACK ----------------
   const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
     setButtonStatus((prev) => ({ ...prev, [key]: label }));
     setTimeout(() => {
@@ -87,7 +85,6 @@ setCategory(defaultCat?.id ? String(defaultCat.id) : "");
     }, duration);
   };
 
-  // ---------------- BACKFILL ORIGINALS ----------------
   const backfillOriginals = async () => {
     try {
       const { data: originals, error: listErr } = await supabase.storage
@@ -123,7 +120,6 @@ setCategory(defaultCat?.id ? String(defaultCat.id) : "");
     }
   };
 
-  // ---------------- LOAD IMAGES ----------------
   const loadImagesAndDerived = async () => {
     setError(null);
     try {
@@ -134,7 +130,9 @@ setCategory(defaultCat?.id ? String(defaultCat.id) : "");
       if (dbErr) console.warn(dbErr);
       if (!dbRows) return setJobs([]);
 
-      const originals = dbRows.filter((row) => row.bucket === "photos-original");
+      const originals = dbRows.filter(
+        (row) => row.bucket === "photos-original",
+      );
       const jobsMapped = originals.map((orig) => {
         const derivedPaths = orig.derived_paths || {};
         let preview = null;
@@ -162,89 +160,106 @@ setCategory(defaultCat?.id ? String(defaultCat.id) : "");
     }
   };
 
-  // ---------------- UPLOAD ----------------
-const handleUploadAll = async () => {
-  if (!files.length) return;
-  setIsUploading(true);
+  const handleUploadAll = async () => {
+    if (!files.length) return;
+    setIsUploading(true);
 
-  // Ensure we have a valid category_id for this upload
-  let category_id = category;
+    let category_id = category;
 
-  if (!category_id) {
-    // fallback to "uncategorized"
-    const { data: uncData } = await supabase
-      .from("image_categories")
-      .select("id")
-      .eq("name", "uncategorized")
-      .maybeSingle();
-
-    category_id = uncData?.id || null;
-    if (!category_id) console.warn("[UPLOAD] No 'uncategorized' category found. category_id will be null.");
-  }
-
-  for (const f of files) {
-    setFiles(prev => prev.map(fileObj => fileObj.id === f.id ? { ...fileObj, status: "uploading", progress: 0 } : fileObj));
-
-    try {
-      // Upload to storage
-      const { data: uploadData, error: uploadErr } = await supabase.storage
-        .from("photos-original")
-        .upload(f.id, f.file, { upsert: true });
-
-      if (uploadErr) throw uploadErr;
-
-      setFiles(prev => prev.map(fileObj => fileObj.id === f.id ? { ...fileObj, progress: 50 } : fileObj));
-
-      // Generate thumbnails
-      const thumbResp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bucket: "photos-original", file: f.id }),
-      });
-      if (!thumbResp.ok) throw new Error("Thumbnail generation failed");
-      const { generatedPaths } = await thumbResp.json();
-
-      // Insert/update DB
-      const { data: existing } = await supabase
-        .from("images")
+    if (!category_id) {
+      const { data: uncData } = await supabase
+        .from("image_categories")
         .select("id")
-        .eq("path", f.id)
-        .limit(1)
+        .eq("name", "uncategorized")
         .maybeSingle();
 
-      const userResp = await supabase.auth.getUser();
-
-      const dbPayload = {
-        title: f.file.name,
-        category_id,
-        bucket: "photos-original",
-        path: f.id,
-        uploaded_by: userResp?.data?.user?.id ?? null,
-        derived_paths: generatedPaths || {},
-      };
-
-      if (!existing) {
-        await supabase.from("images").insert([dbPayload]);
-      } else {
-        await supabase.from("images").update(dbPayload).eq("id", existing.id);
-      }
-
-      setFiles(prev => prev.map(fileObj => fileObj.id === f.id ? { ...fileObj, status: "done", progress: 100 } : fileObj));
-
-    } catch (err) {
-      console.error(err);
-      setFiles(prev => prev.map(fileObj => fileObj.id === f.id ? { ...fileObj, status: "error", progress: 0 } : fileObj));
+      category_id = uncData?.id || null;
+      if (!category_id)
+        console.warn(
+          "[UPLOAD] No 'uncategorized' category found. category_id will be null.",
+        );
     }
-  }
 
-  // Clear state after upload
-  setFiles([]);
-  setCategory(category_id); // keep fallback applied
-  setIsUploading(false);
-  triggerButtonStatus("upload-all", "Uploaded!");
-  await loadImagesAndDerived();
-};
-  // ---------------- DELETE ----------------
+    for (const f of files) {
+      setFiles((prev) =>
+        prev.map((fileObj) =>
+          fileObj.id === f.id
+            ? { ...fileObj, status: "uploading", progress: 0 }
+            : fileObj,
+        ),
+      );
+
+      try {
+        const { data: uploadData, error: uploadErr } = await supabase.storage
+          .from("photos-original")
+          .upload(f.id, f.file, { upsert: true });
+
+        if (uploadErr) throw uploadErr;
+
+        setFiles((prev) =>
+          prev.map((fileObj) =>
+            fileObj.id === f.id ? { ...fileObj, progress: 50 } : fileObj,
+          ),
+        );
+
+        const thumbResp = await fetch(`${SERVICE_URL}/generate-thumbnails`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bucket: "photos-original", file: f.id }),
+        });
+        if (!thumbResp.ok) throw new Error("Thumbnail generation failed");
+        const { generatedPaths } = await thumbResp.json();
+
+        const { data: existing } = await supabase
+          .from("images")
+          .select("id")
+          .eq("path", f.id)
+          .limit(1)
+          .maybeSingle();
+
+        const userResp = await supabase.auth.getUser();
+
+        const dbPayload = {
+          title: f.file.name,
+          category_id,
+          bucket: "photos-original",
+          path: f.id,
+          uploaded_by: userResp?.data?.user?.id ?? null,
+          derived_paths: generatedPaths || {},
+        };
+
+        if (!existing) {
+          await supabase.from("images").insert([dbPayload]);
+        } else {
+          await supabase.from("images").update(dbPayload).eq("id", existing.id);
+        }
+
+        setFiles((prev) =>
+          prev.map((fileObj) =>
+            fileObj.id === f.id
+              ? { ...fileObj, status: "done", progress: 100 }
+              : fileObj,
+          ),
+        );
+      } catch (err) {
+        console.error(err);
+        setFiles((prev) =>
+          prev.map((fileObj) =>
+            fileObj.id === f.id
+              ? { ...fileObj, status: "error", progress: 0 }
+              : fileObj,
+          ),
+        );
+      }
+    }
+
+    setFiles([]);
+    setCategory(category_id);
+    setIsUploading(false);
+    triggerButtonStatus("upload-all", "Uploaded!");
+    await loadImagesAndDerived();
+  };
+
   async function handleDelete(job) {
     if (!job) return;
     let anyDeleted = false;
@@ -253,7 +268,10 @@ const handleUploadAll = async () => {
       const resp = await fetch(`${SERVICE_URL}/delete-job`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path: job.path, derived_paths: job.derived_paths }),
+        body: JSON.stringify({
+          path: job.path,
+          derived_paths: job.derived_paths,
+        }),
       });
       const result = await resp.json();
       if (resp.ok && result.ok) anyDeleted = true;
@@ -262,14 +280,16 @@ const handleUploadAll = async () => {
     }
 
     if (anyDeleted) {
-      const { error } = await supabaseAdmin.from("images").delete().eq("id", job.id);
+      const { error } = await supabaseAdmin
+        .from("images")
+        .delete()
+        .eq("id", job.id);
       if (!error) triggerButtonStatus(`delete-${job.id}`, "Deleted!");
     }
 
     await loadImagesAndDerived();
   }
 
-  // ---------------- HERO / SPECIAL / THUMBNAIL ----------------
   const updateJob = (id, patch) =>
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
 
@@ -279,16 +299,20 @@ const handleUploadAll = async () => {
 
     const col = HERO_COLUMN_FOR_TYPE[type];
     try {
-      await supabase.from("images").update({ [col]: false }).eq(col, true);
-      await supabase.from("images").update({ [col]: true }).eq("id", job.dbRow.id);
+      await supabase
+        .from("images")
+        .update({ [col]: false })
+        .eq(col, true);
+      await supabase
+        .from("images")
+        .update({ [col]: true })
+        .eq("id", job.dbRow.id);
       triggerButtonStatus(`hero-${job.id}-${type}`, "Set!");
       await loadImagesAndDerived();
     } catch (err) {
       console.error(err);
     }
   };
-
-
 
   const setSpecialImage = async (job, type) => {
     if (!job.dbRow?.id) return;
@@ -297,8 +321,14 @@ const handleUploadAll = async () => {
     if (!window.confirm(`Make "${job.name}" the ${type} image?`)) return;
 
     try {
-      await supabase.from("images").update({ [col]: false }).eq(col, true);
-      await supabase.from("images").update({ [col]: true }).eq("id", job.dbRow.id);
+      await supabase
+        .from("images")
+        .update({ [col]: false })
+        .eq(col, true);
+      await supabase
+        .from("images")
+        .update({ [col]: true })
+        .eq("id", job.dbRow.id);
       triggerButtonStatus(`special-${job.id}-${type}`, "Set!");
       await loadImagesAndDerived();
     } catch (err) {
@@ -306,7 +336,6 @@ const handleUploadAll = async () => {
     }
   };
 
-  // ---------------- LOGIN & INITIAL LOAD ----------------
   useEffect(() => {
     const loginAndLoad = async () => {
       setLoadingAuth(true);
@@ -362,73 +391,95 @@ const handleUploadAll = async () => {
                 <div key={file.name} className="file-preview">
                   <span className="filename">{file.name}</span>
                   <span>{status}</span>
-                  <progress value={progress} max="100">{progress}%</progress>
+                  <progress value={progress} max="100">
+                    {progress}%
+                  </progress>
                 </div>
               ))}
             </div>
           )}
 
-<select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  {allCategories
-    .filter(cat => cat && typeof cat.name === "string")
-    .map(cat => (
-      <option key={cat.id} value={String(cat.id)}>
-        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-      </option>
-    ))}
-</select>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {allCategories
+              .filter((cat) => cat && typeof cat.name === "string")
+              .map((cat) => (
+                <option key={cat.id} value={String(cat.id)}>
+                  {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+                </option>
+              ))}
+          </select>
 
           <button
             onClick={handleUploadAll}
             disabled={!files.length || isUploading}
           >
-            {buttonStatus["upload-all"] || (isUploading ? "Uploading..." : `Upload ${files.length ? `(${files.length})` : ""}`)}
+            {buttonStatus["upload-all"] ||
+              (isUploading
+                ? "Uploading..."
+                : `Upload ${files.length ? `(${files.length})` : ""}`)}
           </button>
 
-          <button onClick={() => { loadImagesAndDerived(); triggerButtonStatus("refresh", "Refreshed!"); }}>
+          <button
+            onClick={() => {
+              loadImagesAndDerived();
+              triggerButtonStatus("refresh", "Refreshed!");
+            }}
+          >
             {buttonStatus["refresh"] || "Refresh"}
           </button>
         </div>
 
         <div className="filter-controls">
           <label>
-            
-<label>
-  Filter by Category:
-  <select
-    value={filterCategory}
-    onChange={(e) => setFilterCategory(e.target.value)}
-  >
-    <option value="all">All</option>
-    {visibleCategories.map(cat => (
-      <option key={cat.id} value={cat.id}>
-        {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
-      </option>
-    ))}
-  </select>
-</label>
+            <label>
+              Filter by Category:
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="all">All</option>
+                {visibleCategories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </label>
         </div>
 
         <div className="jobs-grid">
           {jobs.length === 0 && <p>No uploads / images found.</p>}
           {jobs
-            .filter((job) => filterCategory === "all" ? true : String(job.dbRow?.category_id) === filterCategory)
+            .filter((job) =>
+              filterCategory === "all"
+                ? true
+                : String(job.dbRow?.category_id) === filterCategory,
+            )
             .map((job) => (
               <div key={job.id} className="job-card">
                 <div className="job-info">
                   <strong>{job.name}</strong> — <span>{job.status}</span>
                   {job.preview && (
                     <div className="hover-preview-wrapper">
-                      <img src={job.preview} alt={job.name} className="preview-img" />
+                      <img
+                        src={job.preview}
+                        alt={job.name}
+                        className="preview-img"
+                      />
                       <button
                         className={`copy-btn ${copiedJobId === job.id ? "copied" : ""}`}
                         onClick={() => {
-                          navigator.clipboard.writeText(job.preview)
-                            .then(() => { setCopiedJobId(job.id); triggerButtonStatus(`copy-${job.id}`, "Copied!"); setTimeout(() => setCopiedJobId(null), 1500); })
+                          navigator.clipboard
+                            .writeText(job.preview)
+                            .then(() => {
+                              setCopiedJobId(job.id);
+                              triggerButtonStatus(`copy-${job.id}`, "Copied!");
+                              setTimeout(() => setCopiedJobId(null), 1500);
+                            })
                             .catch(console.error);
                         }}
                       >
@@ -439,7 +490,6 @@ const handleUploadAll = async () => {
                 </div>
 
                 <div className="job-actions">
-                  
                   <button onClick={() => setHeroFor(job, "home")}>
                     {buttonStatus[`hero-${job.id}-home`] || "Make Home Hero"}
                   </button>
@@ -449,23 +499,30 @@ const handleUploadAll = async () => {
                   <button onClick={() => setHeroFor(job, "video")}>
                     {buttonStatus[`hero-${job.id}-video`] || "Make Video Hero"}
                   </button>
-             
-                  <button className="contact-button" onClick={() => setSpecialImage(job, "contact")}>
-                    {buttonStatus[`special-${job.id}-contact`] || "Make Contact Image"}
+
+                  <button
+                    className="contact-button"
+                    onClick={() => setSpecialImage(job, "contact")}
+                  >
+                    {buttonStatus[`special-${job.id}-contact`] ||
+                      "Make Contact Image"}
                   </button>
-                  <button className="about-button" onClick={() => setSpecialImage(job, "about")}>
-                    {buttonStatus[`special-${job.id}-about`] || "Make About Image"}
+                  <button
+                    className="about-button"
+                    onClick={() => setSpecialImage(job, "about")}
+                  >
+                    {buttonStatus[`special-${job.id}-about`] ||
+                      "Make About Image"}
                   </button>
                   <button onClick={() => handleDelete(job)}>
                     {buttonStatus[`delete-${job.id}`] || "Delete All"}
                   </button>
                 </div>
-                
               </div>
             ))}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }

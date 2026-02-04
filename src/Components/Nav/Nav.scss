@@ -5,7 +5,6 @@ $nav-height: 80px;
 $breakpoint-mobile: 1000px;
 $transition-speed: 0.25s;
 
-// --- Mixins ---
 @mixin link-underline-effect($color: $primary-gold) {
   position: relative;
   padding-bottom: 0.25rem;
@@ -24,61 +23,69 @@ $transition-speed: 0.25s;
   }
 
   &:hover::after {
-    transform: scaleX(1); 
+    transform: scaleX(1);
     transform-origin: bottom left;
   }
 }
 
-// --- Main Styles ---
 .nav {
   width: 100%;
   display: flex;
   align-items: center;
-  
+
   justify-content: center;
   height: $nav-height;
   box-sizing: border-box;
   padding: 0 1rem;
   z-index: 1000;
-  transition: background $transition-speed ease,
-              color $transition-speed ease,
-              box-shadow $transition-speed ease;
+  transition:
+    background $transition-speed ease,
+    color $transition-speed ease,
+    box-shadow $transition-speed ease;
 
-  // inner container
   &__section {
     display: flex;
     align-items: center;
     flex: 1;
 
-    &--left { justify-content: flex-start; }
-    &--right { justify-content: flex-end; position: relative; }
+    &--left {
+      justify-content: flex-start;
+    }
+    &--right {
+      justify-content: flex-end;
+      position: relative;
+    }
   }
 
-  &__inner, .nav__section {
+  &__inner,
+  .nav__section {
     max-width: 1200px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
-  // logo
-  &__logo-link { display: flex; align-items: center; text-decoration: none; 
-  
-  
-    &:hover {
-      transform: translateY(-2px);
-      color: $primary-gold;
-      
-    }}
-  &__logo { max-width: 4rem; height: auto; display: block; 
-  
-  
-    &:hover {
-      transform: translateY(-2px);
-      color: $primary-gold;
-    }}
+  &__logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
 
-  // links
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }
+  }
+  &__logo {
+    max-width: 4rem;
+    height: auto;
+    display: block;
+
+    &:hover {
+      transform: translateY(-2px);
+      color: $primary-gold;
+    }
+  }
+
   &__links {
     display: flex;
     align-items: center;
@@ -98,7 +105,7 @@ $transition-speed: 0.25s;
         padding: 2rem;
         min-height: 90vh;
         background: var(--color-white);
-        
+
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 999;
       }
@@ -111,10 +118,10 @@ $transition-speed: 0.25s;
     text-decoration: none;
     transition: color $transition-speed ease-in-out;
 
-    // hover text color
-    &:hover { color: $primary-gold; }
+    &:hover {
+      color: $primary-gold;
+    }
 
-    // underline effect
     &:not(&--button):not(&--icon) {
       @include link-underline-effect($primary-gold);
     }
@@ -125,14 +132,13 @@ $transition-speed: 0.25s;
       transition: transform $transition-speed ease-in-out;
       display: block;
 
-    &:hover {
-      transform: translateY(-2px);
-      color: $primary-gold;
-    }
+      &:hover {
+        transform: translateY(-2px);
+        color: $primary-gold;
+      }
     }
   }
 
-  // hamburger
   &__hamburger {
     display: none;
     flex-direction: column;
@@ -144,7 +150,7 @@ $transition-speed: 0.25s;
     cursor: pointer;
     padding: 0;
     z-index: 998;
-    
+
     span {
       width: 2rem;
       height: 3px;
@@ -156,20 +162,24 @@ $transition-speed: 0.25s;
     }
 
     &[aria-expanded="true"] {
-      span:first-child { transform: rotate(45deg); }
-      span:nth-child(2) { opacity: 0; transform: translateX(20px); }
-      span:last-child  { transform: rotate(-45deg); }
+      span:first-child {
+        transform: rotate(45deg);
+      }
+      span:nth-child(2) {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      span:last-child {
+        transform: rotate(-45deg);
+      }
     }
 
-    @media (max-width: $breakpoint-mobile) { display: flex; }
+    @media (max-width: $breakpoint-mobile) {
+      display: flex;
+    }
   }
 }
 
-// ----------------------
-// Mode Modifiers
-// ----------------------
-
-// Overlay variant
 .nav--overlay {
   position: absolute;
   top: 0;
@@ -178,63 +188,91 @@ $transition-speed: 0.25s;
   color: var(--color-black);
   width: 100%;
 
-  // hamburger stays white until scroll
-  .nav__hamburger span { background-color: var(--nav-hamburger-color); }
+  .nav__hamburger span {
+    background-color: var(--nav-hamburger-color);
+  }
 
   .logo_desktop {
-    &.logo_desktop_white { display: block; }
-    &.logo_desktop_colored { display: none; }
+    &.logo_desktop_white {
+      display: block;
+    }
+    &.logo_desktop_colored {
+      display: none;
+    }
   }
   .logo_mobile {
-    &.logo_mobile_white { display: block; }
-    &.logo_mobile_colored { display: none; }
+    &.logo_mobile_white {
+      display: block;
+    }
+    &.logo_mobile_colored {
+      display: none;
+    }
   }
 
   &.scrolled {
     position: fixed;
     background: var(--color-bg);
     color: var(--color-text-primary);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-    // when scrolled, hamburger + links follow theme
-    .nav__hamburger span { background-color: var(--color-text-primary); }
-    .nav__link { color: var(--color-text-primary); }
+    .nav__hamburger span {
+      background-color: var(--color-text-primary);
+    }
+    .nav__link {
+      color: var(--color-text-primary);
+    }
   }
 }
 
-// Solid variant
 .nav--solid {
   position: relative;
   background: var(--color-bg);
   color: var(--color-black);
   width: 100%;
-  // box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 
-  // ✅ hamburger + links both tied to theme now
-  .nav__hamburger span { background-color: var(--nav-hamburger-color); }
-  .nav__link { color: var(--nav-link-color); }
+  .nav__hamburger span {
+    background-color: var(--nav-hamburger-color);
+  }
+  .nav__link {
+    color: var(--nav-link-color);
+  }
 
   .logo_desktop {
-    &.logo_desktop_white { display: none; }
-    &.logo_desktop_colored { display: block; }
+    &.logo_desktop_white {
+      display: none;
+    }
+    &.logo_desktop_colored {
+      display: block;
+    }
   }
   .logo_mobile {
-    &.logo_mobile_white { display: none; }
-    &.logo_mobile_colored { display: block; }
+    &.logo_mobile_white {
+      display: none;
+    }
+    &.logo_mobile_colored {
+      display: block;
+    }
   }
 }
 
-// ----------------------
-// Responsiveness
-// ----------------------
-.logo_desktop { display: block; }
-.logo_mobile  { display: none; }
+.logo_desktop {
+  display: block;
+}
+.logo_mobile {
+  display: none;
+}
 
 @media (max-width: $breakpoint-mobile) {
-  .logo_desktop { display: none !important; }
-  .logo_mobile  { display: block !important; }
+  .logo_desktop {
+    display: none !important;
+  }
+  .logo_mobile {
+    display: block !important;
+  }
 
-  .nav { justify-content: space-between; }
+  .nav {
+    justify-content: space-between;
+  }
 }
 
 .scale-zoom {
@@ -255,11 +293,7 @@ $transition-speed: 0.25s;
 }
 
 .nav__link--active {
-  // color: goldenrod!important;
-  
-
   &::after {
-    /* optional underline/pill */
     content: "";
     position: absolute;
     left: 0;
@@ -271,8 +305,3 @@ $transition-speed: 0.25s;
     color: goldenrod;
   }
 }
-
-/* Ensure overlay/special nav variants keep visibility */
-// .nav--overlay .nav__link--active {
-//   // color: goldenrod;
-// }

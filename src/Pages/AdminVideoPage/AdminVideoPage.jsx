@@ -22,17 +22,14 @@ export default function AdminVideoPage() {
   const [error, setError] = useState(null);
   const [buttonStatus, setButtonStatus] = useState({});
 
-  // ---------------------------
-  // Button feedback helper
-  // ---------------------------
   const triggerButtonStatus = (key, label = "Done", duration = 1500) => {
     setButtonStatus((prev) => ({ ...prev, [key]: label }));
-    setTimeout(() => setButtonStatus((prev) => ({ ...prev, [key]: null })), duration);
+    setTimeout(
+      () => setButtonStatus((prev) => ({ ...prev, [key]: null })),
+      duration,
+    );
   };
 
-  // ---------------------------
-  // Fetch categories
-  // ---------------------------
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
@@ -52,9 +49,6 @@ export default function AdminVideoPage() {
     }
   };
 
-  // ---------------------------
-  // Fetch videos for selected category
-  // ---------------------------
   const fetchVideos = async (categoryId) => {
     if (!categoryId) return;
 
@@ -73,10 +67,9 @@ export default function AdminVideoPage() {
     }
   };
 
-  // ---------------------------
-  // Effects
-  // ---------------------------
-  useEffect(() => { fetchCategories(); }, []);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
   useEffect(() => {
     if (selectedCategory) {
       fetchVideos(selectedCategory.id);
@@ -87,9 +80,6 @@ export default function AdminVideoPage() {
     }
   }, [selectedCategory]);
 
-  // ---------------------------
-  // Category Handlers
-  // ---------------------------
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return setError("Category name required");
 
@@ -115,7 +105,10 @@ export default function AdminVideoPage() {
     if (!window.confirm("Delete category and all its videos?")) return;
 
     try {
-      const { error } = await supabase.from("categories").delete().eq("id", categoryId);
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", categoryId);
       if (error) throw error;
 
       setMessage("Category deleted successfully!");
@@ -139,7 +132,10 @@ export default function AdminVideoPage() {
       if (error) throw error;
 
       setMessage("Category thumbnail updated!");
-      triggerButtonStatus(`update-category-thumb-${selectedCategory.id}`, "Updated!");
+      triggerButtonStatus(
+        `update-category-thumb-${selectedCategory.id}`,
+        "Updated!",
+      );
       fetchCategories();
     } catch (err) {
       console.error(err);
@@ -147,9 +143,6 @@ export default function AdminVideoPage() {
     }
   };
 
-  // ---------------------------
-  // Video Handlers
-  // ---------------------------
   const handleAddVideo = async () => {
     if (!selectedCategory) return setError("Select a category first");
     if (!title.trim() || !url.trim()) return setError("Title and URL required");
@@ -180,7 +173,10 @@ export default function AdminVideoPage() {
     if (!window.confirm("Delete this video?")) return;
 
     try {
-      const { error } = await supabase.from("videos").delete().eq("id", videoId);
+      const { error } = await supabase
+        .from("videos")
+        .delete()
+        .eq("id", videoId);
       if (error) throw error;
 
       setVideos((prev) => prev.filter((v) => v.id !== videoId));
@@ -211,9 +207,6 @@ export default function AdminVideoPage() {
     }
   };
 
-  // ---------------------------
-  // Render
-  // ---------------------------
   return (
     <>
       <Nav />
@@ -222,7 +215,6 @@ export default function AdminVideoPage() {
         {error && <div className="error">{error}</div>}
         {message && <div className="success">{message}</div>}
 
-        {/* Category Management */}
         <div className="category-controls">
           <h2>Manage Categories</h2>
           <input
@@ -231,7 +223,9 @@ export default function AdminVideoPage() {
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
           />
-          <button onClick={handleAddCategory}>{buttonStatus["add-category"] || "Add Category"}</button>
+          <button onClick={handleAddCategory}>
+            {buttonStatus["add-category"] || "Add Category"}
+          </button>
 
           <ul>
             {categories.map((cat) => (
@@ -240,13 +234,17 @@ export default function AdminVideoPage() {
                   style={{
                     color: "rgba(0,0,0,1)",
                     cursor: "pointer",
-                    fontWeight: selectedCategory?.id === cat.id ? "bold" : "normal",
+                    fontWeight:
+                      selectedCategory?.id === cat.id ? "bold" : "normal",
                   }}
                   onClick={() => setSelectedCategory(cat)}
                 >
                   {cat.name}
                 </span>
-                <button className="delete-category" onClick={() => handleDeleteCategory(cat.id)}>
+                <button
+                  className="delete-category"
+                  onClick={() => handleDeleteCategory(cat.id)}
+                >
                   {buttonStatus[`delete-category-${cat.id}`] || "Delete"}
                 </button>
               </li>
@@ -263,7 +261,8 @@ export default function AdminVideoPage() {
                 onChange={(e) => setCategoryThumbnail(e.target.value)}
               />
               <button onClick={handleUpdateCategoryThumbnail}>
-                {buttonStatus[`update-category-thumb-${selectedCategory.id}`] || "Update Thumbnail"}
+                {buttonStatus[`update-category-thumb-${selectedCategory.id}`] ||
+                  "Update Thumbnail"}
               </button>
               {categoryThumbnail && (
                 <img
@@ -277,7 +276,6 @@ export default function AdminVideoPage() {
           )}
         </div>
 
-        {/* Video Management */}
         {selectedCategory && (
           <>
             <h2>Videos in {selectedCategory.name}</h2>
@@ -294,7 +292,9 @@ export default function AdminVideoPage() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
-              <button onClick={handleAddVideo}>{buttonStatus["add-video"] || "Add Video"}</button>
+              <button onClick={handleAddVideo}>
+                {buttonStatus["add-video"] || "Add Video"}
+              </button>
             </div>
 
             <div className="video-list">
@@ -309,7 +309,10 @@ export default function AdminVideoPage() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <button className="delete-category" onClick={() => handleDeleteVideo(v.id)}>
+                  <button
+                    className="delete-category"
+                    onClick={() => handleDeleteVideo(v.id)}
+                  >
                     {buttonStatus[`delete-video-${v.id}`] || "Delete"}
                   </button>
                 </div>
