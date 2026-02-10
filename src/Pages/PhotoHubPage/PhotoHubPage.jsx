@@ -4,6 +4,7 @@ import Nav from "../../Components/Nav/Nav";
 import { Link } from "react-router-dom";
 import "./PhotoHubPage.scss";
 import PageLoader from "../../Components/PageLoader/PageLoader";
+import Footer from "../../Components/Footer/Footer";
 
 const PROJECT_URL = import.meta.env.VITE_PROJECT_URL;
 const ANON_KEY = import.meta.env.VITE_ANON_KEY;
@@ -234,6 +235,7 @@ export default function PhotoHub() {
           ))}
         </div>
       </div>
+      <Footer />
     </>
   );
 }
