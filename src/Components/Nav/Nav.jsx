@@ -92,7 +92,7 @@ function Nav({ overlay = false }) {
                 }
                 onClick={closeMobileMenu}
               >
-                Video
+                Film
               </NavLink>
 
               <NavLink
@@ -103,7 +103,7 @@ function Nav({ overlay = false }) {
                 }
                 onClick={closeMobileMenu}
               >
-                Photography
+                Stills
               </NavLink>
 
               <NavLink
